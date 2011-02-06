@@ -1,0 +1,64 @@
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\bin\Debug\GMare.exe
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\bin\Debug\GMare.pdb
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\bin\Debug\GMLib.dll
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\bin\Debug\ICSharpCode.SharpZipLib.dll
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\bin\Debug\Ocarina Room Editor.dll
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\bin\Debug\GMLib.pdb
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.ComboBoxEx.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.TreeviewEx.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.AboutForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.ExportBinaryForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.ExportGMProjectForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.ExportImageForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.LayerForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.TextForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.MainForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.RoomForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.ShiftForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.SwapForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.Properties.Resources.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.ListboxEx.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.RichTextBoxEx.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.ImportGMProjectForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.ImportImageForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.ImportRM2KForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.Forms.ScriptsForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.RenameForm.resources
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.csproj.GenerateResource.Cache
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.exe
+C:\Documents and Settings\Wormzer\My Documents\Visual Studio 2005\Projects\GMare\GMare\obj\Debug\GMare.pdb
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\obj\Debug\GMare.exe
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\obj\Debug\GMare.pdb
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Properties.Resources.resources
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\bin\Debug\GMare.exe
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\bin\Debug\GMare.pdb
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\bin\Debug\GMare.exe.config
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\obj\Debug\GenerateResource-ResGen.read.1.tlog
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\obj\Debug\GenerateResource-ResGen.write.1.tlog
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Controls.ListboxEx.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Controls.RichTextBoxEx.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Controls.ComboBoxEx.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.ImportImageForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Controls.RoomEditor.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Controls.TreeviewEx.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Controls.ZoomToolStripButton.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.AboutForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.ExportBinaryForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.ExportGMProjectForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.ExportImageForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.LayerForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.TextForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.MainForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.RoomForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.ShiftForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.ReplaceForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Controls.RoomPanel.resources
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.ScriptForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.InstanceForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Controls.TilesPanel.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\bin\Debug\GMare.exe.manifest
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\bin\Debug\GMare.application
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.exe.manifest
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.application
