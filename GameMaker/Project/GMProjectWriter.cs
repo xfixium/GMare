@@ -41,8 +41,6 @@ namespace GameMaker.Project
     {
         #region Fields
 
-        //public event ProjectProgressHandler ProjectWriteProgress;                   // Writing progress event.
-        //public delegate void ProjectProgressHandler(string objects, int progress);  // Writing progress handler.
         private int[,] _swapTable = null;                                             // Table used for encryption.
         private List<byte> _buffer = null;                                            // The uncompressed byte buffer.
         private Stream _writer = null;                                                // The base underlining write stream.
@@ -84,7 +82,7 @@ namespace GameMaker.Project
 
                     // Get game id bytes. The first byte is not encrypted.
                     byte[] id = BitConverter.GetBytes(project.Settings.GameIdentifier);
-                    
+
                     // Bill and Fred, psssttt they like each other ;).
                     int bill = rand.Next() % 3000 + 123;
                     int fred = rand.Next() % 3000 + 231;
@@ -130,65 +128,66 @@ namespace GameMaker.Project
                 WriteEmpty(16);
 
                 // Write project objects.
-                //_object = "Game Settings";
                 WriteSettings(project.Settings, version);
 
                 // If the version is greater than 7.0.
                 if (version > GMVersionType.GameMaker70)
                 {
                     // Read triggers and constants.
-                    //_object = "Triggers";
                     WriteTriggers(project.Triggers, version);
-                    //_object = "Constants";
                     WriteConstants(project.Settings.Constants, version);
                 }
 
-                //_object = "Sounds";
                 WriteSounds(project.Sounds, version);
-                //_object = "Sprites";
                 WriteSprites(project.Sprites, version);
-                //_object = "Backgrounds";
                 WriteBackgrounds(project.Backgrounds, version);
-                //_object = "Paths";
                 WritePaths(project.Paths, version);
-                //_object = "Scripts";
                 WriteScripts(project.Scripts, version);
-                //_object = "Data Files";
                 WriteDataFiles(project.DataFiles, version);
-                //_object = "Fonts";
                 WriteFonts(project.Fonts, version);
-                //_object = "Timelines";
                 WriteTimelines(project.Timelines, version);
-                //_object = "Objects";
                 WriteObjects(project.Objects, version);
-                //_object = "Rooms";
                 WriteRooms(project.Rooms, version);
 
                 // Write last ids for instances and tiles.
                 WriteInt(project.LastInstanceId);
                 WriteInt(project.LastTileId);
 
+                // Write version.
+                if (version < GMVersionType.GameMaker60)
+                    WriteInt(430);
+                else if (version == GMVersionType.GameMaker60)
+                    WriteInt(600);
+                else if (version == GMVersionType.GameMaker70)
+                    WriteInt(620);
+                else if (version == GMVersionType.GameMaker80)
+                    WriteInt(800);
+
                 // Check version.
-                if (version >= GMVersionType.GameMaker70)
+                if (version < GMVersionType.GameMaker70)
+                    WriteGameInformation(project.GameInformation, version);
+                else
                 {
-                    // Write included files data.
-                    //_object = "Includes";
+                    // Write includes.
                     WriteIncludes(project.Settings.Includes, version);
 
-                    // Write packages data.
-                    //_object = "Packages";
+                    // Write packages.
                     WritePackages(project.Packages.ToArray(), version);
+
+                    // Write version.
+                    if (version == GMVersionType.GameMaker70)
+                        WriteInt(600);
+                    else if (version == GMVersionType.GameMaker80)
+                        WriteInt(800);
+
+                    // Write game information.
+                    WriteGameInformation(project.GameInformation, version);
                 }
-                 
-                // Write game information.
-                //_object = "Game Information";
-                WriteGameInformation(project.GameInformation, version);
 
                 // Write version.
                 WriteInt(500);
 
                 // Write the amount of libraries.
-                //_object = "Libraries";
                 WriteInt(project.Libraries.Count);
 
                 // Iterate throught libraries.
@@ -199,7 +198,6 @@ namespace GameMaker.Project
                 }
 
                 // Write project tree.
-                //_object = "Project Tree";
                 WriteTree(project.ProjectTree, version);
             }
         }
@@ -495,7 +493,7 @@ namespace GameMaker.Project
             }
             else if (version > GMVersionType.GameMaker53)
             {
-                // If there are includ files to write.
+                // If there are include files to write.
                 if (settings.Includes != null)
                 {
                     // Number of include files.
@@ -761,10 +759,10 @@ namespace GameMaker.Project
                 // Write version number.
                 if (version < GMVersionType.GameMaker60)
                     WriteInt(400);
+                else if (version == GMVersionType.GameMaker70 || version == GMVersionType.GameMaker60)
+                    WriteInt(542);
                 else if (version == GMVersionType.GameMaker80)
                     WriteInt(800);
-                else
-                    WriteInt(542);
 
                 if (version < GMVersionType.GameMaker80)
                 {
@@ -922,10 +920,10 @@ namespace GameMaker.Project
                 // Write version number.
                 if (version < GMVersionType.GameMaker60)
                     WriteInt(400);
-                if (version == GMVersionType.GameMaker80)
-                    WriteInt(710);
-                else
+                else if (version == GMVersionType.GameMaker60 || version == GMVersionType.GameMaker70)
                     WriteInt(543);
+                else if (version == GMVersionType.GameMaker80)
+                    WriteInt(710);
 
                 // If version is less than GM 8.0.
                 if (version < GMVersionType.GameMaker80)
@@ -1792,16 +1790,6 @@ namespace GameMaker.Project
         /// </summary>
         private void WriteIncludes(GMInclude[] includes, GMVersionType version)
         {
-            // Write version number.
-            if (version < GMVersionType.GameMaker60)
-                WriteInt(430);
-            else if (version == GMVersionType.GameMaker60)
-                WriteInt(600);
-            else if (version == GMVersionType.GameMaker70)
-                WriteInt(620);
-            else if (version == GMVersionType.GameMaker80)
-                WriteInt(800);
-
             // Write the amount of includes.
             WriteInt(includes.Length);
 
@@ -1870,16 +1858,6 @@ namespace GameMaker.Project
         /// </summary>
         private void WriteGameInformation(GMGameInformation gameInfo, GMVersionType version)
         {
-            // Write version number.
-            if (version < GMVersionType.GameMaker60)
-                WriteInt(430);
-            else if (version == GMVersionType.GameMaker60)
-                WriteInt(600);
-            else if (version == GMVersionType.GameMaker70)
-                WriteInt(620);
-            else if (version == GMVersionType.GameMaker80)
-                WriteInt(800);
-
             // If version is 8.0, compress.
             if (version == GMVersionType.GameMaker80)
                 Compress();
@@ -2087,6 +2065,10 @@ namespace GameMaker.Project
         /// </summary>
         private void EndCompress()
         {
+            // If no buffer exists, return.
+            if (_buffer == null)
+                return;
+
             // Input buffer.
             byte[] input = _buffer.ToArray();
 

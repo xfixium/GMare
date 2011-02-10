@@ -219,7 +219,7 @@ namespace GMare.Graphics
                 case PixelFormat.Format32bppArgb: bits = 4; break;
                 case PixelFormat.Format32bppPArgb: bits = 4; break;
                 case PixelFormat.Format8bppIndexed: bits = 1; pallet = image.Palette.Entries; break;
-                default: throw new Exception("The image's pixel format is not supported.");
+                default: throw new Exception(image.PixelFormat.ToString());
             }
 
             // Create a new array of pixels.
@@ -365,6 +365,10 @@ namespace GMare.Graphics
         /// <returns>If the two pixel maps are the same.</returns>
         public static bool Same(PixelMap map1, PixelMap map2)
         {
+            // If either maps are empty, return.
+            if (map1 == null || map2 == null)
+                return false;
+
             // If the pixel map sizes are different, then these pixel maps are not the same.
             if (map1.Width != map2.Width || map1.Height != map2.Height)
                 return false;

@@ -414,6 +414,10 @@ namespace GMare.Common
         /// </summary>
         public Bitmap GetTileset()
         {
+            // If the background is empty, return null.
+            if (_background == null)
+                return null;
+
             // Get the background image.
             Bitmap image = _background.ToBitmap();
 

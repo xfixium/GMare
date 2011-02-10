@@ -61,20 +61,30 @@ namespace GMare.Forms
             get { return new RoomData(ProjectManager.Room); }
             set
             {
-                // Calculate index.
+                // Get current edit index.
                 int index = tscb_EditSelect.SelectedIndex;
+
+                // If the backgrounds are different, update backgrounds.
+                if (GMare.Graphics.PixelMap.Same(ProjectManager.Room.Background, value.Room.Background) == false)
+                {
+                    pnl_Tileset.Image = ProjectManager.Room.GetTileset();
+                    pnl_RoomEditor.Image = ProjectManager.Room.GetTileset();
+                }
 
                 // Set room from undo redo.
                 ProjectManager.Room = value.Room;
-
                 this.Text = "GMare" + " [" + ProjectManager.Room.Name + "]";
-
-                // Update the edit select.
                 UpdateEditSelect(index);
 
-                // Instance update.
+                // If editing layers, delete the selection.
+                if (pnl_RoomEditor.EditMode == EditType.Layers)
+                    pnl_RoomEditor.Delete();
+
                 pnl_RoomEditor_SelectedInstanceChanged();
                 pnl_RoomEditor.Invalidate();
+
+                // Set clipboard GUI.
+                SetClipboard();
             }
         }
 
@@ -433,6 +443,9 @@ namespace GMare.Forms
         private void tsmi_Cut_Click(object sender, EventArgs e)
         {
             pnl_RoomEditor.Cut();
+            
+            // Set clipboard GUI.
+            SetClipboard();
         }
 
         /// <summary>
@@ -441,6 +454,9 @@ namespace GMare.Forms
         private void tsmi_Copy_Click(object sender, EventArgs e)
         {
             pnl_RoomEditor.Copy();
+
+            // Set clipboard GUI.
+            SetClipboard();
         }
 
         /// <summary>
@@ -449,6 +465,9 @@ namespace GMare.Forms
         private void tsmi_Paste_Click(object sender, EventArgs e)
         {
             pnl_RoomEditor.Paste();
+
+            // Set clipboard GUI.
+            SetClipboard();
         }
 
         /// <summary>
@@ -457,6 +476,9 @@ namespace GMare.Forms
         private void tsmi_Delete_Click(object sender, EventArgs e)
         {
             pnl_RoomEditor.Delete();
+
+            // Set clipboard GUI.
+            SetClipboard();
         }
 
         #endregion
@@ -848,6 +870,9 @@ namespace GMare.Forms
 
             // Set status strip.
             SetStatusStrip();
+
+            // Set clipboard GUI.
+            SetClipboard();
         }
 
         /// <summary>
@@ -927,6 +952,9 @@ namespace GMare.Forms
                 tsb_FillTool.Checked = false;
                 tsb_SelectionTool.Checked = false;
             }
+
+            // Set clipboard GUI.
+            SetClipboard();
         }
 
         /// <summary>
@@ -944,6 +972,9 @@ namespace GMare.Forms
                 tsb_TileTool.Checked = false;
                 tsb_SelectionTool.Checked = false;
             }
+
+            // Set clipboard GUI.
+            SetClipboard();
         }
 
         /// <summary>
@@ -961,6 +992,9 @@ namespace GMare.Forms
                 tsb_TileTool.Checked = false;
                 tsb_FillTool.Checked = false;
             }
+
+            // Set clipboard GUI.
+            SetClipboard();
         }
 
         /// <summary>
@@ -1265,9 +1299,12 @@ namespace GMare.Forms
             if (lb_Instances.SelectedItem != null)
             {
                 // Set clipboard GUI.
-                SetClipboard(true, pnl_RoomEditor.InstanceClipboard);
+                SetClipboard();
                 pnl_RoomEditor.SelectedInstance = lb_Instances.SelectedItem as GMareInstance;
             }
+
+            // Set clipboard GUI.
+            SetClipboard();
         }
 
         /// <summary>
@@ -1461,6 +1498,9 @@ namespace GMare.Forms
                 case EditType.Instances: SetInstancesListBox(); break;
             }
 
+            // Set clipboard GUI.
+            SetClipboard();
+
             // Invalidate room editor.
             pnl_RoomEditor.Invalidate();
         }
@@ -1488,14 +1528,13 @@ namespace GMare.Forms
 
             // Set the selected instance.
             if (pnl_RoomEditor.SelectedInstance != null)
-            {
-                // Set clipboard GUI.
-                SetClipboard(true, pnl_RoomEditor.InstanceClipboard);
                 lb_Instances.SelectedItem = pnl_RoomEditor.SelectedInstance;
-            }
 
             // Force redraw.
             pnl_RoomEditor.Invalidate();
+
+            // Set clipboard GUI.
+            SetClipboard();
         }
 
         /// <summary>
@@ -1504,7 +1543,7 @@ namespace GMare.Forms
         private void pnl_RoomEditor_ClipboardChanged()
         {
             // Set clipboard GUI.
-            SetClipboard(true, pnl_RoomEditor.InstanceClipboard);
+            SetClipboard();
         }
 
         #endregion
@@ -1585,8 +1624,49 @@ namespace GMare.Forms
         /// </summary>
         /// <param name="selection">Whether an object was selected.</param>
         /// <param name="clipboard">Whether a clipboard object exits for the selection.</param>
-        private void SetClipboard(bool selection, object clipboard)
+        private void SetClipboard()
         {
+            // The clipboard object.
+            object clipboard = null;
+
+            // Whether the object of interest has been selected.
+            bool selection = false;
+
+            // Set clipboard GUI.
+            switch (pnl_RoomEditor.EditMode)
+            {
+                // Instance edit.
+                case EditType.Instances:
+
+                    // If an instance was selected.
+                    if (lb_Instances.SelectedItem != null)
+                        selection = true;
+
+                    // Set the clipboard.
+                    clipboard = pnl_RoomEditor.InstanceClipboard;
+                    break;
+
+                // Layer edit.
+                case EditType.Layers:
+
+                    // Selection tool.
+                    switch (pnl_RoomEditor.ToolMode)
+                    {
+                        // Selection tool.
+                        case ToolType.Selection:
+
+                            // If a selection has been made.
+                            if (pnl_RoomEditor.Selection != null)
+                                selection = true;
+
+                            // Set the clipboard.
+                            clipboard = pnl_RoomEditor.SelectionClipboard;
+                            break;
+                    }
+                    
+                    break;
+            }
+
             // If an object was selected.
             if (selection == true)
             {
@@ -1747,7 +1827,7 @@ namespace GMare.Forms
             }
 
             // Disable all clipboard functions.
-            SetClipboard(false, null);
+            SetClipboard();
 
             // Clear history.
             _history.Clear();

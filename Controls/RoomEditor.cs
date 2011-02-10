@@ -38,14 +38,14 @@ namespace GMare.Controls
     {
         #region Fields
 
-        public event PositionHandler PositionChanged;         // Mouse position changed event.
-        public delegate void PositionHandler();               // Mouse poisition changed event handler.
-        public event InstanceChangedHandler InstanceChanged;  // Selected instance changed event.
-        public delegate void InstanceChangedHandler();        // Selected instance changed event handler.
-        public event RoomChangedHandler RoomChanged;          // Room changed event.
-        public delegate void RoomChangedHandler();            // Room changed event handler.
-        public event ClipboardChangedHandler ClipboardChanged;        // Clipboard contents changed.
-        public delegate void ClipboardChangedHandler();               // Clipboard contents changed handler.
+        public event PositionHandler PositionChanged;           // Mouse position changed event.
+        public delegate void PositionHandler();                 // Mouse poisition changed event handler.
+        public event InstanceChangedHandler InstanceChanged;    // Selected instance changed event.
+        public delegate void InstanceChangedHandler();          // Selected instance changed event handler.
+        public event RoomChangedHandler RoomChanged;            // Room changed event.
+        public delegate void RoomChangedHandler();              // Room changed event handler.
+        public event ClipboardChangedHandler ClipboardChanged;  // Clipboard contents changed.
+        public delegate void ClipboardChangedHandler();         // Clipboard contents changed handler.
 
         #endregion
 
@@ -182,7 +182,15 @@ namespace GMare.Controls
         }
 
         /// <summary>
-        /// The image to use as a texture.
+        /// Gets the current selection.
+        /// </summary>
+        public TileGrid Selection
+        {
+            get { return pnl_Room.Selection; }
+        }
+
+        /// <summary>
+        /// Sets the image to use as a texture.
         /// </summary>
         public Bitmap Image
         {
@@ -346,7 +354,8 @@ namespace GMare.Controls
         /// </summary>
         private void pnl_Room_PositionChanged()
         {
-            PositionChanged();
+            if (PositionChanged != null)
+                PositionChanged();
         }
 
         /// <summary>
@@ -354,7 +363,8 @@ namespace GMare.Controls
         /// </summary>
         private void pnl_Room_InstanceChanged()
         {
-            InstanceChanged();
+            if (InstanceChanged != null)
+                InstanceChanged();
         }
 
         /// <summary>
@@ -362,7 +372,8 @@ namespace GMare.Controls
         /// </summary>
         private void pnl_Room_ClipboardChanged()
         {
-            ClipboardChanged();
+            if (ClipboardChanged != null)
+                ClipboardChanged();
         }
 
         /// <summary>

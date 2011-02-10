@@ -99,7 +99,6 @@ namespace GMare.Forms
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.pnl_Tileset = new GMare.Controls.BackgroundPanel();
             this.ts_Tiles = new System.Windows.Forms.ToolStrip();
-            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this.tsb_TileTool = new System.Windows.Forms.ToolStripButton();
             this.tsb_FillTool = new System.Windows.Forms.ToolStripButton();
             this.tsb_SelectionTool = new System.Windows.Forms.ToolStripButton();
@@ -330,6 +329,7 @@ namespace GMare.Forms
             this.tsmi_Undo.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
             this.tsmi_Undo.Size = new System.Drawing.Size(144, 22);
             this.tsmi_Undo.Text = "Undo";
+            this.tsmi_Undo.Click += new System.EventHandler(this.tsmi_Undo_Click);
             // 
             // tsmi_Redo
             // 
@@ -338,6 +338,7 @@ namespace GMare.Forms
             this.tsmi_Redo.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
             this.tsmi_Redo.Size = new System.Drawing.Size(144, 22);
             this.tsmi_Redo.Text = "Redo";
+            this.tsmi_Redo.Click += new System.EventHandler(this.tsmi_Redo_Click);
             // 
             // toolStripMenuItem4
             // 
@@ -834,7 +835,6 @@ namespace GMare.Forms
             // ts_Tiles
             // 
             this.ts_Tiles.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripSeparator9,
             this.tsb_TileTool,
             this.tsb_FillTool,
             this.tsb_SelectionTool,
@@ -846,11 +846,6 @@ namespace GMare.Forms
             this.ts_Tiles.Size = new System.Drawing.Size(284, 25);
             this.ts_Tiles.TabIndex = 1;
             this.ts_Tiles.Text = "toolStrip1";
-            // 
-            // toolStripSeparator9
-            // 
-            this.toolStripSeparator9.Name = "toolStripSeparator9";
-            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 25);
             // 
             // tsb_TileTool
             // 
@@ -1723,7 +1718,6 @@ namespace GMare.Forms
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private Controls.RoomEditor pnl_RoomEditor;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem tsmi_Undo;
         private System.Windows.Forms.ToolStripMenuItem tsmi_Redo;

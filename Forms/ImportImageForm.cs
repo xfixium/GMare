@@ -341,12 +341,20 @@ namespace GMare.Forms
                         // Add tile to unique tile list.
                         imageData.Add(compare);
 
-                        // Create a tile bitmap, and remember it's original id.
-                        Bitmap tile = GMare.Graphics.PixelMap.PixelDataToBitmap(GMare.Graphics.PixelMap.GetPixels(image, rect));
-                        tile.Tag = imageData.Count - 1;
+                        try
+                        {
+                            // Create a tile bitmap, and remember it's original id.
+                            Bitmap tile = GMare.Graphics.PixelMap.PixelDataToBitmap(GMare.Graphics.PixelMap.GetPixels(image, rect));
+                            tile.Tag = imageData.Count - 1;
 
-                        // Add bitmap to tiles.
-                        tiles.Add(tile);
+                            // Add bitmap to tiles.
+                            tiles.Add(tile);
+                        }
+                        catch (Exception error)
+                        {
+                            MessageBox.Show("When compiling the tiles, the image's color depth of: " + error.Message + ", is not supported.", "GMare", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            return;
+                        }
                     }
 
                     // Increment progress.

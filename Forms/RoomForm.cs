@@ -123,12 +123,18 @@ namespace GMare.Forms
                 _room.OffsetX != (int)nud_OffsetX.Value ||
                 _room.OffsetY != (int)nud_OffsetY.Value ||
                 _room.SeparationX != (int)nud_SeperationX.Value ||
-                _room.SeparationY != (int)nud_SeperationY.Value ||
-                _room.Background.UseKey != tsb_SetColorKey.Checked ||
-                _room.Background.ColorKey.ToArgb() != pnl_Image.ColorKey.ToArgb() ||
-                Graphics.PixelMap.Same(_room.Background, image) == false
+                _room.SeparationY != (int)nud_SeperationY.Value
             )
                 _changed = true;
+
+            // Check background data change.
+            if (_room.Background != null)
+            {
+                if (_room.Background.UseKey != tsb_SetColorKey.Checked ||
+                    _room.Background.ColorKey.ToArgb() != pnl_Image.ColorKey.ToArgb() ||
+                    Graphics.PixelMap.Same(_room.Background, image) == false)
+                    _changed = true;
+            }
 
             // Set room data.
             _room.Columns = (int)nud_Columns.Value;

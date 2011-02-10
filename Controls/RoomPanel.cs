@@ -133,6 +133,14 @@ namespace GMare.Controls
         }
 
         /// <summary>
+        /// Gets the current selection.
+        /// </summary>
+        public TileGrid Selection
+        {
+            get { return _selection; }
+        }
+
+        /// <summary>
         /// Gets or sets the selected layer.
         /// </summary>
         public EditType EditMode
@@ -422,22 +430,23 @@ namespace GMare.Controls
                 // Set clipboard.
                 _selectionClip = _selection.Clone();
 
-                // Clipboard changed.
-                ClipboardChanged();
-            }
+                // If the selection has not moved, set tiles empty under selection.
+                if (_moved == false)
+                {
+                    // Room changed, selected tiles set.
+                    RoomChanged();
 
-            // If the selection has not moved, set tiles empty under selection.
-            if (_moved == false)
-            {
-                // Room changed, selected tiles set.
-                RoomChanged();
-
-                // Empty out selection tiles.
-                SetTiles(_selection.StartX, _selection.StartY, true, _selection, true);
+                    // Empty out selection tiles.
+                    SetTiles(_selection.ToRectangle().X, _selection.ToRectangle().Y, true, _selection, true);
+                }
             }
 
             // Empty the selection.
             _selection = null;
+
+            // Clipboard changed.
+            if (ClipboardChanged != null)
+                ClipboardChanged();
 
             // Force redraw.
             Invalidate();
@@ -454,15 +463,12 @@ namespace GMare.Controls
                 // Set clipboard.
                 _selectionClip = _selection.Clone();
 
-                // Clipboard changed.
-                ClipboardChanged();
-
                 // Room changed, selected tiles set.
                 if (_moved == true)
                     RoomChanged();
 
                 // Set selection tiles to layer.
-                SetTiles(_selection.StartX, _selection.StartY, false, _selection, true);
+                SetTiles(_selection.ToRectangle().X, _selection.ToRectangle().Y, false, _selection, true);
             }
 
             // Reset moved flag.
@@ -470,6 +476,10 @@ namespace GMare.Controls
 
             // Empty the selection.
             _selection = null;
+
+            // Clipboard changed.
+            if (ClipboardChanged != null)
+                ClipboardChanged();
 
             // Force redraw.
             Invalidate();
@@ -492,6 +502,9 @@ namespace GMare.Controls
 
             // Set the selection.
             _selection = _selectionClip.Clone();
+
+            // Clipboard changed.
+            ClipboardChanged();
 
             // Get the smallest size.
             Size size = GetSmallestCanvas();
@@ -559,23 +572,22 @@ namespace GMare.Controls
         /// </summary>
         private void tsmi_SelectionDeselect_Click(object sender, EventArgs e)
         {
-            // If not in selection mode, return.
-            if (_editMode != EditType.Layers || _toolMode != ToolType.Selection)
-                return;
-
-            // Room changed, selected tiles set.
-            if (_moved == true)
+            // Room changed, selected tiles set, and If there was a previous selection, set it to the layer.
+            if (_moved == true && _selection != null)
+            {
                 RoomChanged();
-
-            // If there was a previous selection, set it to the layer.
-            if (_selection != null)
-                SetTiles(_selection.StartX, _selection.StartY, false, _selection, true);
+                SetTiles(_selection.ToRectangle().X, _selection.ToRectangle().Y, false, _selection, true);
+            }
 
             // Reset moved flag.
             _moved = false;
 
             // Empty the selection.
             _selection = null;
+
+            // Clipboard changed.
+            if (ClipboardChanged != null)
+                ClipboardChanged();
 
             // Force redraw.
             Invalidate();
@@ -593,7 +605,7 @@ namespace GMare.Controls
                 RoomChanged();
 
                 // Empty out selection tiles.
-                SetTiles(_selection.StartX, _selection.StartY, true, _selection, true);
+                SetTiles(_selection.ToRectangle().X, _selection.ToRectangle().Y, true, _selection, true);
             }
 
             // Reset moved flag.
@@ -601,6 +613,9 @@ namespace GMare.Controls
 
             // Empty tile selection.
             _selection = null;
+
+            // Clipboard changed.
+            ClipboardChanged();
 
             // Force redraw.
             Invalidate();
@@ -624,9 +639,6 @@ namespace GMare.Controls
 
             // Set instance clipboard.
             _instanceClip = _selectedInstance.Clone();
-
-            // Clipboard changed.
-            ClipboardChanged();
 
             // Remove selected instance.
             ProjectManager.Room.Instances.Remove(_selectedInstance);
@@ -1166,7 +1178,7 @@ namespace GMare.Controls
                                 RoomChanged();
 
                                 // Set tiles empty under selection.
-                                SetTiles(_selection.StartX, _selection.StartY, true, _selection, true);
+                                SetTiles(_selection.ToRectangle().X, _selection.ToRectangle().Y, true, _selection, true);
 
                                 // Set one time moving flag.
                                 _moved = true;
@@ -1252,15 +1264,10 @@ namespace GMare.Controls
             // Check that the mouse is within room bounds.
             if (CheckBounds(mouse.X, mouse.Y) == false)
             {
-                // Reset cursor.
-                this.Cursor = Cursors.Arrow;
-
                 // Force redraw.
                 Invalidate();
                 return;
             }
-            else
-                SetCursor();
 
             // Do action based on tool mode.
             switch (_toolMode)
@@ -2086,8 +2093,8 @@ namespace GMare.Controls
 
                     // Calculate source point.
                     source = TileGrid.TileIdToSector(_selection.TileIds[col, row], width, tileSize);
-                    position.X = _selection.StartX + col * tileSize.Width;
-                    position.Y = _selection.StartY + row * tileSize.Height;
+                    position.X = _selection.ToRectangle().X + col * tileSize.Width;
+                    position.Y = _selection.ToRectangle().Y + row * tileSize.Height;
 
                     // Draw tile.
                     GraphicsManager.DrawTile(GraphicsManager.TileMaps[0][source.X, source.Y], position.X, position.Y, Color.White);
