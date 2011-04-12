@@ -171,6 +171,22 @@ namespace GMare.Forms
         /// </summary>
         private void cb_CheckedChanged(object sender, EventArgs e)
         {
+            // If the sender object is the tiles checkbox, and unchecked.
+            if (sender == cb_Tiles)
+            {
+                // If tile data is checked
+                if (cb_Tiles.Checked == false)
+                {
+                    cb_Flipping.Enabled = false;
+                    cb_BlendColor.Enabled = false;
+                }
+                else
+                {
+                    cb_Flipping.Enabled = true;
+                    cb_BlendColor.Enabled = true;
+                }
+            }
+
             // Set total size.
             SetTotalSize();
         }
@@ -343,32 +359,37 @@ namespace GMare.Forms
                     writer.Write((int)roomOffset);
 
                     // Add room offset.
-                    roomOffset += room.GetBinaryRoomSize(cb_Tiles.Checked, cb_Instances.Checked, cb_Collisions.Checked);
+                    roomOffset += room.GetBinaryRoomSize(cb_Tiles.Checked, cb_Flipping.Checked, cb_BlendColor.Checked, cb_Instances.Checked, cb_Collisions.Checked);
                 }
 
                 // Write rooms.
                 foreach (GMareRoom room in clb_Rooms.CheckedItems)
                 {
+                    // Calculate tile columns.
+                    int tileCols = (room.Background.Width - (((room.Background.Width - room.OffsetX) / room.TileWidth) * room.SeparationX)) / room.TileWidth;
+
+                    // Write room data.
+                    writer.Write((bool)cb_Tiles.Checked);
+                    writer.Write((bool)cb_Flipping.Checked);
+                    writer.Write((bool)cb_BlendColor.Checked);
+                    writer.Write((bool)cb_Instances.Checked);
+                    writer.Write((bool)cb_Collisions.Checked);
+                    writer.Write((short)room.Columns);
+                    writer.Write((short)room.Rows);
+                    writer.Write((byte)room.OffsetX);
+                    writer.Write((byte)room.OffsetY);
+                    writer.Write((byte)room.SeparationX);
+                    writer.Write((byte)room.SeparationY);
+                    writer.Write((byte)room.TileWidth);
+                    writer.Write((byte)room.TileHeight);
+                    writer.Write((short)tileCols);
+                    writer.Write((int)room.Layers.Count);
+                    writer.Write((int)room.Instances.Count);
+                    writer.Write((int)room.Shapes.Count);
+
                     // If writing tiles to file.
                     if (cb_Tiles.Checked == true)
                     {
-                        // Calculate tile columns.
-                        int tileCols = (room.Background.Width - (((room.Background.Width - room.OffsetX) / room.TileWidth) * room.SeparationX)) / room.TileWidth;
-
-                        // Write room data.
-                        writer.Write((short)room.Columns);
-                        writer.Write((short)room.Rows);
-                        writer.Write((byte)room.OffsetX);
-                        writer.Write((byte)room.OffsetY);
-                        writer.Write((byte)room.SeparationX);
-                        writer.Write((byte)room.SeparationY);
-                        writer.Write((byte)room.TileWidth);
-                        writer.Write((byte)room.TileHeight);
-                        writer.Write((short)tileCols);
-                        writer.Write((int)room.Layers.Count);
-                        writer.Write((int)room.Instances.Count);
-                        writer.Write((int)room.Shapes.Count);
-
                         // Write layers.
                         foreach (GMareLayer layer in room.Layers)
                         {
@@ -383,10 +404,27 @@ namespace GMare.Forms
                                 // Sector data method.
                                 case BinaryMethod.Sector:
 
-                                    // Write tile.
-                                    for (int row = 0; row < layer.Tiles.GetLength(1); row++)
-                                        for (int col = 0; col < layer.Tiles.GetLength(0); col++)
-                                            writer.Write((short)layer.Tiles[col, row]);
+                                    // Write tile data.
+                                    for (int row = 0; row < layer.Tiles2.GetLength(1); row++)
+                                    {
+                                        for (int col = 0; col < layer.Tiles2.GetLength(0); col++)
+                                        {
+                                            // Write tile id.
+                                            writer.Write((short)layer.Tiles2[col, row].TileId);
+
+                                            // If the tile is empty, no need to put other data in.
+                                            if (layer.Tiles2[col, row].TileId == -1)
+                                                continue;
+
+                                            // If flipping data is used.
+                                            if (cb_Flipping.Checked == true)
+                                                writer.Write((byte)layer.Tiles2[col, row].FlipMode);
+
+                                            // If blend color data is used.
+                                            if (cb_BlendColor.Checked == true)
+                                                writer.Write((int)GameMaker.Common.GMUtilities.ColorToGMColor(layer.Tiles2[col, row].Blend));
+                                        }
+                                    }
 
                                     break;
 
@@ -397,17 +435,25 @@ namespace GMare.Forms
                                     writer.Write((int)GMareRoom.GetTileCount(layer));
 
                                     // Iterate through rows.
-                                    for (int row = 0; row < layer.Tiles.GetLength(1); row++)
+                                    for (int row = 0; row < layer.Tiles2.GetLength(1); row++)
                                     {
                                         // Iterate through columns.
-                                        for (int col = 0; col < layer.Tiles.GetLength(0); col++)
+                                        for (int col = 0; col < layer.Tiles2.GetLength(0); col++)
                                         {
                                             // If the tile is not empty, write tile.
-                                            if (layer.Tiles[col, row] != -1)
+                                            if (layer.Tiles2[col, row].TileId != -1)
                                             {
-                                                writer.Write((short)layer.Tiles[col, row]);
-                                                writer.Write((int)col * room.TileWidth);
-                                                writer.Write((int)row * room.TileHeight);
+                                                writer.Write((short)layer.Tiles2[col, row].TileId);
+                                                writer.Write((int)(col * room.TileWidth));
+                                                writer.Write((int)(row * room.TileHeight));
+
+                                                // If flipping is data used.
+                                                if (cb_Flipping.Checked == true)
+                                                    writer.Write((byte)layer.Tiles2[col, row].FlipMode);
+
+                                                // If blend color data is used.
+                                                if (cb_BlendColor.Checked == true)
+                                                    writer.Write((int)GameMaker.Common.GMUtilities.ColorToGMColor(layer.Tiles2[col, row].Blend));
                                             }
                                         }
                                     }
@@ -452,7 +498,7 @@ namespace GMare.Forms
             {
                 // Increment the size.
                 size += room.Name.Length + 5;
-                size += room.GetBinaryRoomSize(cb_Tiles.Checked, cb_Instances.Checked, cb_Collisions.Checked);
+                size += room.GetBinaryRoomSize(cb_Tiles.Checked, cb_Flipping.Checked, cb_BlendColor.Checked, cb_Instances.Checked, cb_Collisions.Checked);
             }
 
             // Return the total size of all rooms in binary form

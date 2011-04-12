@@ -50,7 +50,14 @@ namespace GMare.Forms
 
         #region Constructor
 
-        public ExportImageForm(List<GMareLayer> layers, Bitmap tileset, Size roomSize, Size tileSize, int tilesetWidth)
+        /// <summary>
+        /// Constructs a nes export image form.
+        /// </summary>
+        /// <param name="layers">The layers to draw.</param>
+        /// <param name="tileset">The tileset to use for tile rendering.</param>
+        /// <param name="roomSize">The size of the room.</param>
+        /// <param name="tileSize">The size of a single tile.</param>
+        public ExportImageForm(List<GMareLayer> layers, Bitmap tileset, Size roomSize, Size tileSize)
         {
             InitializeComponent();
 
@@ -58,7 +65,7 @@ namespace GMare.Forms
             _background = tileset;
             _roomSize = roomSize;
             _tileSize = tileSize;
-            _backgroundWidth = tilesetWidth;
+            _backgroundWidth = _background.Width;
 
             // Add layers to the list box.
             clb_Layers.Items.AddRange(layers.ToArray());
@@ -109,7 +116,9 @@ namespace GMare.Forms
                     int rows = _roomSize.Height / _tileSize.Height;
 
                     // Destination rectangle.
-                    Point position = Point.Empty;
+                    Rectangle dest = Rectangle.Empty;
+                    dest.Width = _tileSize.Width;
+                    dest.Height = _tileSize.Height;
 
                     // Source Rectangle.
                     Rectangle source = Rectangle.Empty;
@@ -129,27 +138,54 @@ namespace GMare.Forms
                             for (int row = 0; row < rows; row++)
                             {
                                 // Get tile id.
-                                int tileId = layer.Tiles[col, row];
+                                int tileId = layer.Tiles2[col, row].TileId;
 
                                 // If the tile is empty, continue looping.
                                 if (tileId == -1)
                                     continue;
 
                                 // Calculate destination rectangle.
-                                position.X = col * _tileSize.Width;
-                                position.Y = row * _tileSize.Height;
+                                dest.X = col * _tileSize.Width;
+                                dest.Y = row * _tileSize.Height;
 
                                 // Calculate source point.
-                                source.Location = TileGrid.TileIdToPosition(tileId, _backgroundWidth, _tileSize);
+                                source.Location = GMareBrush.TileIdToPosition(tileId, _backgroundWidth, _tileSize);
 
                                 // Get tile.
                                 Bitmap temp = Graphics.PixelMap.PixelDataToBitmap(Graphics.PixelMap.GetPixels(_background, source));
 
-                                // Draw the image to the bitmap.
-                                gfx.DrawImageUnscaled(temp, position);
+                                // Get converted blend color.
+                                Color color = layer.Tiles2[col, row].Blend;
+                                float red = color.R / 255.0f;
+                                float green = color.G / 255.0f;
+                                float blue = color.B / 255.0f;
 
-                                // Dispose of temp bitmap.
+                                // Alpha changing color matrix.
+                                ColorMatrix cm = new ColorMatrix(new float[][] {
+                                    new float[]{ red, 0.0f, 0.0f, 0.0f, 0.0f},
+                                    new float[]{ 0.0f, green, 0.0f, 0.0f, 0.0f},
+                                    new float[]{ 0.0f, 0.0f, blue, 0.0f, 0.0f},
+                                    new float[]{ 0.0f, 0.0f, 0.0f, 1.0f, 0.0f},
+                                    new float[]{ 0.0f, 0.0f, 0.0f, 0.0f, 1.0f} });
+
+                                // Create new image attributes.
+                                ImageAttributes ia = new ImageAttributes();
+                                ia.SetColorMatrix(cm);
+                                
+                                // Flip tile.
+                                switch (layer.Tiles2[col, row].FlipMode)
+                                {
+                                    case FlipType.Horizontal: temp.RotateFlip(RotateFlipType.RotateNoneFlipX); break;
+                                    case FlipType.Vertical: temp.RotateFlip(RotateFlipType.RotateNoneFlipY); break;
+                                    case FlipType.Both: temp.RotateFlip(RotateFlipType.RotateNoneFlipX); temp.RotateFlip(RotateFlipType.RotateNoneFlipY); break;
+                                }
+
+                                // Draw the image to the bitmap.
+                                gfx.DrawImage(temp, dest, 0, 0, _tileSize.Width, _tileSize.Height, GraphicsUnit.Pixel, ia);
+
+                                // Dispose of things.
                                 temp.Dispose();
+                                ia.Dispose();
                             }
                         }
                     }

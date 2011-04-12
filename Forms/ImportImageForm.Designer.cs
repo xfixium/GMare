@@ -440,7 +440,7 @@ namespace GMare.Forms
             this.gb_Offset.Controls.Add(this.nud_OffsetX);
             this.gb_Offset.Controls.Add(this.label5);
             this.gb_Offset.Controls.Add(this.label6);
-            this.gb_Offset.Location = new System.Drawing.Point(8, 176);
+            this.gb_Offset.Location = new System.Drawing.Point(8, 96);
             this.gb_Offset.Name = "gb_Offset";
             this.gb_Offset.Size = new System.Drawing.Size(144, 72);
             this.gb_Offset.TabIndex = 2;
@@ -471,7 +471,7 @@ namespace GMare.Forms
             this.gb_Seperation.Controls.Add(this.nud_SeperationX);
             this.gb_Seperation.Controls.Add(this.label3);
             this.gb_Seperation.Controls.Add(this.label4);
-            this.gb_Seperation.Location = new System.Drawing.Point(8, 96);
+            this.gb_Seperation.Location = new System.Drawing.Point(8, 176);
             this.gb_Seperation.Name = "gb_Seperation";
             this.gb_Seperation.Size = new System.Drawing.Size(144, 72);
             this.gb_Seperation.TabIndex = 1;

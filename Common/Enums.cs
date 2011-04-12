@@ -39,7 +39,16 @@ namespace GMare.Common
     };
 
     /// <summary>
-    /// Describes different layer levels.
+    /// Describes the flip direction types.
+    /// </summary>
+    public enum FlipDirection
+    {
+        Horizontal,
+        Vertical
+    }
+
+    /// <summary>
+    /// Describes different edit types.
     /// </summary>
     public enum EditType
     {
@@ -54,10 +63,10 @@ namespace GMare.Common
     /// </summary>
     public enum ToolType
     {
-        Pencil,
+        Eraser,
+        Brush,
         Bucket,
         Selection,
-        MultiTile
     };
 
     /// <summary>
@@ -88,15 +97,13 @@ namespace GMare.Common
     };
 
     /// <summary>
-    /// 
+    /// Describes different flip flag types.
     /// </summary>
-    public enum SolidType : byte
+    public enum FlipType : byte
     {
-        Empty = 0,
-        Full = 1,
-        Top = 2,
-        Right = 3,
-        Bottom = 4,
-        Left = 5
+        None = 0,
+        Horizontal = 1,
+        Vertical = 2,
+        Both = 3
     };
 }

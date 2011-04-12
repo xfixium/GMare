@@ -128,10 +128,10 @@ namespace GMare. Forms
             this.cb_OverwriteInstances.AutoSize = true;
             this.cb_OverwriteInstances.Location = new System.Drawing.Point(8, 48);
             this.cb_OverwriteInstances.Name = "cb_OverwriteInstances";
-            this.cb_OverwriteInstances.Size = new System.Drawing.Size(122, 17);
+            this.cb_OverwriteInstances.Size = new System.Drawing.Size(152, 17);
             this.cb_OverwriteInstances.TabIndex = 12;
-            this.cb_OverwriteInstances.Text = "Overwrite instances.";
-            this.toolTip1.SetToolTip(this.cb_OverwriteInstances, "Overwrites a selected room\'s instances");
+            this.cb_OverwriteInstances.Text = "Write/Overwrite instances.";
+            this.toolTip1.SetToolTip(this.cb_OverwriteInstances, "Writes instances, or overwrites existing instances");
             this.cb_OverwriteInstances.UseVisualStyleBackColor = true;
             // 
             // cb_RefactorTiles

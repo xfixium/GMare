@@ -473,12 +473,8 @@ namespace GMare.Graphics
             if (texture == null)
                 return;
 
-            // Calculate position.
-            PointF quadStart = new PointF((float)(x - _offsetX), (float)(y - _offsetY));
-            PointF quadEnd = new PointF(texture.TextureSize + quadStart.X, texture.TextureSize + quadStart.Y);
-
             // Add a textured quad.
-            _quads.Add(new Quad(texture.TextureId, quadStart, quadEnd, color));
+            _quads.Add(new Quad(texture, new PointF(x, y), new PointF(1, 1), 0, color));
         }
 
         /// <summary>
@@ -486,14 +482,10 @@ namespace GMare.Graphics
         /// </summary>
         /// <param name="x">The x coordinate.</param>
         /// <param name="y">The y coordinate.</param>
-        public static void DrawTile(ResTexture texture, int x, int y, Color color)
+        public static void DrawTile(ResTexture texture, int x, int y, float scaleX, float scaleY, float rotation, Color color)
         {
-            // Calculate position.
-            PointF quadStart = new PointF((float)(x - _offsetX), (float)(y - _offsetY));
-            PointF quadEnd = new PointF(texture.TextureSize + quadStart.X, texture.TextureSize + quadStart.Y);
-
             // Add a textured quad.
-            _quads.Add(new Quad(texture.TextureId, quadStart, quadEnd, color));
+            _quads.Add(new Quad(texture, new PointF(x, y), new PointF(scaleX, scaleY), rotation, color));
         }
 
         /// <summary>
@@ -523,10 +515,14 @@ namespace GMare.Graphics
                 OpenGL.glBegin(GLPrimative.Quads);
                 OpenGL.glColor4(quad.Color);
 
-                OpenGL.glTexCoord2i(quad.TexStart.X, quad.TexStart.Y); OpenGL.glVertex2f(quad.QuadStart.X, quad.QuadStart.Y);
-                OpenGL.glTexCoord2i(quad.TexEnd.X, quad.TexStart.Y); OpenGL.glVertex2f(quad.QuadEnd.X, quad.QuadStart.Y);
-                OpenGL.glTexCoord2i(quad.TexEnd.X, quad.TexEnd.Y); OpenGL.glVertex2f(quad.QuadEnd.X, quad.QuadEnd.Y);
-                OpenGL.glTexCoord2i(quad.TexStart.X, quad.TexEnd.Y); OpenGL.glVertex2f(quad.QuadStart.X, quad.QuadEnd.Y);
+                OpenGL.glTexCoord2f(quad.TextureCoordinates[0].X, quad.TextureCoordinates[0].Y);
+                OpenGL.glVertex2f(quad.Vertices[0].X - _offsetX, quad.Vertices[0].Y - _offsetY);
+                OpenGL.glTexCoord2f(quad.TextureCoordinates[1].X, quad.TextureCoordinates[1].Y);
+                OpenGL.glVertex2f(quad.Vertices[1].X - _offsetX, quad.Vertices[1].Y - _offsetY);
+                OpenGL.glTexCoord2f(quad.TextureCoordinates[2].X, quad.TextureCoordinates[2].Y);
+                OpenGL.glVertex2f(quad.Vertices[2].X - _offsetX, quad.Vertices[2].Y - _offsetY);
+                OpenGL.glTexCoord2f(quad.TextureCoordinates[3].X, quad.TextureCoordinates[3].Y);
+                OpenGL.glVertex2f(quad.Vertices[3].X - _offsetX, quad.Vertices[3].Y - _offsetY);
 
                 OpenGL.glEnd();
             }

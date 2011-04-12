@@ -30,8 +30,6 @@ namespace GMare.Forms
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            GMare.Common.TileGrid tileGrid1 = new GMare.Common.TileGrid();
-            GMare.Common.TileGrid tileGrid2 = new GMare.Common.TileGrid();
             this.ms_Main = new System.Windows.Forms.MenuStrip();
             this.tsmi_File = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmi_NewProject = new System.Windows.Forms.ToolStripMenuItem();
@@ -99,11 +97,11 @@ namespace GMare.Forms
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.pnl_Tileset = new GMare.Controls.BackgroundPanel();
             this.ts_Tiles = new System.Windows.Forms.ToolStrip();
-            this.tsb_TileTool = new System.Windows.Forms.ToolStripButton();
+            this.tsb_BrushTool = new System.Windows.Forms.ToolStripButton();
             this.tsb_FillTool = new System.Windows.Forms.ToolStripButton();
             this.tsb_SelectionTool = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsb_Swap = new System.Windows.Forms.ToolStripButton();
+            this.tsb_Replace = new System.Windows.Forms.ToolStripButton();
             this.tsb_TilesetZoom = new GMare.Controls.ZoomToolStripButton();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.lb_Instances = new GMare.Controls.ListboxEx();
@@ -155,6 +153,7 @@ namespace GMare.Forms
             this.tsmi_Zoom200 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmi_Zoom400 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsb_ShowInstances = new System.Windows.Forms.ToolStripButton();
             this.tsb_LayerOptions = new System.Windows.Forms.ToolStripSplitButton();
             this.tsmi_LayerAdd = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
@@ -189,7 +188,7 @@ namespace GMare.Forms
             this.tsmi_Help});
             this.ms_Main.Location = new System.Drawing.Point(0, 0);
             this.ms_Main.Name = "ms_Main";
-            this.ms_Main.Size = new System.Drawing.Size(704, 24);
+            this.ms_Main.Size = new System.Drawing.Size(696, 24);
             this.ms_Main.TabIndex = 0;
             this.ms_Main.Text = "menuStrip1";
             // 
@@ -401,7 +400,8 @@ namespace GMare.Forms
             // 
             this.tsmi_Shift.Image = global::GMare.Properties.Resources.arrow_move;
             this.tsmi_Shift.Name = "tsmi_Shift";
-            this.tsmi_Shift.Size = new System.Drawing.Size(170, 22);
+            this.tsmi_Shift.ShortcutKeyDisplayString = "M";
+            this.tsmi_Shift.Size = new System.Drawing.Size(185, 22);
             this.tsmi_Shift.Text = "Shift Room";
             this.tsmi_Shift.Click += new System.EventHandler(this.tsmi_Shift_Click);
             // 
@@ -409,7 +409,8 @@ namespace GMare.Forms
             // 
             this.tsmi_BackColor.Image = global::GMare.Properties.Resources.color_swatch;
             this.tsmi_BackColor.Name = "tsmi_BackColor";
-            this.tsmi_BackColor.Size = new System.Drawing.Size(170, 22);
+            this.tsmi_BackColor.ShortcutKeyDisplayString = "C";
+            this.tsmi_BackColor.Size = new System.Drawing.Size(185, 22);
             this.tsmi_BackColor.Text = "Background Color";
             this.tsmi_BackColor.Click += new System.EventHandler(this.tsmi_BackColor_Click);
             // 
@@ -417,7 +418,8 @@ namespace GMare.Forms
             // 
             this.tsmi_LayerView.Image = global::GMare.Properties.Resources.page_find;
             this.tsmi_LayerView.Name = "tsmi_LayerView";
-            this.tsmi_LayerView.Size = new System.Drawing.Size(170, 22);
+            this.tsmi_LayerView.ShortcutKeyDisplayString = "V";
+            this.tsmi_LayerView.Size = new System.Drawing.Size(185, 22);
             this.tsmi_LayerView.Text = "Layer View";
             this.tsmi_LayerView.Click += new System.EventHandler(this.tsmi_LayerView_Click);
             // 
@@ -425,7 +427,8 @@ namespace GMare.Forms
             // 
             this.tsmi_Properties.Image = global::GMare.Properties.Resources.room_edit;
             this.tsmi_Properties.Name = "tsmi_Properties";
-            this.tsmi_Properties.Size = new System.Drawing.Size(170, 22);
+            this.tsmi_Properties.ShortcutKeyDisplayString = "P";
+            this.tsmi_Properties.Size = new System.Drawing.Size(185, 22);
             this.tsmi_Properties.Text = "Edit Properties";
             this.tsmi_Properties.Click += new System.EventHandler(this.tsmi_Edit_Click);
             // 
@@ -479,7 +482,7 @@ namespace GMare.Forms
             this.tsb_About});
             this.ts_Main.Location = new System.Drawing.Point(0, 24);
             this.ts_Main.Name = "ts_Main";
-            this.ts_Main.Size = new System.Drawing.Size(704, 25);
+            this.ts_Main.Size = new System.Drawing.Size(696, 25);
             this.ts_Main.TabIndex = 1;
             this.ts_Main.Text = "toolStrip1";
             // 
@@ -586,7 +589,7 @@ namespace GMare.Forms
             this.tsb_Undo.Name = "tsb_Undo";
             this.tsb_Undo.Size = new System.Drawing.Size(23, 22);
             this.tsb_Undo.Text = "toolStripButton1";
-            this.tsb_Undo.ToolTipText = "Undo";
+            this.tsb_Undo.ToolTipText = "Undo (Ctrl + Z)";
             this.tsb_Undo.Click += new System.EventHandler(this.tsmi_Undo_Click);
             // 
             // tsb_Redo
@@ -598,7 +601,7 @@ namespace GMare.Forms
             this.tsb_Redo.Name = "tsb_Redo";
             this.tsb_Redo.Size = new System.Drawing.Size(23, 22);
             this.tsb_Redo.Text = "toolStripButton2";
-            this.tsb_Redo.ToolTipText = "Redo";
+            this.tsb_Redo.ToolTipText = "Redo (Ctrl + Y)";
             this.tsb_Redo.Click += new System.EventHandler(this.tsmi_Redo_Click);
             // 
             // tsb_Cut
@@ -610,7 +613,7 @@ namespace GMare.Forms
             this.tsb_Cut.Name = "tsb_Cut";
             this.tsb_Cut.Size = new System.Drawing.Size(23, 22);
             this.tsb_Cut.Text = "toolStripButton9";
-            this.tsb_Cut.ToolTipText = "Cut";
+            this.tsb_Cut.ToolTipText = "Cut (Ctrl + X)";
             this.tsb_Cut.Click += new System.EventHandler(this.tsmi_Cut_Click);
             // 
             // tsb_Copy
@@ -622,7 +625,7 @@ namespace GMare.Forms
             this.tsb_Copy.Name = "tsb_Copy";
             this.tsb_Copy.Size = new System.Drawing.Size(23, 22);
             this.tsb_Copy.Text = "toolStripButton9";
-            this.tsb_Copy.ToolTipText = "Copy";
+            this.tsb_Copy.ToolTipText = "Copy (Ctrl + C)";
             this.tsb_Copy.Click += new System.EventHandler(this.tsmi_Copy_Click);
             // 
             // tsb_Paste
@@ -634,7 +637,7 @@ namespace GMare.Forms
             this.tsb_Paste.Name = "tsb_Paste";
             this.tsb_Paste.Size = new System.Drawing.Size(23, 22);
             this.tsb_Paste.Text = "toolStripButton9";
-            this.tsb_Paste.ToolTipText = "Paste";
+            this.tsb_Paste.ToolTipText = "Paste (Ctrl + V)";
             this.tsb_Paste.Click += new System.EventHandler(this.tsmi_Paste_Click);
             // 
             // tsb_Delete
@@ -646,7 +649,7 @@ namespace GMare.Forms
             this.tsb_Delete.Name = "tsb_Delete";
             this.tsb_Delete.Size = new System.Drawing.Size(23, 22);
             this.tsb_Delete.Text = "toolStripButton9";
-            this.tsb_Delete.ToolTipText = "Delete";
+            this.tsb_Delete.ToolTipText = "Delete (Del)";
             this.tsb_Delete.Click += new System.EventHandler(this.tsmi_Delete_Click);
             // 
             // toolStripSeparator2
@@ -659,10 +662,11 @@ namespace GMare.Forms
             this.tsb_Shift.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsb_Shift.Image = global::GMare.Properties.Resources.arrow_move;
             this.tsb_Shift.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsb_Shift.Margin = new System.Windows.Forms.Padding(0, 1, 1, 2);
             this.tsb_Shift.Name = "tsb_Shift";
             this.tsb_Shift.Size = new System.Drawing.Size(23, 22);
             this.tsb_Shift.Text = "toolStripButton11";
-            this.tsb_Shift.ToolTipText = "Shift room";
+            this.tsb_Shift.ToolTipText = "Shift room (M)";
             this.tsb_Shift.Click += new System.EventHandler(this.tsmi_Shift_Click);
             // 
             // tsb_BackColor
@@ -674,7 +678,7 @@ namespace GMare.Forms
             this.tsb_BackColor.Name = "tsb_BackColor";
             this.tsb_BackColor.Size = new System.Drawing.Size(23, 22);
             this.tsb_BackColor.Text = "toolStripButton9";
-            this.tsb_BackColor.ToolTipText = "Set background color";
+            this.tsb_BackColor.ToolTipText = "Set background color (C)";
             this.tsb_BackColor.Click += new System.EventHandler(this.tsmi_BackColor_Click);
             // 
             // tsb_LayerView
@@ -682,10 +686,11 @@ namespace GMare.Forms
             this.tsb_LayerView.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsb_LayerView.Image = global::GMare.Properties.Resources.page_find;
             this.tsb_LayerView.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsb_LayerView.Margin = new System.Windows.Forms.Padding(0, 1, 1, 2);
             this.tsb_LayerView.Name = "tsb_LayerView";
             this.tsb_LayerView.Size = new System.Drawing.Size(23, 22);
             this.tsb_LayerView.Text = "toolStripButton1";
-            this.tsb_LayerView.ToolTipText = "View layer data in textual form";
+            this.tsb_LayerView.ToolTipText = "View layer data in textual form (V)";
             this.tsb_LayerView.Click += new System.EventHandler(this.tsmi_LayerView_Click);
             // 
             // tsb_Properties
@@ -697,7 +702,7 @@ namespace GMare.Forms
             this.tsb_Properties.Name = "tsb_Properties";
             this.tsb_Properties.Size = new System.Drawing.Size(23, 22);
             this.tsb_Properties.Text = "toolStripButton10";
-            this.tsb_Properties.ToolTipText = "Edit room properties";
+            this.tsb_Properties.ToolTipText = "Edit room properties (P)";
             this.tsb_Properties.Click += new System.EventHandler(this.tsmi_Edit_Click);
             // 
             // toolStripSeparator7
@@ -715,7 +720,7 @@ namespace GMare.Forms
             this.tsb_Contents.Name = "tsb_Contents";
             this.tsb_Contents.Size = new System.Drawing.Size(23, 22);
             this.tsb_Contents.Text = "toolStripButton1";
-            this.tsb_Contents.ToolTipText = "Contents";
+            this.tsb_Contents.ToolTipText = "Contents (H)";
             // 
             // tsb_About
             // 
@@ -737,7 +742,7 @@ namespace GMare.Forms
             this.toolStripStatusLabel1});
             this.ss_Main.Location = new System.Drawing.Point(0, 488);
             this.ss_Main.Name = "ss_Main";
-            this.ss_Main.Size = new System.Drawing.Size(704, 24);
+            this.ss_Main.Size = new System.Drawing.Size(696, 24);
             this.ss_Main.TabIndex = 2;
             this.ss_Main.Text = "statusStrip1";
             // 
@@ -769,19 +774,20 @@ namespace GMare.Forms
             this.toolStripStatusLabel1.Image = global::GMare.Properties.Resources.eraser;
             this.toolStripStatusLabel1.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(517, 19);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(509, 19);
             this.toolStripStatusLabel1.Spring = true;
-            this.toolStripStatusLabel1.Text = " Right click to erase";
+            this.toolStripStatusLabel1.Text = "Shift + Left Click To Erase";
             this.toolStripStatusLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStripStatusLabel1.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             // 
             // panel1
             // 
             this.panel1.Controls.Add(this.tc_GUI);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel1.Location = new System.Drawing.Point(0, 76);
-            this.panel1.MinimumSize = new System.Drawing.Size(312, 412);
+            this.panel1.MinimumSize = new System.Drawing.Size(320, 412);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(312, 412);
+            this.panel1.Size = new System.Drawing.Size(320, 412);
             this.panel1.TabIndex = 5;
             // 
             // tc_GUI
@@ -795,7 +801,7 @@ namespace GMare.Forms
             this.tc_GUI.Location = new System.Drawing.Point(8, 8);
             this.tc_GUI.Name = "tc_GUI";
             this.tc_GUI.SelectedIndex = 0;
-            this.tc_GUI.Size = new System.Drawing.Size(300, 396);
+            this.tc_GUI.Size = new System.Drawing.Size(308, 396);
             this.tc_GUI.TabIndex = 5;
             // 
             // tabPage1
@@ -805,7 +811,7 @@ namespace GMare.Forms
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3, 5, 5, 5);
-            this.tabPage1.Size = new System.Drawing.Size(292, 370);
+            this.tabPage1.Size = new System.Drawing.Size(300, 370);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Tiles";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -813,21 +819,16 @@ namespace GMare.Forms
             // pnl_Tileset
             // 
             this.pnl_Tileset.AutoScroll = true;
-            this.pnl_Tileset.AutoScrollMinSize = new System.Drawing.Size(280, 331);
+            this.pnl_Tileset.AutoScrollMinSize = new System.Drawing.Size(288, 331);
             this.pnl_Tileset.BackColor = System.Drawing.Color.White;
             this.pnl_Tileset.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pnl_Tileset.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnl_Tileset.Image = null;
             this.pnl_Tileset.Location = new System.Drawing.Point(3, 30);
             this.pnl_Tileset.Name = "pnl_Tileset";
-            tileGrid1.EndX = 16;
-            tileGrid1.EndY = 16;
-            tileGrid1.StartX = 0;
-            tileGrid1.StartY = 0;
-            tileGrid1.TileIds = null;
-            this.pnl_Tileset.Selection = tileGrid1;
+            this.pnl_Tileset.Selection = null;
             this.pnl_Tileset.SelectMode = GMare.Controls.BackgroundPanel.SelectType.Normal;
-            this.pnl_Tileset.Size = new System.Drawing.Size(284, 335);
+            this.pnl_Tileset.Size = new System.Drawing.Size(292, 335);
             this.pnl_Tileset.TabIndex = 0;
             this.pnl_Tileset.Zoom = 1F;
             this.pnl_Tileset.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pnl_Tileset_MouseUp);
@@ -835,32 +836,32 @@ namespace GMare.Forms
             // ts_Tiles
             // 
             this.ts_Tiles.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsb_TileTool,
+            this.tsb_BrushTool,
             this.tsb_FillTool,
             this.tsb_SelectionTool,
             this.toolStripSeparator5,
-            this.tsb_Swap,
+            this.tsb_Replace,
             this.tsb_TilesetZoom});
             this.ts_Tiles.Location = new System.Drawing.Point(3, 5);
             this.ts_Tiles.Name = "ts_Tiles";
-            this.ts_Tiles.Size = new System.Drawing.Size(284, 25);
+            this.ts_Tiles.Size = new System.Drawing.Size(292, 25);
             this.ts_Tiles.TabIndex = 1;
             this.ts_Tiles.Text = "toolStrip1";
             // 
-            // tsb_TileTool
+            // tsb_BrushTool
             // 
-            this.tsb_TileTool.Checked = true;
-            this.tsb_TileTool.CheckOnClick = true;
-            this.tsb_TileTool.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.tsb_TileTool.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsb_TileTool.Image = global::GMare.Properties.Resources.tool_paint;
-            this.tsb_TileTool.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsb_TileTool.Margin = new System.Windows.Forms.Padding(0, 1, 1, 2);
-            this.tsb_TileTool.Name = "tsb_TileTool";
-            this.tsb_TileTool.Size = new System.Drawing.Size(23, 22);
-            this.tsb_TileTool.Text = "toolStripButton6";
-            this.tsb_TileTool.ToolTipText = "Tile tool";
-            this.tsb_TileTool.CheckedChanged += new System.EventHandler(this.tsb_TileTool_CheckedChanged);
+            this.tsb_BrushTool.Checked = true;
+            this.tsb_BrushTool.CheckOnClick = true;
+            this.tsb_BrushTool.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tsb_BrushTool.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsb_BrushTool.Image = global::GMare.Properties.Resources.tool_brush;
+            this.tsb_BrushTool.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsb_BrushTool.Margin = new System.Windows.Forms.Padding(0, 1, 1, 2);
+            this.tsb_BrushTool.Name = "tsb_BrushTool";
+            this.tsb_BrushTool.Size = new System.Drawing.Size(23, 22);
+            this.tsb_BrushTool.Text = "toolStripButton6";
+            this.tsb_BrushTool.ToolTipText = "Brush tool (B)";
+            this.tsb_BrushTool.Click += new System.EventHandler(this.tsb_BrushTool_Click);
             // 
             // tsb_FillTool
             // 
@@ -872,8 +873,8 @@ namespace GMare.Forms
             this.tsb_FillTool.Name = "tsb_FillTool";
             this.tsb_FillTool.Size = new System.Drawing.Size(23, 22);
             this.tsb_FillTool.Text = "toolStripButton7";
-            this.tsb_FillTool.ToolTipText = "Flood fill tool";
-            this.tsb_FillTool.CheckedChanged += new System.EventHandler(this.tsb_FillTool_CheckedChanged);
+            this.tsb_FillTool.ToolTipText = "Flood fill tool (F)";
+            this.tsb_FillTool.Click += new System.EventHandler(this.tsb_FillTool_Click);
             // 
             // tsb_SelectionTool
             // 
@@ -881,28 +882,29 @@ namespace GMare.Forms
             this.tsb_SelectionTool.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tsb_SelectionTool.Image = ((System.Drawing.Image)(resources.GetObject("tsb_SelectionTool.Image")));
             this.tsb_SelectionTool.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsb_SelectionTool.Margin = new System.Windows.Forms.Padding(0, 1, 1, 2);
             this.tsb_SelectionTool.Name = "tsb_SelectionTool";
             this.tsb_SelectionTool.Size = new System.Drawing.Size(23, 22);
             this.tsb_SelectionTool.Text = "toolStripButton7";
-            this.tsb_SelectionTool.ToolTipText = "Selection tool";
-            this.tsb_SelectionTool.CheckedChanged += new System.EventHandler(this.tsb_SelectionTool_CheckedChanged);
+            this.tsb_SelectionTool.ToolTipText = "Selection tool (S)";
+            this.tsb_SelectionTool.Click += new System.EventHandler(this.tsb_SelectionTool_Click);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
             this.toolStripSeparator5.Size = new System.Drawing.Size(6, 25);
             // 
-            // tsb_Swap
+            // tsb_Replace
             // 
-            this.tsb_Swap.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsb_Swap.Image = ((System.Drawing.Image)(resources.GetObject("tsb_Swap.Image")));
-            this.tsb_Swap.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsb_Swap.Margin = new System.Windows.Forms.Padding(0, 1, 1, 2);
-            this.tsb_Swap.Name = "tsb_Swap";
-            this.tsb_Swap.Size = new System.Drawing.Size(23, 22);
-            this.tsb_Swap.Text = "toolStripButton8";
-            this.tsb_Swap.ToolTipText = "Replace tiles";
-            this.tsb_Swap.Click += new System.EventHandler(this.tsb_Swap_Click);
+            this.tsb_Replace.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsb_Replace.Image = ((System.Drawing.Image)(resources.GetObject("tsb_Replace.Image")));
+            this.tsb_Replace.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsb_Replace.Margin = new System.Windows.Forms.Padding(0, 1, 1, 2);
+            this.tsb_Replace.Name = "tsb_Replace";
+            this.tsb_Replace.Size = new System.Drawing.Size(23, 22);
+            this.tsb_Replace.Text = "toolStripButton8";
+            this.tsb_Replace.ToolTipText = "Replace tiles (R)";
+            this.tsb_Replace.Click += new System.EventHandler(this.tsb_Swap_Click);
             // 
             // tsb_TilesetZoom
             // 
@@ -911,6 +913,7 @@ namespace GMare.Forms
             this.tsb_TilesetZoom.Name = "tsb_TilesetZoom";
             this.tsb_TilesetZoom.Size = new System.Drawing.Size(64, 22);
             this.tsb_TilesetZoom.Text = "100%";
+            this.tsb_TilesetZoom.ToolTipText = "Zoom Options";
             this.tsb_TilesetZoom.UseIncrements = false;
             this.tsb_TilesetZoom.ZoomChanged += new GMare.Controls.ZoomToolStripButton.ZoomChangedHandler(this.tsb_TilesetZoom_ZoomChanged);
             // 
@@ -921,7 +924,7 @@ namespace GMare.Forms
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3, 5, 5, 5);
-            this.tabPage3.Size = new System.Drawing.Size(292, 370);
+            this.tabPage3.Size = new System.Drawing.Size(300, 370);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Objects";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -935,13 +938,13 @@ namespace GMare.Forms
             this.lb_Instances.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.lb_Instances.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lb_Instances.FormattingEnabled = true;
-            this.lb_Instances.HorizontalExtent = 280;
+            this.lb_Instances.HorizontalExtent = 304;
             this.lb_Instances.IntegralHeight = false;
             this.lb_Instances.ItemHeight = 18;
             this.lb_Instances.ListboxMode = GMare.Controls.ListboxEx.ListboxType.Instances;
             this.lb_Instances.Location = new System.Drawing.Point(3, 30);
             this.lb_Instances.Name = "lb_Instances";
-            this.lb_Instances.Size = new System.Drawing.Size(284, 335);
+            this.lb_Instances.Size = new System.Drawing.Size(292, 335);
             this.lb_Instances.TabIndex = 0;
             this.lb_Instances.SelectedIndexChanged += new System.EventHandler(this.lb_Instances_SelectedIndexChanged);
             // 
@@ -1023,7 +1026,7 @@ namespace GMare.Forms
             this.tsb_Objects});
             this.toolStrip2.Location = new System.Drawing.Point(3, 5);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(284, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(292, 25);
             this.toolStrip2.TabIndex = 2;
             this.toolStrip2.Text = "toolStrip1";
             // 
@@ -1036,7 +1039,7 @@ namespace GMare.Forms
             this.tsb_ImportObjects.Name = "tsb_ImportObjects";
             this.tsb_ImportObjects.Size = new System.Drawing.Size(23, 22);
             this.tsb_ImportObjects.Text = "toolStripButton3";
-            this.tsb_ImportObjects.ToolTipText = "Import objects from Game Maker project";
+            this.tsb_ImportObjects.ToolTipText = "Import objects from Game Maker project (O)";
             this.tsb_ImportObjects.Click += new System.EventHandler(this.tsb_ImportObjects_Click);
             // 
             // toolStripSeparator3
@@ -1067,7 +1070,7 @@ namespace GMare.Forms
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3, 5, 5, 5);
-            this.tabPage2.Size = new System.Drawing.Size(292, 370);
+            this.tabPage2.Size = new System.Drawing.Size(300, 370);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Collisions";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -1078,21 +1081,23 @@ namespace GMare.Forms
             this.lb_Shapes.CellWidth = 16;
             this.lb_Shapes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lb_Shapes.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.lb_Shapes.Enabled = false;
             this.lb_Shapes.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lb_Shapes.HorizontalExtent = 280;
+            this.lb_Shapes.HorizontalExtent = 288;
             this.lb_Shapes.HorizontalScrollbar = true;
             this.lb_Shapes.IntegralHeight = false;
             this.lb_Shapes.ItemHeight = 16;
             this.lb_Shapes.ListboxMode = GMare.Controls.ListboxEx.ListboxType.Shapes;
             this.lb_Shapes.Location = new System.Drawing.Point(3, 30);
             this.lb_Shapes.Name = "lb_Shapes";
-            this.lb_Shapes.Size = new System.Drawing.Size(284, 335);
+            this.lb_Shapes.Size = new System.Drawing.Size(292, 335);
             this.lb_Shapes.Sorted = true;
             this.lb_Shapes.TabIndex = 0;
             this.lb_Shapes.SelectedIndexChanged += new System.EventHandler(this.lb_Shapes_SelectedIndexChanged);
             // 
             // ts_Collisions
             // 
+            this.ts_Collisions.Enabled = false;
             this.ts_Collisions.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsb_MoveUp,
             this.tsb_MoveDown,
@@ -1100,7 +1105,7 @@ namespace GMare.Forms
             this.tsb_Level});
             this.ts_Collisions.Location = new System.Drawing.Point(3, 5);
             this.ts_Collisions.Name = "ts_Collisions";
-            this.ts_Collisions.Size = new System.Drawing.Size(284, 25);
+            this.ts_Collisions.Size = new System.Drawing.Size(292, 25);
             this.ts_Collisions.TabIndex = 2;
             this.ts_Collisions.Text = "toolStrip2";
             // 
@@ -1196,9 +1201,10 @@ namespace GMare.Forms
             // 
             this.panel2.Controls.Add(this.gb_Editor);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(312, 76);
+            this.panel2.Location = new System.Drawing.Point(320, 76);
+            this.panel2.MinimumSize = new System.Drawing.Size(16, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(392, 412);
+            this.panel2.Size = new System.Drawing.Size(376, 412);
             this.panel2.TabIndex = 6;
             // 
             // gb_Editor
@@ -1209,7 +1215,7 @@ namespace GMare.Forms
             this.gb_Editor.Controls.Add(this.pnl_RoomEditor);
             this.gb_Editor.Location = new System.Drawing.Point(8, 8);
             this.gb_Editor.Name = "gb_Editor";
-            this.gb_Editor.Size = new System.Drawing.Size(376, 398);
+            this.gb_Editor.Size = new System.Drawing.Size(360, 398);
             this.gb_Editor.TabIndex = 0;
             this.gb_Editor.TabStop = false;
             this.gb_Editor.Text = "Room Editor";
@@ -1235,17 +1241,12 @@ namespace GMare.Forms
             this.pnl_RoomEditor.SelectedShape = null;
             this.pnl_RoomEditor.ShapeMode = GMare.Common.ShapeType.Rectangle;
             this.pnl_RoomEditor.ShowGrid = true;
-            this.pnl_RoomEditor.Size = new System.Drawing.Size(360, 372);
+            this.pnl_RoomEditor.ShowInstances = false;
+            this.pnl_RoomEditor.Size = new System.Drawing.Size(344, 372);
             this.pnl_RoomEditor.Snap = true;
             this.pnl_RoomEditor.TabIndex = 0;
-            tileGrid2.EndX = 16;
-            tileGrid2.EndY = 16;
-            tileGrid2.StartX = 0;
-            tileGrid2.StartY = 0;
-            tileGrid2.TileIds = null;
-            this.pnl_RoomEditor.Tiles = tileGrid2;
-            this.pnl_RoomEditor.ToolMode = GMare.Common.ToolType.Pencil;
-            this.pnl_RoomEditor.Zoom = 1F;
+            this.pnl_RoomEditor.Tiles = null;
+            this.pnl_RoomEditor.ToolMode = GMare.Common.ToolType.Brush;
             this.pnl_RoomEditor.PositionChanged += new GMare.Controls.RoomEditor.PositionHandler(this.pnl_RoomEditor_PositionChanged);
             this.pnl_RoomEditor.InstanceChanged += new GMare.Controls.RoomEditor.InstanceChangedHandler(this.pnl_RoomEditor_SelectedInstanceChanged);
             this.pnl_RoomEditor.RoomChanged += new GMare.Controls.RoomEditor.RoomChangedHandler(this.pnl_RoomEditor_RoomChanged);
@@ -1254,7 +1255,7 @@ namespace GMare.Forms
             // 
             // splitter1
             // 
-            this.splitter1.Location = new System.Drawing.Point(312, 76);
+            this.splitter1.Location = new System.Drawing.Point(320, 76);
             this.splitter1.Name = "splitter1";
             this.splitter1.Size = new System.Drawing.Size(4, 412);
             this.splitter1.TabIndex = 7;
@@ -1273,13 +1274,14 @@ namespace GMare.Forms
             this.tsb_GridY,
             this.tsb_Zoom,
             this.toolStripSeparator6,
+            this.tsb_ShowInstances,
             this.tsb_LayerOptions,
             this.tsl_Layer,
             this.tscb_EditSelect});
             this.ts_Tools.Location = new System.Drawing.Point(0, 49);
             this.ts_Tools.Name = "ts_Tools";
             this.ts_Tools.Padding = new System.Windows.Forms.Padding(0, 1, 1, 0);
-            this.ts_Tools.Size = new System.Drawing.Size(704, 27);
+            this.ts_Tools.Size = new System.Drawing.Size(696, 27);
             this.ts_Tools.TabIndex = 8;
             this.ts_Tools.Text = "toolStrip2";
             // 
@@ -1295,8 +1297,8 @@ namespace GMare.Forms
             this.tsb_Grid.Name = "tsb_Grid";
             this.tsb_Grid.Size = new System.Drawing.Size(23, 23);
             this.tsb_Grid.Text = "toolStripButton13";
-            this.tsb_Grid.ToolTipText = "Show grid";
-            this.tsb_Grid.CheckedChanged += new System.EventHandler(this.tsb_Grid_Click);
+            this.tsb_Grid.ToolTipText = "Show grid (G)";
+            this.tsb_Grid.CheckedChanged += new System.EventHandler(this.tsb_Grid_CheckChanged);
             // 
             // tsb_GridIso
             // 
@@ -1308,7 +1310,7 @@ namespace GMare.Forms
             this.tsb_GridIso.Name = "tsb_GridIso";
             this.tsb_GridIso.Size = new System.Drawing.Size(23, 23);
             this.tsb_GridIso.Text = "toolStripButton1";
-            this.tsb_GridIso.ToolTipText = "The grid is drawn in an isometric perspective";
+            this.tsb_GridIso.ToolTipText = "The grid is drawn in an isometric perspective (I)";
             this.tsb_GridIso.CheckedChanged += new System.EventHandler(this.tsb_GridIso_CheckedChanged);
             // 
             // tsb_Snap
@@ -1323,7 +1325,7 @@ namespace GMare.Forms
             this.tsb_Snap.Size = new System.Drawing.Size(23, 23);
             this.tsb_Snap.Text = "toolStripButton2";
             this.tsb_Snap.ToolTipText = "Snap instances to grid";
-            this.tsb_Snap.Click += new System.EventHandler(this.tsmi_Snap_Click);
+            this.tsb_Snap.Click += new System.EventHandler(this.tsb_Snap_Click);
             // 
             // toolStripSeparator4
             // 
@@ -1390,6 +1392,7 @@ namespace GMare.Forms
             // 
             // tsb_Zoom
             // 
+            this.tsb_Zoom.AutoSize = false;
             this.tsb_Zoom.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsmi_ZoomIn,
             this.tsmi_ZoomOut,
@@ -1400,11 +1403,13 @@ namespace GMare.Forms
             this.tsmi_Zoom200,
             this.tsmi_Zoom400});
             this.tsb_Zoom.Image = ((System.Drawing.Image)(resources.GetObject("tsb_Zoom.Image")));
+            this.tsb_Zoom.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.tsb_Zoom.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsb_Zoom.Name = "tsb_Zoom";
             this.tsb_Zoom.Size = new System.Drawing.Size(67, 23);
             this.tsb_Zoom.Tag = "";
             this.tsb_Zoom.Text = "100%";
+            this.tsb_Zoom.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.tsb_Zoom.ToolTipText = "Zoom options";
             // 
             // tsmi_ZoomIn
@@ -1480,6 +1485,19 @@ namespace GMare.Forms
             this.toolStripSeparator6.Name = "toolStripSeparator6";
             this.toolStripSeparator6.Size = new System.Drawing.Size(6, 26);
             // 
+            // tsb_ShowInstances
+            // 
+            this.tsb_ShowInstances.CheckOnClick = true;
+            this.tsb_ShowInstances.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsb_ShowInstances.Image = global::GMare.Properties.Resources.instance_show;
+            this.tsb_ShowInstances.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsb_ShowInstances.Margin = new System.Windows.Forms.Padding(0, 1, 1, 2);
+            this.tsb_ShowInstances.Name = "tsb_ShowInstances";
+            this.tsb_ShowInstances.Size = new System.Drawing.Size(23, 23);
+            this.tsb_ShowInstances.Text = "toolStripButton1";
+            this.tsb_ShowInstances.ToolTipText = "Always show instances";
+            this.tsb_ShowInstances.CheckedChanged += new System.EventHandler(this.tsb_ShowInstances_CheckedChanged);
+            // 
             // tsb_LayerOptions
             // 
             this.tsb_LayerOptions.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -1541,13 +1559,14 @@ namespace GMare.Forms
             // 
             // tscb_EditSelect
             // 
+            this.tscb_EditSelect.AutoSize = false;
             this.tscb_EditSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tscb_EditSelect.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.tscb_EditSelect.Margin = new System.Windows.Forms.Padding(0, 1, 1, 4);
             this.tscb_EditSelect.Name = "tscb_EditSelect";
             this.tscb_EditSelect.SelectedIndex = 0;
             this.tscb_EditSelect.SelectedItem = "View Room";
-            this.tscb_EditSelect.Size = new System.Drawing.Size(150, 21);
+            this.tscb_EditSelect.Size = new System.Drawing.Size(200, 21);
             this.tscb_EditSelect.Text = "View Room";
             this.tscb_EditSelect.SelectedIndexChanged += new System.EventHandler(this.tscb_EditSelect_SelectedIndexChanged);
             this.tscb_EditSelect.DropDownClosed += new System.EventHandler(this.tscb_EditSelect_DropDownClosed);
@@ -1556,7 +1575,7 @@ namespace GMare.Forms
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(704, 512);
+            this.ClientSize = new System.Drawing.Size(696, 512);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
@@ -1564,13 +1583,13 @@ namespace GMare.Forms
             this.Controls.Add(this.ts_Tools);
             this.Controls.Add(this.ts_Main);
             this.Controls.Add(this.ms_Main);
+            this.KeyPreview = true;
             this.MainMenuStrip = this.ms_Main;
-            this.MinimumSize = new System.Drawing.Size(720, 550);
+            this.MinimumSize = new System.Drawing.Size(712, 550);
             this.Name = "MainForm";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "GMare";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.ms_Main.ResumeLayout(false);
             this.ms_Main.PerformLayout();
             this.ts_Main.ResumeLayout(false);
@@ -1675,7 +1694,6 @@ namespace GMare.Forms
         private System.Windows.Forms.ToolStripMenuItem tsmi_Zoom100;
         private System.Windows.Forms.ToolStripMenuItem tsmi_Zoom200;
         private System.Windows.Forms.ToolStripMenuItem tsmi_Zoom400;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.GroupBox gb_Editor;
         private System.Windows.Forms.ToolStripStatusLabel tssl_Info;
         private System.Windows.Forms.ToolStripButton tsb_Snap;
@@ -1697,14 +1715,13 @@ namespace GMare.Forms
         private System.Windows.Forms.ToolStripMenuItem tsmi_Level4;
         private System.Windows.Forms.ToolStripMenuItem tsmi_Level5;
         private System.Windows.Forms.ToolStrip ts_Tiles;
-        private System.Windows.Forms.ToolStripButton tsb_TileTool;
+        private System.Windows.Forms.ToolStripButton tsb_BrushTool;
         private System.Windows.Forms.ToolStripButton tsb_FillTool;
         private System.Windows.Forms.ToolStripButton tsb_SelectionTool;
-        private Controls.ZoomToolStripButton tsb_TilesetZoom;
         private System.Windows.Forms.ToolStrip toolStrip2;
         private System.Windows.Forms.ToolStripLabel toolStripLabel4;
         private System.Windows.Forms.ToolStripSplitButton tsb_Objects;
-        private System.Windows.Forms.ToolStripButton tsb_Swap;
+        private System.Windows.Forms.ToolStripButton tsb_Replace;
         private System.Windows.Forms.ToolStripButton tsb_ImportObjects;
         private System.Windows.Forms.ContextMenuStrip cms_Instances;
         private System.Windows.Forms.ToolStripMenuItem tsmi_Sorting;
@@ -1715,7 +1732,6 @@ namespace GMare.Forms
         private System.Windows.Forms.ToolStripMenuItem tsmi_DeleteInstance;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private Controls.RoomEditor pnl_RoomEditor;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
@@ -1734,6 +1750,10 @@ namespace GMare.Forms
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem7;
         private System.Windows.Forms.ToolStripMenuItem tsmi_Delete;
         private System.Windows.Forms.ToolStripButton tsb_Delete;
+        private Controls.ZoomToolStripButton tsb_TilesetZoom;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripButton tsb_ShowInstances;
     }
 }
 

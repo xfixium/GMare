@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GMare.exe" size="646656">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GMare.exe" size="683520">
       <assemblyIdentity name="GMare" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>SStoOzr8p2lsfib1WW3VViQp5ck=</dsig:DigestValue>
+        <dsig:DigestValue>a4VzkuNygCTk9Sl6ys2hD24QIfU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

@@ -82,7 +82,7 @@ namespace GMare.Forms
             int cols = ProjectManager.Room.Columns;
             int rows = ProjectManager.Room.Rows;
             int depth = ProjectManager.Room.GetUniqueDepth();
-            int[,] tiles = GMareLayer.GetEmptyLayer(cols, rows);
+            GMareTile[,] tiles = GMareLayer.GetEmptyLayer(cols, rows);
 
             // Create a new layer.
             _layer = new GMareLayer("Layer", depth, tiles);

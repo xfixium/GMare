@@ -51,7 +51,7 @@ namespace GMare.Controls
             Fixed
         };
         private SelectType _selectMode = SelectType.Normal;  // Mode of the tileset panel.
-        private TileGrid _selection = new TileGrid();        // Selection of tiles.
+        private GMareBrush _selection = null;                // Selection of tiles.
         private Bitmap _backBuffer = null;                   // The drawing surface.
         private Bitmap _image = null;                        // The tileset image.
         private float _scale = 1.0f;                         // Scaling factor.
@@ -73,7 +73,7 @@ namespace GMare.Controls
         /// <summary>
         /// Gets or sets selection rectangle.
         /// </summary>
-        public TileGrid Selection
+        public GMareBrush Selection
         {
             get { return _selection; }
             set { _selection = value; UpdateBackBuffer(); }
@@ -92,6 +92,9 @@ namespace GMare.Controls
                 // Reset selection.
                 OnMouseDown(new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
                 OnMouseUp(new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
+
+                // Create new brush.
+                _selection = new GMareBrush();
 
                 // Redraw the backbuffer.
                 UpdateBackBuffer();
@@ -304,7 +307,7 @@ namespace GMare.Controls
                 return;
 
             // Get an array of tile ids.
-            _selection.TileIds = TileGrid.RectangleToTileIds(_selection.ToRectangle(), _image.Width, ProjectManager.Room.TileSize);
+            _selection.Tiles = GMareBrush.RectangleToTiles(_selection.ToRectangle(), _image.Width, ProjectManager.Room.TileSize);
 
             if (_selectMode == SelectType.Fixed)
                 UpdateBackBuffer();

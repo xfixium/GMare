@@ -195,8 +195,6 @@ namespace GMare.Forms
                         {
                             // Set GUI.
                             pnl_Image.Image = image;
-                            tssl_Width.Text = "Image Width: " + image.Width;
-                            tssl_Height.Text = "Image Height: " + image.Height;
 
                             // Set transparency color.
                             tsb_SetColorKey_CheckedChanged(this, EventArgs.Empty);
@@ -252,12 +250,21 @@ namespace GMare.Forms
         }
 
         /// <summary>
+        /// Numeric up and down column amount changed.
+        /// </summary>
+        private void nud_RoomSize_ValueChanged(object sender, EventArgs e)
+        {
+            UpdateSize();
+        }
+
+        /// <summary>
         /// Numeric up and down tile size value changed.
         /// </summary>
         private void nud_TileSize_ValueChanged(object sender, EventArgs e)
         {
             // Set tile width.
             pnl_Image.TileSize = new Size((int)nud_TileX.Value, (int)nud_TileY.Value);
+            UpdateSize();
         }
 
         /// <summary>
@@ -342,9 +349,9 @@ namespace GMare.Forms
             int count = width * height;
 
             // If the tile count exceeds maximum value.
-            if (count > 2147483647)
+            if (count > 32767)
             {
-                MessageBox.Show("The desired image and tile size exceed maximum allowed tile amount (2147483647 tiles).", "GMare", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                MessageBox.Show("The desired image and tile size exceed maximum allowed tile amount (32,767 tiles).", "GMare", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
                 return false;
             }
 
@@ -364,6 +371,15 @@ namespace GMare.Forms
             }
             else
                 tsb_Ok.Enabled = false;
+        }
+
+        /// <summary>
+        /// Updates the size of the room information.
+        /// </summary>
+        private void UpdateSize()
+        {
+            tssl_Width.Text = "Room Width: " + (nud_Columns.Value * nud_TileX.Value).ToString();
+            tssl_Height.Text = "Room Height: " + (nud_Rows.Value * nud_TileY.Value).ToString();
         }
 
         #endregion

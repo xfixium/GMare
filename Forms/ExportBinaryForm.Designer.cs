@@ -31,7 +31,6 @@ namespace GMare.Forms
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExportBinaryForm));
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.clb_Rooms = new GMare.Controls.CheckedListBoxEx();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.tssl_TotalSize = new System.Windows.Forms.ToolStripStatusLabel();
@@ -52,6 +51,9 @@ namespace GMare.Forms
             this.cb_Collisions = new System.Windows.Forms.CheckBox();
             this.cb_Instances = new System.Windows.Forms.CheckBox();
             this.cb_Tiles = new System.Windows.Forms.CheckBox();
+            this.cb_Flipping = new System.Windows.Forms.CheckBox();
+            this.cb_BlendColor = new System.Windows.Forms.CheckBox();
+            this.clb_Rooms = new GMare.Controls.CheckedListBoxEx();
             this.groupBox2.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -59,29 +61,10 @@ namespace GMare.Forms
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // clb_Rooms
-            // 
-            this.clb_Rooms.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.clb_Rooms.FormattingEnabled = true;
-            this.clb_Rooms.Glyph = global::GMare.Properties.Resources.room;
-            this.clb_Rooms.HorizontalExtent = 212;
-            this.clb_Rooms.HorizontalScrollbar = true;
-            this.clb_Rooms.IntegralHeight = false;
-            this.clb_Rooms.Location = new System.Drawing.Point(8, 16);
-            this.clb_Rooms.Name = "clb_Rooms";
-            this.clb_Rooms.Size = new System.Drawing.Size(216, 168);
-            this.clb_Rooms.TabIndex = 1;
-            this.toolTip1.SetToolTip(this.clb_Rooms, "List of rooms to export to binary file");
-            this.clb_Rooms.SelectedIndexChanged += new System.EventHandler(this.clb_Rooms_SelectedIndexChanged);
-            this.clb_Rooms.KeyDown += new System.Windows.Forms.KeyEventHandler(this.clb_Rooms_KeyDown);
-            this.clb_Rooms.MouseDown += new System.Windows.Forms.MouseEventHandler(this.clb_Rooms_MouseDown);
-            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.clb_Rooms);
-            this.groupBox2.Location = new System.Drawing.Point(8, 112);
+            this.groupBox2.Location = new System.Drawing.Point(8, 144);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(232, 192);
             this.groupBox2.TabIndex = 2;
@@ -92,7 +75,7 @@ namespace GMare.Forms
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tssl_TotalSize});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 316);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 346);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(250, 22);
             this.statusStrip1.TabIndex = 3;
@@ -198,14 +181,14 @@ namespace GMare.Forms
             this.toolStripSeparator2,
             this.tsmi_Rename});
             this.cms_Options.Name = "contextMenuStrip1";
-            this.cms_Options.Size = new System.Drawing.Size(165, 76);
+            this.cms_Options.Size = new System.Drawing.Size(173, 76);
             // 
             // tsmi_ShiftUp
             // 
             this.tsmi_ShiftUp.Image = ((System.Drawing.Image)(resources.GetObject("tsmi_ShiftUp.Image")));
             this.tsmi_ShiftUp.Name = "tsmi_ShiftUp";
             this.tsmi_ShiftUp.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.tsmi_ShiftUp.Size = new System.Drawing.Size(164, 22);
+            this.tsmi_ShiftUp.Size = new System.Drawing.Size(172, 22);
             this.tsmi_ShiftUp.Text = "Shift Up";
             this.tsmi_ShiftUp.Click += new System.EventHandler(this.tsmi_ShiftUp_Click);
             // 
@@ -214,31 +197,33 @@ namespace GMare.Forms
             this.tsmi_ShiftDown.Image = ((System.Drawing.Image)(resources.GetObject("tsmi_ShiftDown.Image")));
             this.tsmi_ShiftDown.Name = "tsmi_ShiftDown";
             this.tsmi_ShiftDown.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.tsmi_ShiftDown.Size = new System.Drawing.Size(164, 22);
+            this.tsmi_ShiftDown.Size = new System.Drawing.Size(172, 22);
             this.tsmi_ShiftDown.Text = "Shift Down";
             this.tsmi_ShiftDown.Click += new System.EventHandler(this.tsmi_ShiftDown_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(161, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(169, 6);
             // 
             // tsmi_Rename
             // 
-            this.tsmi_Rename.Image = global::GMare.Properties.Resources.textfield_rename;
+            this.tsmi_Rename.Image = global::GMare.Properties.Resources.rename;
             this.tsmi_Rename.Name = "tsmi_Rename";
             this.tsmi_Rename.ShortcutKeys = System.Windows.Forms.Keys.F2;
-            this.tsmi_Rename.Size = new System.Drawing.Size(164, 22);
+            this.tsmi_Rename.Size = new System.Drawing.Size(172, 22);
             this.tsmi_Rename.Text = "Rename";
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.cb_BlendColor);
+            this.groupBox1.Controls.Add(this.cb_Flipping);
             this.groupBox1.Controls.Add(this.cb_Collisions);
             this.groupBox1.Controls.Add(this.cb_Instances);
             this.groupBox1.Controls.Add(this.cb_Tiles);
             this.groupBox1.Location = new System.Drawing.Point(8, 32);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(232, 72);
+            this.groupBox1.Size = new System.Drawing.Size(232, 104);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Write Options";
@@ -246,7 +231,8 @@ namespace GMare.Forms
             // cb_Collisions
             // 
             this.cb_Collisions.AutoSize = true;
-            this.cb_Collisions.Location = new System.Drawing.Point(8, 48);
+            this.cb_Collisions.Enabled = false;
+            this.cb_Collisions.Location = new System.Drawing.Point(8, 80);
             this.cb_Collisions.Name = "cb_Collisions";
             this.cb_Collisions.Size = new System.Drawing.Size(128, 17);
             this.cb_Collisions.TabIndex = 2;
@@ -257,7 +243,7 @@ namespace GMare.Forms
             // cb_Instances
             // 
             this.cb_Instances.AutoSize = true;
-            this.cb_Instances.Location = new System.Drawing.Point(8, 32);
+            this.cb_Instances.Location = new System.Drawing.Point(8, 64);
             this.cb_Instances.Name = "cb_Instances";
             this.cb_Instances.Size = new System.Drawing.Size(131, 17);
             this.cb_Instances.TabIndex = 1;
@@ -278,11 +264,52 @@ namespace GMare.Forms
             this.cb_Tiles.UseVisualStyleBackColor = true;
             this.cb_Tiles.CheckedChanged += new System.EventHandler(this.cb_CheckedChanged);
             // 
+            // cb_Flipping
+            // 
+            this.cb_Flipping.AutoSize = true;
+            this.cb_Flipping.Location = new System.Drawing.Point(24, 32);
+            this.cb_Flipping.Name = "cb_Flipping";
+            this.cb_Flipping.Size = new System.Drawing.Size(146, 17);
+            this.cb_Flipping.TabIndex = 3;
+            this.cb_Flipping.Text = "Include Tile Flipping Data";
+            this.cb_Flipping.UseVisualStyleBackColor = true;
+            this.cb_Flipping.CheckedChanged += new System.EventHandler(this.cb_CheckedChanged);
+            // 
+            // cb_BlendColor
+            // 
+            this.cb_BlendColor.AutoSize = true;
+            this.cb_BlendColor.Location = new System.Drawing.Point(24, 48);
+            this.cb_BlendColor.Name = "cb_BlendColor";
+            this.cb_BlendColor.Size = new System.Drawing.Size(164, 17);
+            this.cb_BlendColor.TabIndex = 4;
+            this.cb_BlendColor.Text = "Include Tile Blend Color Data";
+            this.cb_BlendColor.UseVisualStyleBackColor = true;
+            this.cb_BlendColor.CheckedChanged += new System.EventHandler(this.cb_CheckedChanged);
+            // 
+            // clb_Rooms
+            // 
+            this.clb_Rooms.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.clb_Rooms.FormattingEnabled = true;
+            this.clb_Rooms.Glyph = global::GMare.Properties.Resources.room;
+            this.clb_Rooms.HorizontalExtent = 212;
+            this.clb_Rooms.HorizontalScrollbar = true;
+            this.clb_Rooms.IntegralHeight = false;
+            this.clb_Rooms.Location = new System.Drawing.Point(8, 16);
+            this.clb_Rooms.Name = "clb_Rooms";
+            this.clb_Rooms.Size = new System.Drawing.Size(216, 168);
+            this.clb_Rooms.TabIndex = 1;
+            this.toolTip1.SetToolTip(this.clb_Rooms, "List of rooms to export to binary file");
+            this.clb_Rooms.SelectedIndexChanged += new System.EventHandler(this.clb_Rooms_SelectedIndexChanged);
+            this.clb_Rooms.KeyDown += new System.Windows.Forms.KeyEventHandler(this.clb_Rooms_KeyDown);
+            this.clb_Rooms.MouseDown += new System.Windows.Forms.MouseEventHandler(this.clb_Rooms_MouseDown);
+            // 
             // ExportBinaryForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(250, 338);
+            this.ClientSize = new System.Drawing.Size(250, 368);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.groupBox2);
@@ -332,5 +359,7 @@ namespace GMare.Forms
         private System.Windows.Forms.CheckBox cb_Collisions;
         private System.Windows.Forms.CheckBox cb_Instances;
         private System.Windows.Forms.CheckBox cb_Tiles;
+        private System.Windows.Forms.CheckBox cb_BlendColor;
+        private System.Windows.Forms.CheckBox cb_Flipping;
     }
 }

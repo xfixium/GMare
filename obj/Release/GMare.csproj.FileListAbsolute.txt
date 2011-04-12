@@ -48,7 +48,6 @@ C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Release\GMar
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Release\GMare.Forms.ExportImageForm.resources
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Release\GMare.Forms.InstanceForm.resources
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Release\GMare.Forms.LayerForm.resources
-C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Release\GMare.Forms.TextForm.resources
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Release\GMare.Forms.MainForm.resources
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Release\GMare.Forms.RoomForm.resources
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Release\GMare.Forms.ShiftForm.resources
@@ -62,3 +61,7 @@ C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Release\Gene
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Release\GenerateResource-ResGen.write.1.tlog
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Release\GMare.exe.manifest
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Release\GMare.application
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\obj\Release\GMare.Forms.BrushEditForm.resources
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\obj\Release\GMare.Forms.WarningForm.resources
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\obj\Release\GMare.Forms.ViewForm.resources
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\obj\Release\GMare.Forms.BrushForm.resources

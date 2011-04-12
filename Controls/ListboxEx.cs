@@ -62,7 +62,8 @@ namespace GMare.Controls
             Backgrounds,
             BinaryFiles,
             Shapes,
-            Instances
+            Instances,
+            Brushes
         };
 
         private ListboxType _listboxMode = ListboxType.Backgrounds;  // The information displayed by this listbox.
@@ -193,8 +194,9 @@ namespace GMare.Controls
                 {
                     case ListboxType.Backgrounds: text = "- No Backgrounds -"; break;
                     case ListboxType.BinaryFiles: text = "- No Project Files -"; break;
-                    case ListboxType.Shapes: text = "- No Collisions -"; break;
+                    case ListboxType.Shapes: text = "- Collisions Feature Not Yet Available -"; break;
                     case ListboxType.Instances: text = "- No Instances -"; break;
+                    case ListboxType.Brushes: text = "- No Brushes -"; break;
                 }
 
                 // Calculate the position of the text, which is the center of the control.
@@ -229,6 +231,7 @@ namespace GMare.Controls
                     case ListboxType.BinaryFiles: DrawRoom(e); break;
                     case ListboxType.Shapes: DrawShape(e); break;
                     case ListboxType.Instances: DrawInstance(e); break;
+                    case ListboxType.Brushes: DrawBrush(e); break;
                 }
             }
         }
@@ -628,6 +631,57 @@ namespace GMare.Controls
 
             // Draw the text.
             e.Graphics.DrawString(text, this.Font, new SolidBrush(textColor), textLocation.X, textLocation.Y);
+
+            // Dispose of glyph.
+            image.Dispose();
+        }
+
+        #endregion
+
+        #region DrawBrush
+
+        /// <summary>
+        /// Draw array item.
+        /// </summary>
+        private void DrawBrush(DrawItemEventArgs e)
+        {
+            // Shape data.
+            Bitmap image = (Bitmap)(this.Items[e.Index] as GMareBrush).Glyph.Clone();
+            string text = this.Items[e.Index].ToString();
+
+            // Set the points where to draw the glyph and text.
+            Point imageLocation = new Point(e.Bounds.X + 1, e.Bounds.Y + 1);
+            Point textLocation = new Point(e.Bounds.X + _cellWidth + 1, e.Bounds.Y + 2);
+
+            // The text color.
+            Color textColor = this.ForeColor;
+
+            // Do some fancy background painting.
+            if (e.Index % 2 == 0)
+                e.Graphics.FillRectangle(SystemBrushes.Control, e.Bounds);
+            else
+                e.Graphics.FillRectangle(new SolidBrush(this.BackColor), e.Bounds);
+
+            // If the current item is selected.
+            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+            {
+                if (_lastSelectedIndex > -1)
+                {
+                    DrawItemEventArgs diea = new DrawItemEventArgs(e.Graphics, e.Font, e.Bounds, _lastSelectedIndex, DrawItemState.NoFocusRect);
+                    base.OnDrawItem(diea);
+                }
+
+                // Draw the area in the selected state.
+                e.Graphics.FillRectangle(SystemBrushes.Highlight, e.Bounds);
+                textColor = Color.White;
+                _lastSelectedIndex = e.Index;
+            }
+
+            // Draw the glyph.
+            e.Graphics.DrawImageUnscaled(image, imageLocation);
+
+            // Draw the text.
+            e.Graphics.DrawString(text, Font, new SolidBrush(textColor), textLocation.X, textLocation.Y);
 
             // Dispose of glyph.
             image.Dispose();

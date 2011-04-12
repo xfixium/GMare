@@ -62,7 +62,7 @@ namespace GMare.Controls
             // 
             // tsmi_Deselect
             // 
-            this.tsmi_Deselect.Image = global::GMare.Properties.Resources.select_empty;
+            this.tsmi_Deselect.Image = global::GMare.Properties.Resources.selection_empty;
             this.tsmi_Deselect.Name = "tsmi_Deselect";
             this.tsmi_Deselect.Size = new System.Drawing.Size(142, 22);
             this.tsmi_Deselect.Text = "Deselect";

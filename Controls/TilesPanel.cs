@@ -17,8 +17,8 @@ namespace GMare.Controls
         private Bitmap _backBuffer = null;                 // Rendering surface.
         private Bitmap _tileSelection = null;              // Tile selection bitmap.     
         private List<Bitmap> _tiles = null;                // Collection of tile images.
-        private TileGrid _targets = null;                  // The target tiles.
-        private TileGrid _swaps = null;                    // The swapping tiles.
+        private GMareBrush _targets = null;                // The target tiles.
+        private GMareBrush _swaps = null;                  // The swapping tiles.
         private Size _tileSize = new Size(16, 16);         // The size of a single tile in pixels.
         private ColorMatrix _matrix = null;                // Grid color matrix.
         private ImageAttributes _atts = null;              // Grid image attributes.
@@ -334,7 +334,7 @@ namespace GMare.Controls
                     }
 
                     // Create a new tile grid.
-                    _targets = new TileGrid();
+                    _targets = new GMareBrush();
 
                     // Start collecting other tiles.
                     _dragging = true;
@@ -464,7 +464,7 @@ namespace GMare.Controls
                 _dragging = false;
 
                 // Get an array of tile ids.
-                _targets.TileIds = TileGrid.RectangleToTileIds(_targets.ToRectangle(), TilesetWidth, _tileSize);
+                _targets.Tiles = GMareBrush.RectangleToTiles(_targets.ToRectangle(), TilesetWidth, _tileSize);
 
                 // Get target tiles.
                 int[] tiles = _targets.ToArray();
@@ -505,7 +505,7 @@ namespace GMare.Controls
                 }
 
                 // Get an array of selected tile ids.
-                _targets.TileIds = TileGrid.RectangleToTileIds(_targets.ToRectangle(), TilesetWidth, _tileSize);
+                _targets.Tiles = GMareBrush.RectangleToTiles(_targets.ToRectangle(), TilesetWidth, _tileSize);
 
                 // Get new target tiles.
                 int[] tiles = _targets.ToArray();

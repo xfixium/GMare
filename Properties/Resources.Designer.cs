@@ -123,9 +123,46 @@ namespace GMare.Properties {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Color blend data is only available for binary export, and requires Pro versions of Game Maker. Game Maker does not natively support color blend data for tile objects in it&apos;s project files..
+        /// </summary>
+        internal static string BlendWarning {
+            get {
+                return ResourceManager.GetString("BlendWarning", resourceCulture);
+            }
+        }
+        
         internal static System.Drawing.Bitmap book_open {
             get {
                 object obj = ResourceManager.GetObject("book_open", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap brush_add {
+            get {
+                object obj = ResourceManager.GetObject("brush_add", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap brush_delete {
+            get {
+                object obj = ResourceManager.GetObject("brush_delete", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap brush_edit {
+            get {
+                object obj = ResourceManager.GetObject("brush_edit", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap brush_fill {
+            get {
+                object obj = ResourceManager.GetObject("brush_fill", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -182,13 +219,6 @@ namespace GMare.Properties {
         internal static System.Drawing.Bitmap delete {
             get {
                 object obj = ResourceManager.GetObject("delete", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap empty {
-            get {
-                object obj = ResourceManager.GetObject("empty", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -270,6 +300,20 @@ namespace GMare.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap flip_horizontal {
+            get {
+                object obj = ResourceManager.GetObject("flip_horizontal", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap flip_vertical {
+            get {
+                object obj = ResourceManager.GetObject("flip_vertical", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap folder_image {
             get {
                 object obj = ResourceManager.GetObject("folder_image", resourceCulture);
@@ -329,6 +373,27 @@ namespace GMare.Properties {
         internal static System.Drawing.Bitmap import_objects {
             get {
                 object obj = ResourceManager.GetObject("import_objects", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap information {
+            get {
+                object obj = ResourceManager.GetObject("information", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap instance {
+            get {
+                object obj = ResourceManager.GetObject("instance", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap instance_show {
+            get {
+                object obj = ResourceManager.GetObject("instance_show", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -438,6 +503,13 @@ namespace GMare.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap mouse_wheel {
+            get {
+                object obj = ResourceManager.GetObject("mouse_wheel", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap page_find {
             get {
                 object obj = ResourceManager.GetObject("page_find", resourceCulture);
@@ -455,6 +527,13 @@ namespace GMare.Properties {
         internal static System.Drawing.Bitmap refactor {
             get {
                 object obj = ResourceManager.GetObject("refactor", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap rename {
+            get {
+                object obj = ResourceManager.GetObject("rename", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -480,6 +559,15 @@ namespace GMare.Properties {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Scaling data is only available for binary export. Game Maker does not natively support scaling data for tile objects in it&apos;s project files..
+        /// </summary>
+        internal static string ScaleWarning {
+            get {
+                return ResourceManager.GetString("ScaleWarning", resourceCulture);
+            }
+        }
+        
         internal static System.Drawing.Bitmap script {
             get {
                 object obj = ResourceManager.GetObject("script", resourceCulture);
@@ -494,16 +582,9 @@ namespace GMare.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap select_empty {
+        internal static System.Drawing.Bitmap selection_empty {
             get {
-                object obj = ResourceManager.GetObject("select_empty", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap selection {
-            get {
-                object obj = ResourceManager.GetObject("selection", resourceCulture);
+                object obj = ResourceManager.GetObject("selection_empty", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -585,16 +666,16 @@ namespace GMare.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap textfield_rename {
+        internal static System.Drawing.Bitmap tileset_save {
             get {
-                object obj = ResourceManager.GetObject("textfield_rename", resourceCulture);
+                object obj = ResourceManager.GetObject("tileset_save", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap tileset_save {
+        internal static System.Drawing.Bitmap tool_brush {
             get {
-                object obj = ResourceManager.GetObject("tileset_save", resourceCulture);
+                object obj = ResourceManager.GetObject("tool_brush", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -606,16 +687,16 @@ namespace GMare.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap tool_paint {
+        internal static System.Drawing.Bitmap tool_properties {
             get {
-                object obj = ResourceManager.GetObject("tool_paint", resourceCulture);
+                object obj = ResourceManager.GetObject("tool_properties", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap tool_select {
+        internal static System.Drawing.Bitmap tool_selection {
             get {
-                object obj = ResourceManager.GetObject("tool_select", resourceCulture);
+                object obj = ResourceManager.GetObject("tool_selection", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -327,7 +327,7 @@ namespace GMare.Forms
                             match = true;
 
                             // Set tile id, which is the same as the tile's index at this point.
-                            layer.Tiles[col, row] = j;
+                            layer.Tiles2[col, row].TileId = j;
                             break;
                         }
                     }
@@ -336,7 +336,7 @@ namespace GMare.Forms
                     if (match == false)
                     {
                         // New tile id.
-                        layer.Tiles[col, row] = imageData.Count;
+                        layer.Tiles2[col, row].TileId = imageData.Count;
 
                         // Add tile to unique tile list.
                         imageData.Add(compare);

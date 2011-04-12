@@ -46,26 +46,29 @@ namespace GMare.Controls
         public delegate void PositionHandler();                       // Mouse poisition changed event handler.
         public event InstanceChangedHandler SelectedInstanceChanged;  // Selected instance changed event.
         public delegate void InstanceChangedHandler();                // Selected instance changed event handler.
-        public event RoomChangedHandler RoomChanged;                  // Room changed event.
-        public delegate void RoomChangedHandler();                    // Room changed event handler.
+        public event RoomChangingHandler RoomChanging;                // Room changing event.
+        public delegate void RoomChangingHandler();                   // Room changing event handler.
         public event ClipboardChangedHandler ClipboardChanged;        // Clipboard contents changed.
         public delegate void ClipboardChangedHandler();               // Clipboard contents changed handler.
 
         private Timer _stippleTimer = new Timer();                    // Marching ants timer.
         private GMareObject _selectedObject = null;                   // The currently selected object.
-        private GMareCollision _selectedShape = null;                     // The currently selected shape.
+        private GMareCollision _selectedShape = null;                 // The currently selected shape.
         private GMareInstance _selectedInstance = null;               // The currently selected instance.
         private GMareInstance _instanceClip = null;                   // The instance clipboard.
         private EditType _editMode = EditType.ViewAll;                // The edit mode of the control.
-        private ToolType _toolMode = ToolType.Pencil;                 // The type of tool selected.
+        private ToolType _toolMode = ToolType.Brush;                  // The type of tool selected.
         private ShapeType _shapeMode = ShapeType.Rectangle;           // The type of collision shape selected.
         private GridType _gridMode = GridType.Normal;                 // The type of grid to draw.
-        private TileGrid _tiles = new TileGrid();                     // The tile grid used for setting tile ids, the brush.
-        private TileGrid _selection = null;                           // The selection of tiles when in selection mode.
-        private TileGrid _selectionClip = null;                       // The selection clipboard.
+        private GMareBrush _brush = new GMareBrush();                 // The brush used for setting tile ids.
+        private GMareBrush _selection = null;                         // A selection brush.
+        private GMareBrush _selectionClip = null;                     // The selection clipboard.
         private Cursor _cursorPencil = null;                          // The pencil cursor.
         private Cursor _cursorBucket = null;                          // The bucket cursor.
         private Cursor _cursorCross = null;                           // The selection cursor.
+        private Cursor _cursorHandOpen = null;                        // The viewport drag open hand.
+        private Cursor _cursorHandClose = null;                       // The viewport drag closed hand.
+        private Point _mousePosition = Point.Empty;                   // The position of the mouse within the control.
         private string _mouseActual = "-NA-";                         // The actual position of the mouse.
         private string _mouseSnapped = "-NA-";                        // The snapped position of the mouse.
         private string _mouseSector = "-NA-";                         // The tile id, based on mouse position.
@@ -80,10 +83,14 @@ namespace GMare.Controls
         private int _level = 0;                                       // The level of the collision.
         private bool _showGrid = true;                                // Whether to show the grid.
         private bool _showCursor = false;                             // Whether to show the cursor.
+        private bool _showInstances = false;                          // Whether to show instances all the time.
         private bool _dragging = false;                               // Whether in a dragging operation.
         private bool _moving = false;                                 // Whether in a moving operation.
         private bool _moved = false;                                  // Whether a selection has moved since it first was selected.
         private bool _snap = true;                                    // Whether the instances created are snapped to a grid.
+        private bool _shiftKey = false;                               // Whether the shift key is being held down.
+        private bool _handKey = false;                                // Whether the hand tool key is being held down.
+        private bool _mouseDown = false;                              // Whether the mouse if being held down.
 
         #endregion
 
@@ -127,7 +134,7 @@ namespace GMare.Controls
         /// <summary>
         /// Gets the selection clipboard.
         /// </summary>
-        public TileGrid SelectionClipboard
+        public GMareBrush SelectionClipboard
         {
             get { return _selectionClip; }
         }
@@ -135,7 +142,7 @@ namespace GMare.Controls
         /// <summary>
         /// Gets the current selection.
         /// </summary>
-        public TileGrid Selection
+        public GMareBrush Selection
         {
             get { return _selection; }
         }
@@ -170,11 +177,11 @@ namespace GMare.Controls
             get { return _toolMode; }
             set
             {
-                _toolMode = value;
-
-                // If not using the selection tool, deselect.
-                if (_toolMode != ToolType.Selection)
+                // If not switching to the same selection type tool, deselect.
+                if (_toolMode == ToolType.Selection && value != ToolType.Selection)
                     tsmi_SelectionDeselect_Click(this, EventArgs.Empty);
+                
+                _toolMode = value;
 
                 // Set the tool cursor.
                 SetCursor();
@@ -200,12 +207,12 @@ namespace GMare.Controls
         }
 
         /// <summary>
-        /// Gets or sets the grid of selected tiles.
+        /// Gets or sets the tiles used to paint.
         /// </summary>
-        public TileGrid Tiles
+        public GMareBrush Brush
         {
-            get { return _tiles; }
-            set { _tiles = value; }
+            get { return _brush; }
+            set { _brush = value; }
         }
 
         /// <summary>
@@ -214,6 +221,14 @@ namespace GMare.Controls
         public Bitmap Image
         {
             set { LoadTexture(value); }
+        }
+
+        /// <summary>
+        /// Gets the actual mouse position.
+        /// </summary>
+        public Point MousePosition
+        {
+            get { return _mousePosition; }
         }
 
         /// <summary>
@@ -294,6 +309,9 @@ namespace GMare.Controls
             set { GraphicsManager.ScreenScale = value; Invalidate(); }
         }
 
+        /// <summary>
+        /// Gets or sets the viewport offset.
+        /// </summary>
         public Point Offset
         {
             get { return new Point(GraphicsManager.OffsetX, GraphicsManager.OffsetY); }
@@ -355,12 +373,52 @@ namespace GMare.Controls
         }
 
         /// <summary>
+        /// Gets or sets the show instances always.
+        /// </summary>
+        public bool ShowInstances
+        {
+            get { return _showInstances; }
+            set { _showInstances = value; Invalidate(); }
+        }
+
+        /// <summary>
         /// Gets or sets whether to snap instances to the grid.
         /// </summary>
         public bool Snap
         {
             get { return _snap; }
             set { _snap = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the shift key is being held down.
+        /// </summary>
+        public bool ShiftKey
+        {
+            get { return _shiftKey; }
+            set { _shiftKey = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the shift key is being held down.
+        /// </summary>
+        public bool HandKey
+        {
+            get { return _handKey; }
+            set
+            {
+                _handKey = value;
+
+                // If the hand tool is being readied, use hand open cursor.
+                if (_handKey == true)
+                    this.Cursor = _cursorHandOpen;
+                else  // Set the cursoe normally.
+                    SetCursor();
+                
+                // Dragging the view, change cursor.
+                if (_mouseDown == true)
+                    this.Cursor = _cursorHandClose;
+            }
         }
 
         #endregion
@@ -386,11 +444,19 @@ namespace GMare.Controls
             _cursorPencil = new Cursor(GetType().Assembly.GetManifestResourceStream("GMare.Resources.cur_pencil.cur"));
             _cursorBucket = new Cursor(GetType().Assembly.GetManifestResourceStream("GMare.Resources.cur_bucket.cur"));
             _cursorCross = new Cursor(GetType().Assembly.GetManifestResourceStream("GMare.Resources.cur_cross.cur"));
+            _cursorHandOpen = new Cursor(GetType().Assembly.GetManifestResourceStream("GMare.Resources.cur_hand_open.cur"));
+            _cursorHandClose = new Cursor(GetType().Assembly.GetManifestResourceStream("GMare.Resources.cur_hand_close.cur"));
 
             // Set stipple timer.
             _stippleTimer.Interval = 100;
             _stippleTimer.Tick += new EventHandler(Timer_Tick);
             _stippleTimer.Start();
+
+            // Set brush options click events.
+            tsmi_BrushEdit.Click += new EventHandler(tsmi_BrushEdit_Click);
+            tsmi_BrushColor.Click += new EventHandler(tsmi_BrushColor_Click);
+            tsmi_BrushFlipHorizontal.Click += new EventHandler(tsmi_BrushFlipHorizontally_Click);
+            tsmi_BrushFlipVertical.Click += new EventHandler(tsmi_BrushFlipVertically_Click);
 
             // Set selection options click events.
             tsmi_SelectionCut.Click += new EventHandler(tsmi_SelectionCut_Click);
@@ -398,7 +464,11 @@ namespace GMare.Controls
             tsmi_SelectionPaste.Click += new EventHandler(tsmi_SelectionPaste_Click);
             tsmi_SelectionDeselect.Click += new EventHandler(tsmi_SelectionDeselect_Click);
             tsmi_SelectionDelete.Click += new EventHandler(tsmi_SelectionDelete_Click);
-            tsmi_SelectionFill.Click += new EventHandler(tsmi_SelectionFill_Click);
+            tsmi_SelectionBrush.Click += new EventHandler(tsmi_SelectionBrush_Click);
+            tsmi_SelectionAddBrush.Click += new EventHandler(tsmi_SelectionAdd_Click);
+            tsmi_SelectionFlipHorizontal.Click += new EventHandler(tsmi_SelectionFlipX_Click);
+            tsmi_SelectionFlipVertical.Click += new EventHandler(tsmi_SelectionFlipY_Click);
+            tsmi_SelectionColor.Click += new EventHandler(tsmi_SelectionColor_Click);
 
             // Set instance options click events.
             tsmi_InstanceCut.Click += new EventHandler(tsmi_InstanceCut_Click);
@@ -417,6 +487,120 @@ namespace GMare.Controls
 
         #region Events
 
+        #region Brush Options
+
+        /// <summary>
+        /// Create a brushes edit form.
+        /// </summary>
+        private void tsmi_BrushEdit_Click(object sender, EventArgs e)
+        {
+            // If a room is not being edited, return.
+            if (RoomExists() == false)
+                return;
+
+            // Create a new array of brushes.
+            GMareBrush[] brushes = new GMareBrush[ProjectManager.Room.Brushes.Count];
+
+            for (int i = 0; i < ProjectManager.Room.Brushes.Count; i++)
+                brushes[i] = ProjectManager.Room.Brushes[i].Clone();
+
+            // Create a new brushes edit.
+            using (BrushEditForm form = new BrushEditForm(brushes))
+            {
+                // If Ok was clicked.
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    ProjectManager.Room.Brushes.Clear();
+                    ProjectManager.Room.Brushes.AddRange(form.Brushes);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Flip horizontally click.
+        /// </summary>
+        public void tsmi_BrushFlipHorizontally_Click(object sender, EventArgs e)
+        {
+            // If the selection is empty, return.
+            if (_brush == null)
+                return;
+
+            // Show warning message.
+            if (ProjectManager.Room != null && ProjectManager.Room.ScaleWarning == true)
+                ShowWarning(GMare.Properties.Resources.ScaleWarning);
+
+            // Flip brush horizontally.
+            _brush.Flip(FlipDirection.Horizontal);
+
+            // Force redraw.
+            Invalidate();
+        }
+
+        /// <summary>
+        /// Flip vertically click.
+        /// </summary>
+        public void tsmi_BrushFlipVertically_Click(object sender, EventArgs e)
+        {
+            // If the selection is empty, return.
+            if (_brush == null)
+                return;
+
+            // Show warning message.
+            if (ProjectManager.Room != null && ProjectManager.Room.ScaleWarning == true)
+                ShowWarning(GMare.Properties.Resources.ScaleWarning);
+
+            // Flip the brush vertically.
+            _brush.Flip(FlipDirection.Vertical);
+
+            // Force redraw.
+            Invalidate();
+        }
+
+        /// <summary>
+        /// Brush blend color click.
+        /// </summary>
+        private void tsmi_BrushColor_Click(object sender, EventArgs e)
+        {
+            // If the selection is empty, return.
+            if (_brush == null)
+                return;
+
+            // Show warning message.
+            if (ProjectManager.Room != null && ProjectManager.Room.BlendWarning == true)
+                ShowWarning(GMare.Properties.Resources.BlendWarning);
+
+            // Create a color dialog.
+            using (ColorDialog form = new ColorDialog())
+            {
+                // If Ok was clicked.
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    // Set the color blend for each selection tile.
+                    foreach (GMareTile tile in _brush.Tiles)
+                    {
+                        // If the tile is not empty, set blend.
+                        if (tile.TileId != -1)
+                            tile.Blend = form.Color;
+                    }
+
+                    // Force redraw.
+                    Invalidate();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Item click.
+        /// </summary>
+        private void cms_BrushOptions_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            // If the tag holds a brush, set brush.
+            if (e.ClickedItem.Tag is GMareBrush)
+                _brush = e.ClickedItem.Tag as GMareBrush;
+        }
+
+        #endregion
+
         #region Selection Options
 
         /// <summary>
@@ -433,10 +617,8 @@ namespace GMare.Controls
                 // If the selection has not moved, set tiles empty under selection.
                 if (_moved == false)
                 {
-                    // Room changed, selected tiles set.
-                    RoomChanged();
-
-                    // Empty out selection tiles.
+                    // Room is about to change, record it.
+                    RoomChanging();
                     SetTiles(_selection.ToRectangle().X, _selection.ToRectangle().Y, true, _selection, true);
                 }
             }
@@ -465,7 +647,7 @@ namespace GMare.Controls
 
                 // Room changed, selected tiles set.
                 if (_moved == true)
-                    RoomChanged();
+                    RoomChanging();
 
                 // Set selection tiles to layer.
                 SetTiles(_selection.ToRectangle().X, _selection.ToRectangle().Y, false, _selection, true);
@@ -493,10 +675,8 @@ namespace GMare.Controls
             // If there was a previous selection.
             if (_selection != null)
             {
-                // Room changed, selected tiles set.
-                RoomChanged();
-
-                // Set previous selection to the layer.
+                // Room is about to change, record it.
+                RoomChanging();
                 SetTiles(_selection.StartX, _selection.StartY, false, _selection, true);
             }
 
@@ -537,34 +717,45 @@ namespace GMare.Controls
         }
 
         /// <summary>
-        /// Fill click.
+        /// Brush from selection click.
         /// </summary>
-        private void tsmi_SelectionFill_Click(object sender, EventArgs e)
+        private void tsmi_SelectionBrush_Click(object sender, EventArgs e)
         {
             // Get point.
             Point point = (sender as ToolStripMenuItem).GetCurrentParent().Location;
 
             // If not in selection mode, return.
-            if (_editMode != EditType.Layers || _toolMode != ToolType.Selection)
+            if (_editMode != EditType.Layers || _toolMode != ToolType.Selection || _selection == null)
                 return;
 
-            // If the clipboard is empty, return.
-            if (_selectionClip == null)
+            // Set brush to selection.
+            _brush = _selection.Clone();
+        }
+
+        /// <summary>
+        /// Add brush from selection click.
+        /// </summary>
+        private void tsmi_SelectionAdd_Click(object sender, EventArgs e)
+        {
+            // If not in selection mode, return.
+            if (_editMode != EditType.Layers || _toolMode != ToolType.Selection || _selection == null || RoomExists() == false)
                 return;
 
-            // Room changed, tile fill.
-            RoomChanged();
+            // Create a new brush form.
+            using (BrushForm form = new BrushForm(ProjectManager.Room.GetTileset(), _selection, ProjectManager.Room.TileSize))
+            {
+                // If ok was clcicked.
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    // Create a brush.
+                    GMareBrush brush = _selection.Clone();
+                    brush.Name = form.BrushName;
+                    brush.Glyph = form.BrushGlyph;
 
-            // Calculate starting point in tiles.
-            Size tileSize = ProjectManager.Room.TileSize;
-            Point snap = GetSnappedPoint(this.PointToClient(point), tileSize);
-            Point tile = new Point(snap.X / tileSize.Width, snap.Y / tileSize.Height);
-
-            // Fill tile(s).
-            ProjectManager.Room.Layers[_layerIndex].Fill(tile, _selectionClip.TileIds);
-
-            // Force redraw.
-            Invalidate();
+                    // Add the selection to the brushes list.
+                    ProjectManager.Room.Brushes.Add(brush);
+                }
+            }
         }
 
         /// <summary>
@@ -575,7 +766,8 @@ namespace GMare.Controls
             // Room changed, selected tiles set, and If there was a previous selection, set it to the layer.
             if (_moved == true && _selection != null)
             {
-                RoomChanged();
+                // Room is about to change, record it.
+                RoomChanging();
                 SetTiles(_selection.ToRectangle().X, _selection.ToRectangle().Y, false, _selection, true);
             }
 
@@ -601,10 +793,8 @@ namespace GMare.Controls
             // If the selection has not moved, set tiles empty under selection.
             if (_selection != null && _moved == false)
             {
-                // Room changed, selected tiles set.
-                RoomChanged();
-
-                // Empty out selection tiles.
+                // Room is about to change, record it.
+                RoomChanging();
                 SetTiles(_selection.ToRectangle().X, _selection.ToRectangle().Y, true, _selection, true);
             }
 
@@ -621,6 +811,88 @@ namespace GMare.Controls
             Invalidate();
         }
 
+        /// <summary>
+        /// Flip horizontally click.
+        /// </summary>
+        public void tsmi_SelectionFlipX_Click(object sender, EventArgs e)
+        {
+            // If the selection is empty, return.
+            if (_selection == null)
+                return;
+
+            // Show warning message.
+            if (ProjectManager.Room != null && ProjectManager.Room.ScaleWarning == true)
+                ShowWarning(GMare.Properties.Resources.ScaleWarning);
+
+            // Flip selection horizontally.
+            _selection.Flip(FlipDirection.Horizontal);
+
+            // Set that the selection changed.
+            _moved = true;
+
+            // Force redraw.
+            Invalidate();
+        }
+
+        /// <summary>
+        /// Flip vertically click.
+        /// </summary>
+        public void tsmi_SelectionFlipY_Click(object sender, EventArgs e)
+        {
+            // If the selection is empty, return.
+            if (_selection == null)
+                return;
+
+            // Show warning message.
+            if (ProjectManager.Room != null && ProjectManager.Room.ScaleWarning == true)
+                ShowWarning(GMare.Properties.Resources.ScaleWarning);
+
+            // Flip selection vertically.
+            _selection.Flip(FlipDirection.Vertical);
+
+            // Set that the selection changed.
+            _moved = true;
+
+            // Force redraw.
+            Invalidate();
+        }
+
+        /// <summary>
+        /// Blend color click.
+        /// </summary>
+        public void tsmi_SelectionColor_Click(object sender, EventArgs e)
+        {
+            // If the selection is empty, return.
+            if (_selection == null)
+                return;
+
+            // Show warning message.
+            if (ProjectManager.Room != null && ProjectManager.Room.BlendWarning == true)
+                ShowWarning(GMare.Properties.Resources.BlendWarning);
+
+            // Create a color dialog.
+            using (ColorDialog form = new ColorDialog())
+            {
+                // If Ok was clicked.
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    // Set the color blend for each selection tile.
+                    foreach (GMareTile tile in _selection.Tiles)
+                    {
+                        // If the tile is not empty, set blend.
+                        if (tile.TileId != -1)
+                            tile.Blend = form.Color;
+                    }
+
+                    // Set that the selection changed.
+                    _moved = true;
+
+                    // Force redraw.
+                    Invalidate();
+                }
+            }
+        }
+
         #endregion
 
         #region Instance Options
@@ -635,7 +907,7 @@ namespace GMare.Controls
                 return;
 
             // Room changed, instance deleted.
-            RoomChanged();
+            RoomChanging();
 
             // Set instance clipboard.
             _instanceClip = _selectedInstance.Clone();
@@ -708,7 +980,7 @@ namespace GMare.Controls
                 return;
 
             // Room changed, instance index changed.
-            RoomChanged();
+            RoomChanging();
 
             // Send the selected instance to the end of the list.
             ProjectManager.Room.Instances.Add(_selectedInstance.Clone());
@@ -731,7 +1003,7 @@ namespace GMare.Controls
                 return;
 
             // Room changed, instance index changed.
-            RoomChanged();
+            RoomChanging();
 
             // Send the selected instance to the end of the list.
             ProjectManager.Room.Instances.Insert(0, _selectedInstance.Clone());
@@ -769,7 +1041,7 @@ namespace GMare.Controls
                 return;
 
             // Room changed, instance position changed.
-            RoomChanged();
+            RoomChanging();
 
             // Set instance new position.
             _selectedInstance.X = snap.X;
@@ -799,7 +1071,7 @@ namespace GMare.Controls
                         return;
 
                     // Room changed, instance creation code changed.
-                    RoomChanged();
+                    RoomChanging();
 
                     // Set creation code.
                     _selectedInstance.CreationCode = form.Code;
@@ -820,7 +1092,7 @@ namespace GMare.Controls
                 return;
 
             // Room changed, instance deleted.
-            RoomChanged();
+            RoomChanging();
 
             // Remove selected instance.
             ProjectManager.Room.Instances.Remove(_selectedInstance);
@@ -845,7 +1117,7 @@ namespace GMare.Controls
             if (result == DialogResult.Yes)
             {
                 // Room changed, all instances of set type deleted.
-                RoomChanged();
+                RoomChanging();
 
                 // Delete all of the selected object type.
                 ProjectManager.Room.Instances.RemoveAll(delegate(GMareInstance i) { return i.ObjectId == _selectedInstance.ObjectId; });
@@ -871,7 +1143,7 @@ namespace GMare.Controls
             if (result == DialogResult.Yes)
             {
                 // Room changed, all instances deleted.
-                RoomChanged();
+                RoomChanging();
 
                 // Clear all instances.
                 ProjectManager.Room.Instances.Clear();
@@ -937,7 +1209,7 @@ namespace GMare.Controls
                 DrawTiles();
 
                 // If in instance mode, or view all mode, draw instances.
-                if (_editMode == EditType.Instances || _editMode == EditType.ViewAll)
+                if (_editMode == EditType.Instances || _editMode == EditType.ViewAll || _showInstances == true)
                     DrawInstances();
 
                 // Draw grid.
@@ -950,11 +1222,13 @@ namespace GMare.Controls
                 // Draw selection.
                 if (_editMode == EditType.Layers)
                 {
-                    // If selection tool, draw selection, else draw the standard cursor.
-                    if (_toolMode == ToolType.Selection)
-                        DrawSelection();
-                    else
-                        DrawCursor();
+                    // Do action based on tool type.
+                    switch (_toolMode)
+                    {
+                        case ToolType.Brush: DrawBrush(); break;
+                        case ToolType.Bucket: DrawBrush(); break;
+                        case ToolType.Selection: DrawSelection(); break;
+                    }
                 }
 
                 // Disable scissor testing.
@@ -991,6 +1265,14 @@ namespace GMare.Controls
             if (RoomExists() == false)
                 return;
 
+            // If the hand key is being held down, return.
+            if (_handKey == true)
+            {
+                _mouseDown = true;
+                return;
+            }
+
+            // Do action based on edit mode.
             switch (_editMode)
             {
                 case EditType.Layers: LayersMouseDown(e); break;
@@ -1017,8 +1299,13 @@ namespace GMare.Controls
             Point snap = GetSnappedPoint(e.Location, tileSize);
 
             // Set mouse position information.
+            _mousePosition = GetActualPoint(e.X, e.Y);
             this.SetMouseActual = "Actual: " + GetActualPoint(e.X, e.Y).ToString();
             this.SetMouseSnapped = "Snapped: " + snap.ToString();
+
+            // If the hand key is being held down, return.
+            if (_handKey == true)
+                return;
 
             // Do action based on edit mode.
             switch (_editMode)
@@ -1037,7 +1324,10 @@ namespace GMare.Controls
             // If a room has not been loaded, return.
             if (RoomExists() == false)
                 return;
-                
+
+            // No more hand tool.
+            _mouseDown = false;
+
             // Do action based on edit mode.
             switch (_editMode)
             {
@@ -1058,9 +1348,6 @@ namespace GMare.Controls
         /// </summary>
         protected override void  OnMouseEnter(EventArgs e)
         {
-            // Focus for scroll support.
-            Focus();
-
             // Allow hooking of this event.
             base.OnMouseEnter(e);
 
@@ -1082,7 +1369,7 @@ namespace GMare.Controls
             // Set mouse information.
             SetMouseActual = "Actual: -NA-";
             SetMouseSnapped = "Snapped: -NA-";
-            SetMouseSector = "Tile Id: -NA-";
+            SetMouseSector = "Tile: -NA-";
 
             // Set cursor.
             this.Cursor = Cursors.Arrow;
@@ -1121,20 +1408,26 @@ namespace GMare.Controls
             // Do action based on tool.
             switch (_toolMode)
             {
-                // Pencil tool.
-                case ToolType.Pencil:
-
-                    // Room changed, tiles have been set.
-                    RoomChanged();
-
-                    // Start dragging operation.
-                    _dragging = true;
+                // Brush tool.
+                case ToolType.Brush:
 
                     // If left click set tile, right click set tile empty.
                     if (mouse.Button == MouseButtons.Left)
-                        SetTiles(mouse.X, mouse.Y, false, _tiles, false);
+                    {
+                        // Room is about to change, record it.
+                        RoomChanging();
+
+                        // If the shift key is being held down erase tile, else paint tile.
+                        if (_shiftKey == true)
+                            SetTiles(mouse.X, mouse.Y, true, _brush, false);
+                        else
+                            SetTiles(mouse.X, mouse.Y, false, _brush, false);
+                    }
                     else if (mouse.Button == MouseButtons.Right)
-                        SetTiles(mouse.X, mouse.Y, true, _tiles, false);
+                    {
+                        // Show context menu.
+                        ShowBrushesContext(mouse.Location);
+                    }
 
                     // Force redraw.
                     Invalidate();
@@ -1143,17 +1436,38 @@ namespace GMare.Controls
                 // Bucket fill tool.
                 case ToolType.Bucket:
 
-                    // Room changed, tiles have been set.
-                    RoomChanged();
-
-                    // Calculate starting point in tiles.
-                    Point tile = new Point(snap.X / tileSize.Width, snap.Y / tileSize.Height);
-
                     // If left click fill tile(s), right click set tile(s) empty.
                     if (mouse.Button == MouseButtons.Left)
-                        ProjectManager.Room.Layers[_layerIndex].Fill(tile, _tiles.TileIds);
+                    {
+                        // Room is changing.
+                        RoomChanging();
+
+                        // Calculate starting point in tiles.
+                        Point tile = new Point(snap.X / tileSize.Width, snap.Y / tileSize.Height);
+
+                        // If the shift key is being held down, erase tiles else, fill with brush.
+                        if (_shiftKey == true)
+                            ProjectManager.Room.Layers[_layerIndex].Fill(tile, -1);
+                        else
+                            ProjectManager.Room.Layers[_layerIndex].Fill(tile, _brush.Tiles);
+                    }
                     else if (mouse.Button == MouseButtons.Right)
-                        SetTiles(mouse.X, mouse.Y, true, _tiles, false);
+                    {
+                        // Set context menu.
+                        if (ProjectManager.Room.Brushes.Count == 0)
+                        {
+                            tsmi_BrushEdit.Visible = false;
+                            tsmi_BrushNone.Visible = true;
+                        }
+                        else
+                        {
+                            tsmi_BrushEdit.Visible = true;
+                            tsmi_BrushNone.Visible = false;
+                        }
+
+                        // Show context menu.
+                        cms_BrushOptions.Show(PointToScreen(mouse.Location));
+                    }
 
                     // Force redraw.
                     Invalidate();
@@ -1174,8 +1488,8 @@ namespace GMare.Controls
                             // If the selection has never been clicked to be moved.
                             if (_moved == false)
                             {
-                                // Room changed, selected tiles set.
-                                RoomChanged();
+                                // Room is about to change, record it.
+                                RoomChanging();
 
                                 // Set tiles empty under selection.
                                 SetTiles(_selection.ToRectangle().X, _selection.ToRectangle().Y, true, _selection, true);
@@ -1197,7 +1511,7 @@ namespace GMare.Controls
                                 SetTiles(_selection.StartX, _selection.StartY, false, _selection, true);
 
                             // Create a new selection.
-                            _selection = new TileGrid();
+                            _selection = new GMareBrush();
 
                             // Start collecting other tiles.
                             _dragging = true;
@@ -1226,20 +1540,15 @@ namespace GMare.Controls
                             tsmi_SelectionCut.Enabled = true;
                             tsmi_SelectionDelete.Enabled = true;
                             tsmi_SelectionDeselect.Enabled = true;
+                            tsmi_SelectionBrush.Enabled = true;
+                            tsmi_SelectionAddBrush.Enabled = true;
+                            tsmi_SelectionFlipHorizontal.Enabled = true;
+                            tsmi_SelectionFlipVertical.Enabled = true;
+                            tsmi_SelectionColor.Enabled = true;
                         }
 
                         // If the clipboard is empty, do not enable the paste function, else allow it.
                         tsmi_SelectionPaste.Enabled = _selectionClip == null ? false : true;
-
-                        // If the mouse is not within the selection, and the clipboard is not empty, allow flood fill.
-                        if (_selectionClip != null)
-                        {
-                            // If there is no selection, or if there is a fill, but the cursor is not within it, allow fill.
-                            if (_selection == null)
-                                tsmi_SelectionFill.Enabled = true;
-                            else if (_selection != null && _selection.ToRectangle().Contains(snap) == false)
-                                tsmi_SelectionFill.Enabled = true;
-                        }
 
                         // Show menu.
                         cms_SelectionOptions.Show(PointToScreen(mouse.Location));
@@ -1259,7 +1568,7 @@ namespace GMare.Controls
             Point snap = GetSnappedPoint(mouse.Location, tileSize);
 
             // Set tile id string.
-            SetMouseSector = "Tile Id: " + GetTile(mouse.X, mouse.Y);
+            SetMouseSector = GetTile(mouse.X, mouse.Y);
 
             // Check that the mouse is within room bounds.
             if (CheckBounds(mouse.X, mouse.Y) == false)
@@ -1273,7 +1582,7 @@ namespace GMare.Controls
             switch (_toolMode)
             {
                 // Pencil tool.
-                case ToolType.Pencil:
+                case ToolType.Brush:
 
                     // If the new snapped position differs from the old position.
                     if (snap.X != _posX || snap.Y != _posY)
@@ -1284,9 +1593,13 @@ namespace GMare.Controls
 
                         // If left click set tile, right click set tile empty.
                         if (mouse.Button == MouseButtons.Left)
-                            SetTiles(mouse.X, mouse.Y, false, _tiles, false);
-                        else if (mouse.Button == MouseButtons.Right)
-                            SetTiles(mouse.X, mouse.Y, true, _tiles, false);
+                        {
+                            // If the shift key is being held down.
+                            if (_shiftKey == true)
+                                SetTiles(mouse.X, mouse.Y, true, _brush, false);
+                            else
+                                SetTiles(mouse.X, mouse.Y, false, _brush, false);
+                        }
 
                         // Force redraw.
                         Invalidate();
@@ -1356,6 +1669,7 @@ namespace GMare.Controls
 
                     break;
 
+                // Default.
                 default:
 
                     // If the mouse snap position is different, update.
@@ -1386,8 +1700,7 @@ namespace GMare.Controls
 
                     // If dragging, get selected tile ids.
                     if (_dragging == true)
-                        // Set selection.
-                        _selection.TileIds = GetTiles(_selection);
+                        _selection.Tiles = GetTiles(_selection);
 
                     // Stop moving and dragging operations.
                     _moving = false;
@@ -1533,7 +1846,7 @@ namespace GMare.Controls
                 return;
 
             // Room changed, instance added.
-            RoomChanged();
+            RoomChanging();
 
             // Create a new instance, based off of selected object.
             GMareInstance inst = new GMareInstance();
@@ -1745,7 +2058,7 @@ namespace GMare.Controls
 
         #region Draw
 
-        #region DrawTiles
+        #region Draw Tiles
 
         /// <summary>
         /// Draws all the tiles in the tile array.
@@ -1784,7 +2097,8 @@ namespace GMare.Controls
                     for (int row = 0; row < rows; row++)
                     {
                         // Get tile id.
-                        int tileId = ProjectManager.Room.Layers[layer].Tiles[col, row];
+                        GMareTile tile = ProjectManager.Room.Layers[layer].Tiles2[col, row];
+                        int tileId = tile.TileId;
 
                         // If the tile is empty, continue looping.
                         if (tileId == -1)
@@ -1805,11 +2119,14 @@ namespace GMare.Controls
                             continue;
 
                         // Calculate source point.
-                        source = TileGrid.TileIdToSector(tileId, width, tileSize);
+                        source = GMareBrush.TileIdToSector(tileId, width, tileSize);
+
+                        // Scaling values.
+                        PointF scale = tile.GetScale();
 
                         // Draw tile to cache.
                         if (source.X < GraphicsManager.TileMaps[0].GetLength(0) && source.Y < GraphicsManager.TileMaps[0].GetLength(1))
-                            GraphicsManager.DrawTile(GraphicsManager.TileMaps[index][source.X, source.Y], position.X, position.Y, Color.White);
+                            GraphicsManager.DrawTile(GraphicsManager.TileMaps[index][source.X, source.Y], position.X, position.Y, scale.X, scale.Y, 0, tile.Blend);
                     }
                 }
 
@@ -1818,9 +2135,45 @@ namespace GMare.Controls
             }
         }
 
+        /// <summary>
+        /// Sets the blend mode for tile drawing.
+        /// </summary>
+        /// <param name="depth">The depth of the tile.</param>
+        /// <returns>Tileset index to use for rendering.</returns>
+        private int GetIndex(int depth)
+        {
+            // Do action based on edit mode.
+            switch (_editMode)
+            {
+                // Draw normal for view all mode.
+                case EditType.ViewAll:
+                    return 0;
+
+                // Draw dark for instance mode.
+                case EditType.Instances:
+                    return 1;
+
+                // Layer mode.
+                case EditType.Layers:
+
+                    // Set tileset based on depth
+                    if (depth == _depthIndex)
+                        return 0;
+                    else if (depth > _depthIndex)
+                        return 1;
+                    else if (depth < _depthIndex)
+                        return 2;
+
+                    break; 
+            }
+
+            // Draw normal as default.
+            return 0;
+        }
+
         #endregion
 
-        #region DrawGrid
+        #region Draw Grid
 
         /// <summary>
         /// Draws the grid.
@@ -1918,15 +2271,15 @@ namespace GMare.Controls
 
         #endregion
 
-        #region DrawCursor
+        #region Draw Brush
 
         /// <summary>
         /// Draws the selected tiles with a rectangle border.
         /// </summary>
-        private void DrawCursor()
+        private void DrawBrush()
         {
             // If the cursor should not be drawn, return.
-            if (_showCursor == false)
+            if (_showCursor == false || _handKey == true)
                 return;
 
             // Get room tilesize.
@@ -1936,7 +2289,7 @@ namespace GMare.Controls
             Rectangle selection = new Rectangle();
 
             // Get selection rectangle.
-            selection = _tiles.ToRectangle();
+            selection = _brush.ToRectangle();
             selection.X = _posX;
             selection.Y = _posY;
 
@@ -1951,18 +2304,19 @@ namespace GMare.Controls
             Point position = Point.Empty;
 
             // Iterate through tiles horizontally.
-            for (int col = 0; col < _tiles.Columns; col++)
+            for (int col = 0; col < _brush.Columns; col++)
             {
                 // Iterate through tiles vertically.
-                for (int row = 0; row < _tiles.Rows; row++)
+                for (int row = 0; row < _brush.Rows; row++)
                 {
                     // Calculate source point.
-                    source = TileGrid.TileIdToSector(_tiles.TileIds[col, row], width, tileSize);
+                    source = GMareBrush.TileIdToSector(_brush.Tiles[col, row].TileId, width, tileSize);
                     position.X = _posX + col * tileSize.Width;
                     position.Y = _posY + row * tileSize.Height;
 
-                    // Draw tile.
-                    GraphicsManager.DrawTile(GraphicsManager.TileMaps[2][source.X, source.Y], position.X, position.Y, Color.White);
+                    // If within bounds, draw tile.
+                    if (source.X > -1 && source.X < GraphicsManager.TileMaps[2].GetLength(0) && source.Y > -1 && source.Y < GraphicsManager.TileMaps[2].GetLength(1))
+                        GraphicsManager.DrawTile(GraphicsManager.TileMaps[2][source.X, source.Y], position.X, position.Y, _brush.Tiles[col, row].GetScale().X, _brush.Tiles[col, row].GetScale().Y, 0, _brush.Tiles[col, row].Blend);
                 }
             }
 
@@ -1987,7 +2341,7 @@ namespace GMare.Controls
 
         #endregion
 
-        #region DrawShapes
+        #region Draw Shapes
 
         /// <summary>
         /// Draws all the room shapes.
@@ -2023,20 +2377,13 @@ namespace GMare.Controls
 
         #endregion
 
-        #region DrawInstances
+        #region Draw Instances
 
         /// <summary>
         /// Draws all the instances within the room.
         /// </summary>
         private void DrawInstances()
         {
-            // Blending color.
-            Color blend = Color.White;
-
-            // If in view all mode, draw instances semi-transparent.
-            if (_editMode == EditType.ViewAll)
-                blend = Color.FromArgb(128, Color.White);
-
             // Iterate through room instances.
             foreach (GMareInstance instance in ProjectManager.Room.Instances)
             {
@@ -2044,7 +2391,7 @@ namespace GMare.Controls
                 if (_editMode == EditType.Instances && instance == _selectedInstance)
                     GraphicsManager.DrawSprite(instance.ObjectId, instance.X, instance.Y, Color.Orange);
                 else
-                    GraphicsManager.DrawSprite(instance.ObjectId, instance.X, instance.Y, blend);
+                    GraphicsManager.DrawSprite(instance.ObjectId, instance.X, instance.Y, Color.White);
             }
 
             // If dragging an instance, there's no instance selected and there is an object selected, draw dragging instance.
@@ -2057,7 +2404,7 @@ namespace GMare.Controls
 
         #endregion
 
-        #region DrawSelection
+        #region Draw Selection
 
         /// <summary>
         /// Draws selection from selection tool.
@@ -2088,16 +2435,19 @@ namespace GMare.Controls
                 for (int row = 0; row < _selection.Rows; row++)
                 {
                     // Calculate source point.
-                    if (_selection.TileIds[col, row] == -1)
+                    if (_selection.Tiles[col, row].TileId == -1)
                         continue;
 
                     // Calculate source point.
-                    source = TileGrid.TileIdToSector(_selection.TileIds[col, row], width, tileSize);
+                    source = GMareBrush.TileIdToSector(_selection.Tiles[col, row].TileId, width, tileSize);
                     position.X = _selection.ToRectangle().X + col * tileSize.Width;
                     position.Y = _selection.ToRectangle().Y + row * tileSize.Height;
 
+                    // Scaling values.
+                    PointF scale = _selection.Tiles[col, row].GetScale();
+
                     // Draw tile.
-                    GraphicsManager.DrawTile(GraphicsManager.TileMaps[0][source.X, source.Y], position.X, position.Y, Color.White);
+                    GraphicsManager.DrawTile(GraphicsManager.TileMaps[0][source.X, source.Y], position.X, position.Y, scale.X, scale.Y, 0, _selection.Tiles[col, row].Blend);
                 }
             }
 
@@ -2122,7 +2472,7 @@ namespace GMare.Controls
         /// <summary>
         /// Sets the room's cursor.
         /// </summary>
-        private void SetCursor()
+        public void SetCursor()
         {
             // Default cursor.
             this.Cursor = Cursors.Arrow;
@@ -2133,7 +2483,7 @@ namespace GMare.Controls
                 // Switch cursor based on tool mode.
                 switch (_toolMode)
                 {
-                    case ToolType.Pencil: this.Cursor = _cursorPencil; break;
+                    case ToolType.Brush: this.Cursor = _cursorPencil; break;
                     case ToolType.Bucket: this.Cursor = _cursorBucket; break;
                     case ToolType.Selection: this.Cursor = _cursorCross; break;
                 }
@@ -2153,7 +2503,7 @@ namespace GMare.Controls
         {
             // If not within bounds of the layers array or room, return empty tile id.
             if ( _layerIndex < 0 || _layerIndex >= ProjectManager.Room.Layers.Count || CheckBounds(x, y) == false)
-                return "- NA -";
+                return "Tile: -NA-";
 
             // Calculate tilesize.
             Size tileSize = ProjectManager.Room.TileSize;
@@ -2166,7 +2516,7 @@ namespace GMare.Controls
             int row = snap.Y / ProjectManager.Room.TileHeight;
 
             // Return tile id.
-            return ProjectManager.Room.Layers[_layerIndex].Tiles[col, row].ToString();
+            return ProjectManager.Room.Layers[_layerIndex].Tiles2[col, row].ToString();
         }
 
         /// <summary> 
@@ -2174,12 +2524,12 @@ namespace GMare.Controls
         /// </summary>
         /// <param name="grid">The grid to use for selection data.</param>
         /// <returns>An array of tiles.</returns>
-        private int[,] GetTiles(TileGrid grid)
+        private GMareTile[,] GetTiles(GMareBrush grid)
         {
             // A new array of tile ids.
             Rectangle rect = grid.ToRectangle();
             Size tileSize = ProjectManager.Room.TileSize;
-            int[,] tiles = new int[rect.Width / tileSize.Width, rect.Height / tileSize.Height];
+            GMareTile[,] tiles = new GMareTile[rect.Width / tileSize.Width, rect.Height / tileSize.Height];
 
             // Iterate through columns.
             for (int col = 0; col < tiles.GetLength(0); col++)
@@ -2192,7 +2542,7 @@ namespace GMare.Controls
                     int y = ((row * tileSize.Height) + rect.Y) / tileSize.Height;
 
                     // Set tile id.
-                    tiles[col, row] = ProjectManager.Room.Layers[_layerIndex].Tiles[x, y];
+                    tiles[col, row] = ProjectManager.Room.Layers[_layerIndex].Tiles2[x, y].Clone();
                 }
             }
 
@@ -2205,7 +2555,7 @@ namespace GMare.Controls
         /// </summary>
         /// <param name="x">Mouse X position.</param>
         /// <param name="y">Mouse Y position.</param>
-        private void SetTiles(int x, int y, bool setEmpty, TileGrid tiles, bool absolute)
+        private void SetTiles(int x, int y, bool setEmpty, GMareBrush tiles, bool absolute)
         {
             // Calculate tilesize.
             Size tileSize = ProjectManager.Room.TileSize;
@@ -2218,10 +2568,10 @@ namespace GMare.Controls
                 snap = GetSnappedPoint(new Point(x, y), tileSize);
 
             // Iterate through columns.
-            for (int col = 0; col < tiles.TileIds.GetLength(0); col++)
+            for (int col = 0; col < tiles.Tiles.GetLength(0); col++)
             {
                 // Iterate through rows.
-                for (int row = 0; row < tiles.TileIds.GetLength(1); row++)
+                for (int row = 0; row < tiles.Tiles.GetLength(1); row++)
                 {
                     // Calculate destination tile position.
                     int destCol = (snap.X / tileSize.Width) + col;
@@ -2232,31 +2582,13 @@ namespace GMare.Controls
                         destCol < 0 || destRow > ProjectManager.Room.Rows - 1)
                         continue;
 
-                    // If set empty is true, set tile id to -1, else set a the targter tile id.
+                    // If set empty is true, set tile id to -1, else set the target tile.
                     if (setEmpty == true)
-                        ProjectManager.Room.Layers[_layerIndex].Tiles[destCol, destRow] = -1;
+                        ProjectManager.Room.Layers[_layerIndex].Tiles2[destCol, destRow] = new GMareTile();
                     else
-                        ProjectManager.Room.Layers[_layerIndex].Tiles[destCol, destRow] = tiles.TileIds[col, row];
+                        ProjectManager.Room.Layers[_layerIndex].Tiles2[destCol, destRow] = tiles.Tiles[col, row].Clone();
                 }
             }
-        }
-
-        /// <summary>
-        /// Sets the blend mode for tile drawing.
-        /// </summary>
-        /// <param name="depth">The depth of the tile.</param>
-        /// <returns>Tileset index to use for rendering.</returns>
-        private int GetIndex(int depth)
-        {
-            // If the layer is the currently selected layer, or not in layer mode, draw opaque.
-            if (depth == _depthIndex || _editMode != EditType.Layers)
-                return 0;
-
-            // If the depth is more than the currently selected layer, draw dark.
-            if (depth > _depthIndex)
-                return 1;
-            else
-                return 2;
         }
 
         #endregion
@@ -2356,6 +2688,29 @@ namespace GMare.Controls
             return size;
         }
 
+        /// <summary>
+        /// ReAquires the tools origin position.
+        /// </summary>
+        public void ReAquirePosition()
+        {
+            // If a room has not been loaded, return.
+            if (RoomExists() == false)
+                return;
+
+            // Get snapped position.
+            Point pos = GetSnappedPoint(this.PointToClient(Cursor.Position), ProjectManager.Room.TileSize);
+
+            // Set cursor position.
+            _posX = pos.X;
+            _posY = pos.Y;
+
+            // Set the cursor.
+            SetCursor();
+
+            // Force redraw.
+            Invalidate();
+        }
+
         #endregion
 
         #region Texture
@@ -2374,7 +2729,7 @@ namespace GMare.Controls
 
             // This is so that the bitmap is pre-rendered with "blending effects", instead of using OpenGL.
             GraphicsManager.LoadTileMap(image, ProjectManager.Room.TileWidth, ProjectManager.Room.TileHeight);
-            GraphicsManager.LoadTileMap(PixelMap.BitmapBrightness(image, -0.3f), ProjectManager.Room.TileWidth, ProjectManager.Room.TileHeight);
+            GraphicsManager.LoadTileMap(PixelMap.BitmapBrightness(image, -0.2f), ProjectManager.Room.TileWidth, ProjectManager.Room.TileHeight);
             GraphicsManager.LoadTileMap(PixelMap.BitmapTransparency(image, 0.5f), ProjectManager.Room.TileWidth, ProjectManager.Room.TileHeight);
 
             image.Dispose();
@@ -2415,6 +2770,30 @@ namespace GMare.Controls
             GraphicsManager.DeleteTilemaps();
         }
 
+        /// <summary>
+        /// Shows a warning message.
+        /// </summary>
+        /// <param name="text">Text to display in the warning.</param>
+        private void ShowWarning(string text)
+        {
+            // Create a new warning message form.
+            using (WarningForm form = new WarningForm(text))
+            {
+                // Show dialog box.
+                form.ShowDialog();
+
+                // If the checkbox was ticked.
+                if ( form.ShowMessage == true)
+                {
+                    // Set message flag off.
+                    if (text == GMare.Properties.Resources.BlendWarning)
+                        ProjectManager.Room.BlendWarning = false;
+                    else if (text == GMare.Properties.Resources.ScaleWarning)
+                        ProjectManager.Room.ScaleWarning = false;
+                }
+            }
+        }
+
         #endregion
 
         #region Timer
@@ -2434,6 +2813,55 @@ namespace GMare.Controls
             // As long as there is a selection, force redraw.
             if (_selection != null)
                 Invalidate();
+        }
+
+        #endregion
+
+        #region Show Brushes Context
+
+        /// <summary>
+        /// Shows the brushes context menu.
+        /// </summary>
+        /// <param name="location">Where to draw the context.</param>
+        private void ShowBrushesContext(Point location)
+        {
+            // Items before deletion.
+            int count = cms_BrushOptions.Items.Count - 1;
+
+            // Remove all previous brushes.
+            for (int i = count; i > 5; i--)
+            {
+                // Remove item.
+                cms_BrushOptions.Items.RemoveAt(i);
+            }
+
+            // Set visible elements, based on brush count.
+            if (ProjectManager.Room.Brushes.Count == 0)
+            {
+                tsmi_BrushEdit.Visible = false;
+                tsmi_BrushNone.Visible = true;
+            }
+            else
+            {
+                tsmi_BrushEdit.Visible = true;
+                tsmi_BrushNone.Visible = false;
+            }
+
+            // Iterate through brushes.
+            foreach (GMareBrush brush in ProjectManager.Room.Brushes)
+            {
+                // Create a tool strip item.
+                ToolStripMenuItem item = new ToolStripMenuItem(brush.Name, brush.Glyph);
+
+                // Set item tag to brush.
+                item.Tag = brush;
+
+                // Add item.
+                cms_BrushOptions.Items.Add(item);
+            }
+
+            // Show context menu.
+            cms_BrushOptions.Show(PointToScreen(location));
         }
 
         #endregion

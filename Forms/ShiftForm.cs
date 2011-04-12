@@ -35,11 +35,41 @@ namespace GMare.Forms
     {
         #region Fields
 
-        private ShiftDirection _direction = ShiftDirection.Up;
+        private ShiftDirection _direction = ShiftDirection.Up;  // The direction to shift
+        private GMareLayer _layer = null;                       // The layer to shift.
+        private int _amount = 0;                                // The amount of tiles to shift.
 
         #endregion
 
-        #region Ctor
+        #region Properties
+
+        /// <summary>
+        /// Gets the direction to shift
+        /// </summary>
+        public ShiftDirection Direction
+        {
+            get { return _direction; }
+        }
+
+        /// <summary>
+        /// Gets the layer to shift.
+        /// </summary>
+        public GMareLayer Layer
+        {
+            get { return _layer; }
+        }
+
+        /// <summary>
+        /// Gets the amount of tiles to shift.
+        /// </summary>
+        public int Amount
+        {
+            get { return _amount; }
+        }
+
+        #endregion
+
+        #region Constructor
 
         public ShiftForm()
         {
@@ -57,7 +87,7 @@ namespace GMare.Forms
 
         #endregion
 
-        #region Methods
+        #region Events
 
         /// <summary>
         /// Up radio button checked changed.
@@ -104,13 +134,16 @@ namespace GMare.Forms
         /// </summary>
         private void ShiftForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (DialogResult == DialogResult.OK)
-            {
-                if (cmbobx_Layer.SelectedIndex == 0)
-                    ProjectManager.Room.Shift(null, _direction, (int)nud_Amount.Value);
-                else
-                    ProjectManager.Room.Shift((GMareLayer)cmbobx_Layer.SelectedItem, _direction, (int)nud_Amount.Value);
-            }
+            // If ok was not clicked from the dialog.
+            if (DialogResult != DialogResult.OK)
+                return;
+
+            // If All Layers was not selected.
+            if (cmbobx_Layer.SelectedIndex != 0)
+                _layer = (GMareLayer)cmbobx_Layer.SelectedItem;
+
+            // Set the amount of tiles to move.
+            _amount = (int)nud_Amount.Value;
         }
 
         #endregion

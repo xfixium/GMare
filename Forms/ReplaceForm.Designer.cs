@@ -29,8 +29,8 @@ namespace GMare.Forms
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            GMare.Common.TileGrid tileGrid1 = new GMare.Common.TileGrid();
-            GMare.Common.TileGrid tileGrid2 = new GMare.Common.TileGrid();
+            GMare.Common.GMareBrush tileGrid1 = new GMare.Common.GMareBrush();
+            GMare.Common.GMareBrush tileGrid2 = new GMare.Common.GMareBrush();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.pnl_Target = new GMare.Controls.BackgroundPanel();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -74,7 +74,7 @@ namespace GMare.Forms
             tileGrid1.EndY = 16;
             tileGrid1.StartX = 0;
             tileGrid1.StartY = 0;
-            tileGrid1.TileIds = null;
+            tileGrid1.Tiles = null;
             this.pnl_Target.Selection = tileGrid1;
             this.pnl_Target.SelectMode = GMare.Controls.BackgroundPanel.SelectType.Normal;
             this.pnl_Target.Size = new System.Drawing.Size(224, 304);
@@ -108,7 +108,7 @@ namespace GMare.Forms
             tileGrid2.EndY = 16;
             tileGrid2.StartX = 0;
             tileGrid2.StartY = 0;
-            tileGrid2.TileIds = null;
+            tileGrid2.Tiles = null;
             this.pnl_Swap.Selection = tileGrid2;
             this.pnl_Swap.SelectMode = GMare.Controls.BackgroundPanel.SelectType.Fixed;
             this.pnl_Swap.Size = new System.Drawing.Size(224, 304);

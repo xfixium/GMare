@@ -269,6 +269,7 @@ namespace GMare.Forms
             0,
             0,
             0});
+            this.nud_Rows.ValueChanged += new System.EventHandler(this.nud_RoomSize_ValueChanged);
             // 
             // nud_Columns
             // 
@@ -292,6 +293,7 @@ namespace GMare.Forms
             0,
             0,
             0});
+            this.nud_Columns.ValueChanged += new System.EventHandler(this.nud_RoomSize_ValueChanged);
             // 
             // toolStrip1
             // 

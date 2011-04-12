@@ -568,7 +568,7 @@ namespace GameMaker.Project
             }
 
             // Write last changed.
-            WriteDouble(GMTrigger.LastChanged);
+            WriteDouble(GMTrigger.TriggerLastChanged);
         }
 
         #endregion

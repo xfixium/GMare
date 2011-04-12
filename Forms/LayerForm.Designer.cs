@@ -90,6 +90,7 @@ namespace GMare.Forms
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.txtbx_Name.Location = new System.Drawing.Point(8, 18);
+            this.txtbx_Name.MaxLength = 40;
             this.txtbx_Name.Name = "txtbx_Name";
             this.txtbx_Name.Size = new System.Drawing.Size(160, 20);
             this.txtbx_Name.TabIndex = 0;

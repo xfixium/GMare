@@ -51,7 +51,7 @@ namespace GMare.Forms
 
         #endregion
 
-        #region IRoomOwner Members
+        #region Properties
 
         /// <summary>
         /// Gets or sets the project Undo/Redo room.
@@ -71,8 +71,19 @@ namespace GMare.Forms
                     pnl_RoomEditor.Image = ProjectManager.Room.GetTileset();
                 }
 
+                // Take the existing objects, warnings, and brushes, as these do not undo/redo.
+                List<GMareObject> objects = ProjectManager.Room.Objects;
+                List<GMareBrush> brushes = ProjectManager.Room.Brushes;
+                bool scaleWarning = ProjectManager.Room.ScaleWarning;
+                bool blendWarning = ProjectManager.Room.BlendWarning;
+
                 // Set room from undo redo.
                 ProjectManager.Room = value.Room;
+                ProjectManager.Room.Objects = objects;
+                ProjectManager.Room.Brushes = brushes;
+                ProjectManager.Room.ScaleWarning = scaleWarning;
+                ProjectManager.Room.BlendWarning = blendWarning;
+
                 this.Text = "GMare" + " [" + ProjectManager.Room.Name + "]";
                 UpdateEditSelect(index);
 
@@ -114,14 +125,28 @@ namespace GMare.Forms
 
         #endregion
 
-        #region Events
-
-        #region MainForm
+        #region Overrides
 
         /// <summary>
-        /// Main form closing.
+        /// On mouse wheel.
         /// </summary>
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            // If no room was loaded, return.
+            if (ProjectManager.Room == null)
+                return;
+
+            // If zooming in.
+            if (e.Delta >= 0)
+                tsmi_Zoom_Click(tsb_Zoom.DropDownItems[0], EventArgs.Empty);
+            else
+                tsmi_Zoom_Click(tsb_Zoom.DropDownItems[1], EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Closing.
+        /// </summary>
+        protected override void OnClosing(CancelEventArgs e)
         {
             // If a project was loaded, check for user action.
             if (ProjectManager.Room == null)
@@ -170,7 +195,40 @@ namespace GMare.Forms
             }
         }
 
+        /// <summary>
+        /// Process dialog key.
+        /// </summary>
+        protected override bool ProcessDialogKey(Keys keyData)
+        {
+            // If the room is empty, return.
+            if (ProjectManager.Room == null)
+                return base.ProcessDialogKey(keyData);
+
+            // Do action based on key.
+            switch (keyData)
+            {
+                case Keys.P: tsmi_Edit_Click(this, EventArgs.Empty); pnl_RoomEditor.Invalidate(); break;
+                case Keys.M: tsmi_Shift_Click(this, EventArgs.Empty); pnl_RoomEditor.Invalidate(); break;
+                case Keys.C: tsmi_BackColor_Click(this, EventArgs.Empty); pnl_RoomEditor.Invalidate(); break;
+                case Keys.V: tsmi_LayerView_Click(this, EventArgs.Empty); pnl_RoomEditor.Invalidate(); break;
+                case Keys.G: tsb_Grid.Checked = tsb_Grid.Checked ? false : true; pnl_RoomEditor.Invalidate(); break;
+                case Keys.I: tsb_GridIso.Checked = tsb_GridIso.Checked ? false : true; pnl_RoomEditor.Invalidate(); break;
+                case Keys.B: tsb_BrushTool_Click(this, EventArgs.Empty); pnl_RoomEditor.Invalidate(); break;
+                case Keys.F: tsb_FillTool_Click(this, EventArgs.Empty); pnl_RoomEditor.Invalidate(); break;
+                case Keys.S: tsb_SelectionTool_Click(this, EventArgs.Empty); pnl_RoomEditor.Invalidate(); break;
+                case Keys.R: tsb_Swap_Click(this, EventArgs.Empty); pnl_RoomEditor.Invalidate(); break;
+                case Keys.O: tsb_ImportObjects_Click(this, EventArgs.Empty); pnl_RoomEditor.Invalidate(); break;
+                case Keys.Right: pnl_RoomEditor.Flip(FlipDirection.Horizontal); break;
+                case Keys.Down: pnl_RoomEditor.Flip(FlipDirection.Vertical); break;
+            }
+
+            // Process.
+            return base.ProcessDialogKey(keyData);
+        }
+
         #endregion
+
+        #region Events
 
         #region MenuStrip
 
@@ -190,11 +248,11 @@ namespace GMare.Forms
                     // Set project room.
                     ProjectManager.Room = form.Room;
 
-                    // The new project has not been saved yet, so it has changed.
-                    ProjectManager.Changed = true;
-
                     // Set the GUI.
                     SetGUI();
+
+                    // The new project has not been saved yet, so it has changed.
+                    ProjectManager.Changed = true;
                 }
             }
         }
@@ -209,6 +267,7 @@ namespace GMare.Forms
             {
                 // Set file format filter.
                 form.Filter = "Supported Files (.gmpf, .oref, .png, .bmp, .gif)|*.gmpf;*.oref;*.png;*.bmp;*.gif;|GMare Project File (.gmpf)|*.gmpf|Ocarina Room File (.oref)|*.oref|Image File (.png, .bmp, .gif)|*png;*bmp;*gif;";
+                form.Title = "Open Supported File";
 
                 // If the dialog result is Ok.
                 if (form.ShowDialog() == DialogResult.OK)
@@ -248,6 +307,7 @@ namespace GMare.Forms
                         {
                             // Set filter.
                             form.Filter = "GMare Project File (.gmpf)|*.gmpf";
+                            form.Title = "Save Project";
 
                             // If the dialog result was Ok, save the project.
                             if (form.ShowDialog() == DialogResult.OK)
@@ -292,11 +352,8 @@ namespace GMare.Forms
             if (ProjectManager.Room == null || ProjectManager.Room.Background == null)
                 return;
 
-            Size roomSize = new Size(ProjectManager.Room.Width, ProjectManager.Room.Height);
-            Size tileSize = new Size(ProjectManager.Room.TileWidth, ProjectManager.Room.TileHeight);
-
             // Create a new save file dialog.
-            using (ExportImageForm form = new ExportImageForm(ProjectManager.Room.Layers, ProjectManager.Room.GetTileset(), roomSize, tileSize, ProjectManager.Room.Background.Width))
+            using (ExportImageForm form = new ExportImageForm(ProjectManager.Room.Layers, ProjectManager.Room.GetTileset(), ProjectManager.Room.RoomSize, ProjectManager.Room.TileSize))
             {
                 // Show the form;
                 form.ShowDialog();
@@ -330,6 +387,7 @@ namespace GMare.Forms
             {
                 // Set file format filter.
                 ofd.Filter = "Game Maker Project Files (.gmk, .gm6, .gmd)|*.gmk;*.gm6;*gmd;";
+                ofd.Title = "Open Game Maker Project For Export";
 
                 // If the dialog result is Ok.
                 if (ofd.ShowDialog() == DialogResult.OK)
@@ -358,6 +416,7 @@ namespace GMare.Forms
             {
                 // Set filter.
                 form.Filter = "Portable Network Graphics (.png)|*.png";
+                form.Title = "Save Room As Image File";
 
                 // If the dialog result was Ok, save the background.
                 if (form.ShowDialog() == DialogResult.OK)
@@ -379,6 +438,7 @@ namespace GMare.Forms
             {
                 // Set filter.
                 form.Filter = "GMare Project File (.gmpf)|*.gmpf";
+                form.Title = "Save Project";
 
                 // If the dialog result was Ok, save the project.
                 if (form.ShowDialog() == DialogResult.OK)
@@ -499,7 +559,16 @@ namespace GMare.Forms
             {
                 // If the dialog result was Ok, force refresh.
                 if (form.ShowDialog() == DialogResult.OK)
+                {
+                    // Room changed.
+                    PushHistory();
+
+                    // Shift layer(s).
+                    ProjectManager.Room.Shift(form.Layer, form.Direction, form.Amount);
+
+                    // Force redraw.
                     pnl_RoomEditor.Invalidate();
+                }
             }
         }
 
@@ -517,10 +586,16 @@ namespace GMare.Forms
             {
                 // If the dialog result is Ok.
                 if (form.ShowDialog() == DialogResult.OK)
+                {
+                    // Room changed.
+                    PushHistory();
+
+                    // Change back color.
                     ProjectManager.Room.BackColor = form.Color;
 
-                // Refresh the room editor.
-                pnl_RoomEditor.Invalidate();
+                    // Refresh the room editor.
+                    pnl_RoomEditor.Invalidate();
+                }
             }
         }
 
@@ -534,7 +609,7 @@ namespace GMare.Forms
                 return;
 
             // Create a new text form.
-            using (TextForm form = new TextForm(ProjectManager.Room.Layers))
+            using (ViewForm form = new ViewForm(ProjectManager.Room.Layers))
             {
                 // Show the form.
                 form.ShowDialog();
@@ -612,7 +687,7 @@ namespace GMare.Forms
         /// <summary>
         /// Grid show button clicked.
         /// </summary>
-        private void tsb_Grid_Click(object sender, EventArgs e)
+        private void tsb_Grid_CheckChanged(object sender, EventArgs e)
         {
             // Toggle room editor grid on or off.
             pnl_RoomEditor.ShowGrid = tsb_Grid.Checked;
@@ -630,10 +705,10 @@ namespace GMare.Forms
         /// <summary>
         /// Snap to grid button click.
         /// </summary>
-        private void tsmi_Snap_Click(object sender, EventArgs e)
+        private void tsb_Snap_Click(object sender, EventArgs e)
         {
             // Toggle snap to grid.
-            pnl_RoomEditor.Snap = tsb_Snap.Checked ? true : false;
+            pnl_RoomEditor.Snap = tsb_Snap.Checked;
         }
 
         /// <summary>
@@ -684,15 +759,18 @@ namespace GMare.Forms
                         // Set room editor scale.
                         switch (tsb_Zoom.Text)
                         {
-                            case "25%": pnl_RoomEditor.Zoom = .25f; break;
-                            case "50%": pnl_RoomEditor.Zoom = .50f; break;
-                            case "100%": pnl_RoomEditor.Zoom = 1f; break;
-                            case "200%": pnl_RoomEditor.Zoom = 2f; break;
-                            case "400%": pnl_RoomEditor.Zoom = 4f; break;
+                            case "25%": pnl_RoomEditor.Zoom(.25f); tsb_Zoom.Tag = 3; break;
+                            case "50%": pnl_RoomEditor.Zoom(.50f); tsb_Zoom.Tag = 4; break;
+                            case "100%": pnl_RoomEditor.Zoom(1f); tsb_Zoom.Tag = 5; break;
+                            case "200%": pnl_RoomEditor.Zoom(2f); tsb_Zoom.Tag = 6; break;
+                            case "400%": pnl_RoomEditor.Zoom(4f); tsb_Zoom.Tag = 7; break;
 
                             case "Zoom In":
-                                // Get next index.
-                                index = (int)tsb_Zoom.Tag + 1 > tsb_Zoom.DropDownItems.Count - 1 ? tsb_Zoom.DropDownItems.Count - 1 : (int)tsb_Zoom.Tag + 1;
+                                // Set new item index.
+                                if ((int)tsb_Zoom.Tag + 1 > tsb_Zoom.DropDownItems.Count - 1)
+                                    index = (int)tsb_Zoom.Tag;
+                                else
+                                    index = (int)tsb_Zoom.Tag + 1;
 
                                 // Set the new index.
                                 tsb_Zoom.Tag = (int)index;
@@ -702,8 +780,11 @@ namespace GMare.Forms
                                 return;
 
                             case "Zoom Out":
-                                // Get next index.
-                                index = (int)tsb_Zoom.Tag - 1 < 3 ? 3 : (int)tsb_Zoom.Tag - 1;
+                                // Set next index.
+                                if ((int)tsb_Zoom.Tag - 1 < 3)
+                                    index = 3;
+                                else
+                                    index = (int)tsb_Zoom.Tag - 1;
 
                                 // Set the new index.
                                 tsb_Zoom.Tag = (int)index;
@@ -717,6 +798,15 @@ namespace GMare.Forms
                         (tsb_Zoom.DropDownItems[i] as ToolStripMenuItem).Checked = false;
                 }
             }
+        }
+
+        /// <summary>
+        /// Always show instances checked changed.
+        /// </summary>
+        private void tsb_ShowInstances_CheckedChanged(object sender, EventArgs e)
+        {
+            // Set if the instances should be drawn at all times.
+            pnl_RoomEditor.ShowInstances = tsb_ShowInstances.Checked;
         }
 
         /// <summary>
@@ -938,67 +1028,75 @@ namespace GMare.Forms
         #region Tiles
 
         /// <summary>
-        /// Tile tool button check changed.
+        /// Eraser tool button click.
         /// </summary>
-        private void tsb_TileTool_CheckedChanged(object sender, EventArgs e)
+        private void tsb_Eraser_Click(object sender, EventArgs e)
         {
-            // Toggle tools.
-            if (tsb_TileTool.Checked == true)
-            {
-                // Set the tool mode to pencil.
-                pnl_RoomEditor.ToolMode = ToolType.Pencil;
+            // Set the tool mode to bucket fill.
+            pnl_RoomEditor.ToolMode = ToolType.Eraser;
 
-                // Toggle off other tools.
-                tsb_FillTool.Checked = false;
-                tsb_SelectionTool.Checked = false;
-            }
+            // Toggle off other tools.
+            tsb_SelectionTool.Checked = false;
+            tsb_BrushTool.Checked = false;
+            tsb_FillTool.Checked = false;
 
             // Set clipboard GUI.
             SetClipboard();
         }
 
         /// <summary>
-        /// Bucket fill button check changed.
+        /// Brush tool button click.
         /// </summary>
-        private void tsb_FillTool_CheckedChanged(object sender, EventArgs e)
+        private void tsb_BrushTool_Click(object sender, EventArgs e)
         {
-            // Toggle tools.
-            if (tsb_FillTool.Checked == true)
-            {
-                // Set the tool mode to bucket fill.
-                pnl_RoomEditor.ToolMode = ToolType.Bucket;
+            // Set the tool mode to pencil.
+            pnl_RoomEditor.ToolMode = ToolType.Brush;
 
-                // Toggle off other tools.
-                tsb_TileTool.Checked = false;
-                tsb_SelectionTool.Checked = false;
-            }
+            // Toggle off other tools.
+            tsb_BrushTool.Checked = true;
+            tsb_FillTool.Checked = false;
+            tsb_SelectionTool.Checked = false;
 
             // Set clipboard GUI.
             SetClipboard();
         }
 
         /// <summary>
-        /// Tile selection tool check changed.
+        /// Bucket fill button click.
         /// </summary>
-        private void tsb_SelectionTool_CheckedChanged(object sender, EventArgs e)
+        private void tsb_FillTool_Click(object sender, EventArgs e)
         {
-            // Toggle tools.
-            if (tsb_SelectionTool.Checked == true)
-            {
-                // Set the tool mode to bucket fill.
-                pnl_RoomEditor.ToolMode = ToolType.Selection;
+            // Set the tool mode to bucket fill.
+            pnl_RoomEditor.ToolMode = ToolType.Bucket;
 
-                // Toggle off other tools.
-                tsb_TileTool.Checked = false;
-                tsb_FillTool.Checked = false;
-            }
+            // Toggle off other tools.
+            tsb_FillTool.Checked = true;
+            tsb_BrushTool.Checked = false;
+            tsb_SelectionTool.Checked = false;
 
             // Set clipboard GUI.
             SetClipboard();
         }
 
         /// <summary>
-        /// Swap tiles clicked.
+        /// Tile selection tool click.
+        /// </summary>
+        private void tsb_SelectionTool_Click(object sender, EventArgs e)
+        {
+            // Set the tool mode to bucket fill.
+            pnl_RoomEditor.ToolMode = ToolType.Selection;
+
+            // Toggle off other tools.
+            tsb_SelectionTool.Checked = true;
+            tsb_BrushTool.Checked = false;
+            tsb_FillTool.Checked = false;
+
+            // Set clipboard GUI.
+            SetClipboard();
+        }
+
+        /// <summary>
+        /// Swap tiles click.
         /// </summary>
         private void tsb_Swap_Click(object sender, EventArgs e)
         {
@@ -1008,6 +1106,9 @@ namespace GMare.Forms
                 // If the dialog result was Ok.
                 if (form.ShowDialog() == DialogResult.OK)
                 {
+                    // Room changed.
+                    PushHistory();
+
                     // If the tile swap happens on all layers.
                     if (form.Layer == null)
                     {
@@ -1069,6 +1170,7 @@ namespace GMare.Forms
             {
                 // Set file format filter.
                 ofd.Filter = "Game Maker Project Files (.gmk, .gm6, .gmd)|*.gmk;*.gm6;*gmd;";
+                ofd.Title = "Import Objects From Game Maker Project";
 
                 // If the dialog result is ok.
                 if (ofd.ShowDialog() == DialogResult.OK)

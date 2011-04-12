@@ -44,7 +44,7 @@ namespace GameMaker.Resource
 
         #region Properties
 
-        public static double LastChanged
+        public static double TriggerLastChanged
         {
             get { return _lastChanged; }
             set { _lastChanged = value; }

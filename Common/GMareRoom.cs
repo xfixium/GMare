@@ -51,9 +51,10 @@ namespace GMare.Common
         public const int MAXDEPTH = 1000000000;                              // The maximum depth a layer can have.
         public const int MINDEPTH = -1000000000;                             // The minimum depth a layer can have.
         private List<GMareLayer> _layers = new List<GMareLayer>();           // List of layers.
-        private List<GMareObject> _objects = new List<GMareObject>();        // List of objects.
-        private List<GMareCollision> _shapes = new List<GMareCollision>();           // List of shapes.
+        private List<GMareCollision> _shapes = new List<GMareCollision>();   // List of shapes.
         private List<GMareInstance> _instances = new List<GMareInstance>();  // List of instances.
+        private List<GMareObject> _objects = new List<GMareObject>();        // List of objects.
+        private List<GMareBrush> _brushes = new List<GMareBrush>();          // List of brushes.
         private GMNode[] _nodes = null;                                      // An array of object nodes.
         private PixelMap _background = null;                                 // The background pixel map of the room.
         private Color _backColor = Color.Silver;                             // Backcolor of the room.
@@ -66,6 +67,8 @@ namespace GMare.Common
         private int _seperationY = 0;                                        // The vertical tile seperation.
         private int _offsetX = 0;                                            // The horizontal tile offset.
         private int _offsetY = 0;                                            // The vertical tile offset.
+        private bool _scaleWarning = true;                                   // Message on scaling.
+        private bool _blendWarning = true;                                   // Message on color blending.
 
         #endregion
 
@@ -114,6 +117,15 @@ namespace GMare.Common
         {
             get { return _nodes; }
             set { _nodes = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the list of saved brushes.
+        /// </summary>
+        public List<GMareBrush> Brushes
+        {
+            get { return _brushes; }
+            set { _brushes = value; }
         }
 
         /// <summary>
@@ -210,11 +222,19 @@ namespace GMare.Common
         }
 
         /// <summary>
-        /// Gets or sets the tile height.
+        /// Gets the tile size.
         /// </summary>
         public Size TileSize
         {
             get { return new Size(_tileWidth, _tileHeight); }
+        }
+
+        /// <summary>
+        /// Gets the room size.
+        /// </summary>
+        public Size RoomSize
+        {
+            get { return new Size(Width, Height); }
         }
 
         /// <summary>
@@ -252,6 +272,25 @@ namespace GMare.Common
             get { return _seperationY; }
             set { _seperationY = value; }
         }
+
+        /// <summary>
+        /// Gets or sets whether a scale warning should show.
+        /// </summary>
+        public bool ScaleWarning
+        {
+            get { return _scaleWarning; }
+            set { _scaleWarning = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets whether a color blend warning should show.
+        /// </summary>
+        public bool BlendWarning
+        {
+            get { return _blendWarning; }
+            set { _blendWarning = value; }
+        }
+
 
         #endregion
 
@@ -303,10 +342,6 @@ namespace GMare.Common
             foreach (GMareLayer layer in _layers)
                 room._layers.Add(layer.Clone());
 
-            // Iterate through objects.
-            foreach (GMareObject obj in _objects)
-                room.Objects.Add(obj.Clone());
-
             // Iterate through instances.
             foreach (GMareInstance inst in _instances)
                 room.Instances.Add(inst.Clone());
@@ -351,7 +386,7 @@ namespace GMare.Common
             for (int layer = 0; layer < _layers.Count; layer++)
             {
                 // Create an empty tile array with the new size.
-                int[,] array = GMareLayer.GetEmptyLayer(columns, _rows);
+                GMareTile[,] array = GMareLayer.GetEmptyLayer(columns, _rows);
 
                 // Iterate through columns.
                 for (int col = 0; col < array.GetLength(0); col++)
@@ -361,14 +396,14 @@ namespace GMare.Common
                     {
                         // Set tile.
                         if (col < amount)
-                            array[col, row] = _layers[layer].Tiles[col, row];
+                            array[col, row].TileId = _layers[layer].Tiles2[col, row].TileId;
                         else
-                            array[col, row] = -1;
+                            array[col, row].TileId = -1;
                     }
                 }
 
                 // Set tiles with new array.
-                _layers[layer].Tiles = array;
+                _layers[layer].Tiles2 = array;
             }
         }
 
@@ -388,7 +423,7 @@ namespace GMare.Common
             for (int layer = 0; layer < _layers.Count; layer++)
             {
                 // Create an empty tile array with the new size.
-                int[,] array = GMareLayer.GetEmptyLayer(_columns, rows);
+                GMareTile[,] array = GMareLayer.GetEmptyLayer(_columns, rows);
 
                 // Iterate through columns.
                 for (int col = 0; col < array.GetLength(0); col++)
@@ -398,14 +433,14 @@ namespace GMare.Common
                     {
                         // Set tile.
                         if (row < amount)
-                            array[col, row] = _layers[layer].Tiles[col, row];
+                            array[col, row].TileId = _layers[layer].Tiles2[col, row].TileId;
                         else
-                            array[col, row] = -1;
+                            array[col, row].TileId = -1;
                     }
                 }
 
                 // Set tiles with new array.
-                _layers[layer].Tiles = array;
+                _layers[layer].Tiles2 = array;
             }
         }
 
@@ -576,8 +611,8 @@ namespace GMare.Common
             {
                 // Get various layer properties.
                 int depth = layer.Depth;
-                int cols = layer.Tiles.GetLength(0);
-                int rows = layer.Tiles.GetLength(1);
+                int cols = layer.Tiles2.GetLength(0);
+                int rows = layer.Tiles2.GetLength(1);
 
                 // Iterate through layer tile rows.
                 for (int row = 0; row < rows; row++)
@@ -586,7 +621,7 @@ namespace GMare.Common
                     for (int col = 0; col < cols; col++)
                     {
                         // Get tile id.
-                        int sector = layer.Tiles[col, row];
+                        int sector = layer.Tiles2[col, row].TileId;
 
                         // If the tile is not empty.
                         if (sector != -1)
@@ -614,6 +649,36 @@ namespace GMare.Common
             }
 
             // Return the array of tiles.
+            return tiles.ToArray();
+        }
+
+        /// <summary>
+        /// Converts a rectangle to an array of tile ids.
+        /// </summary>
+        /// <param name="rectangle">The source rectangle to copy tiles from.</param>
+        /// <param name="layer">The layer to copy tiles from.</param>
+        /// <returns>An array fo tile ids.</returns>
+        public GMareTile[] GetTiles(Rectangle rectangle, GMareLayer layer)
+        {
+            // If the layer does not exist, return.
+            if (_layers.Contains(layer) == false)
+                return null;
+
+            // Create a new list of tiles.
+            List<GMareTile> tiles = new List<GMareTile>();
+
+            // Iterate through layer tiles.
+            foreach (GMareTile tile in layer.Tiles2)
+            {
+                // The check rectangle.
+                Rectangle rect = new Rectangle(GMareBrush.TileIdToPosition(tile.TileId, _background.Width, TileSize), TileSize);
+
+                // Add the included tile.
+                if (rectangle.Contains(rect) == true)
+                    tiles.Add(tile.Clone());
+            }
+
+            // Return the array of tile ids.
             return tiles.ToArray();
         }
 
@@ -684,13 +749,13 @@ namespace GMare.Common
             int count = 0;
 
             // Iterate through columns.
-            for (int col = 0; col < layer.Tiles.GetLength(0); col++)
+            for (int col = 0; col < layer.Tiles2.GetLength(0); col++)
             {
                 // Iterate through rows.
-                for (int row = 0; row < layer.Tiles.GetLength(1); row++)
+                for (int row = 0; row < layer.Tiles2.GetLength(1); row++)
                 {
                     // If the tile is not empty, add it to the count.
-                    if (layer.Tiles[col, row] != -1)
+                    if (layer.Tiles2[col, row].TileId != -1)
                         count++;
                 }
             }
@@ -704,9 +769,14 @@ namespace GMare.Common
         /// </summary>
         /// <param name="layers">The layers to get sizes for.</param>
         /// <returns>The size of the room  in bytes.</returns>
-        public int GetBinaryRoomSize(bool useLayers, bool useInstances, bool useCollisions)
+        public int GetBinaryRoomSize(bool useLayers, bool useScaling, bool useBlendColor, bool useInstances, bool useCollisions)
         {
             /* Size of initial room data.
+             * 1 bool        Uses tile data
+             * 1 bool        Uses tile flipping data
+             * 1 bool        Uses blend color data
+             * 1 bool        Uses instance data
+             * 1 bool        Uses collision data
              * 1 short       The number of columns
              * 1 short       The number of rows
              * 1 byte        The horizontal tile offset
@@ -729,7 +799,9 @@ namespace GMare.Common
              * 1 short       Tile id (For method 0)
              * 1 short       Tile id (For method 1)
              * 1 int         Horizontal coordinate (For method 1)
-             * 1 int         Vertical coordinate (For method 1)*/
+             * 1 int         Vertical coordinate (For method 1)
+             * 1 byte        Tile flipping type
+             * 1 int         Tile blend color*/
 
              /* Size of instance data.
              * 1 int         Parent object Id.
@@ -738,7 +810,7 @@ namespace GMare.Common
              * 1 int         Number of letters in instance creation code
              * 1 char[]      The characters of the instance creation code*/
 
-            int size = 24;
+            int size = 29;
             int tiled = 0;
             int sectored = 0;
 
@@ -748,11 +820,28 @@ namespace GMare.Common
                 // Iterate through layers.
                 foreach (GMareLayer layer in _layers)
                 {
+                    // The number of non-empty  tiles in the layer.
+                    int tileCount = GetTileCount(layer);
+
                     // Calculate complex method size.
-                    tiled += GetTileCount(layer) * 10 + 9;
+                    tiled += tileCount * 10 + 9;
 
                     // Calculate simple method size.
-                    sectored += layer.Tiles.Length * 2 + 5;
+                    sectored += layer.Tiles2.Length * 2 + 5;
+
+                    // If using flipping flags data.
+                    if (useScaling == true)
+                    {
+                        tiled += tileCount;
+                        sectored += tileCount;
+                    }
+
+                    // If using blend color data.
+                    if (useBlendColor == true)
+                    {
+                        tiled += tileCount * 4;
+                        sectored += tileCount * 4;
+                    }
 
                     // If the simple method size is bigger, add the complex method, else add simple method to total size.
                     size += sectored >= tiled ? tiled : sectored;
@@ -797,7 +886,7 @@ namespace GMare.Common
             complex += GetTileCount(layer) * 10;
 
             // Calculate simple method size.
-            simple += layer.Tiles.Length * 2;
+            simple += layer.Tiles2.Length * 2;
 
             // If the simple method size is bigger, return complex method, else return simple method.
             return simple >= complex ? BinaryMethod.Tile : BinaryMethod.Sector;
@@ -825,16 +914,7 @@ namespace GMare.Common
             room.Layers.Add(new GMareLayer("Upper Layer", -1, OreTilesToGMareTiles(oreRoom.TilesUpper, room.Columns, room.Rows)));
             room.Layers.Add(new GMareLayer("Lower Layer", 0, OreTilesToGMareTiles(oreRoom.TilesLower, room.Columns, room.Rows)));
 
-            // If there are shapes.
-            if (oreRoom.Shapes != null)
-            {
-                // Iterate through Ore room shapes.
-                foreach (OcarinaRoomEditor.Shape shape in oreRoom.Shapes)
-                {
-                    // Add shape to GMare room.
-                    room.Shapes.Add(new GMareCollision(shape.Points));
-                }
-            }
+            // TODO: Convert shapes to collisions.
 
             // Return converted GMare room.
             return room;
@@ -847,13 +927,13 @@ namespace GMare.Common
         /// <param name="cols">The amount of tiles horizontally.</param>
         /// <param name="rows">The amount of tiles vertically.</param>
         /// <returns>A converted tile array.</returns>
-        private static int[,] OreTilesToGMareTiles(int[] oreTiles, int cols, int rows)
+        private static GMareTile[,] OreTilesToGMareTiles(int[] oreTiles, int cols, int rows)
         {
             // Ore tile indexer.
             int index = 0;
 
             // Create a new 2d array of tiles.
-            int[,] tiles = new int[cols, rows];
+            GMareTile[,] tiles = new GMareTile[cols, rows];
 
             // Iterate through rows.
             for (int row = 0; row < rows; row++)
@@ -861,8 +941,11 @@ namespace GMare.Common
                 // Iterate through columns.
                 for (int col = 0; col < cols; col++)
                 {
-                    // Set sector.
-                    tiles[col, row] = oreTiles[index];
+                    // Create new tile.
+                    tiles[col, row] = new GMareTile();
+
+                    // Set tile id.
+                    tiles[col, row].TileId = oreTiles[index];
 
                     // Increament indexer.
                     index++;
@@ -899,9 +982,10 @@ namespace GMare.Common
     {
         #region Fields
 
-        private string _name = "Layer";  // The name of the layer.
-        private int _depth = 0;          // The z order of the layer.
-        private int[,] _tiles = null;    // The tile ids of the layer.
+        private string _name = "Layer";       // The name of the layer.
+        private int _depth = 0;               // The z order of the layer.
+        private int[,] _tiles = null;         // Old tile objects.
+        private GMareTile[,] _tiles2 = null;  // The tile objects of the layer.
 
         #endregion
 
@@ -926,12 +1010,22 @@ namespace GMare.Common
         }
 
         /// <summary>
-        /// Gets or sets the layer's tiles.
+        /// Gets or sets the layer's old tile ids.
         /// </summary>
+        [Obsolete("Use Tiles2, simple integer tile ids are no longer used.")]
         public int[,] Tiles
         {
             get { return _tiles; }
             set { _tiles = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the layer's tiles.
+        /// </summary>
+        public GMareTile[,] Tiles2
+        {
+            get { return _tiles2; }
+            set { _tiles2 = value; }
         }
 
         #endregion
@@ -946,7 +1040,7 @@ namespace GMare.Common
         public GMareLayer(int cols, int rows)
         {
             // Set empty tiles.
-            _tiles = GetEmptyLayer(cols, rows);
+            _tiles2 = GetEmptyLayer(cols, rows);
         }
 
 
@@ -956,12 +1050,17 @@ namespace GMare.Common
         /// <param name="name">The name of the layer.</param>
         /// <param name="depth">The depth of the layer.</param>
         /// <param name="tiles">The tiles for the layer.</param>
-        public GMareLayer(string name, int depth, int[,] tiles)
+        public GMareLayer(string name, int depth, GMareTile[,] tiles)
         {
             // Set fields.
             _name = name;
             _depth = depth;
-            _tiles = (int[,])tiles.Clone();
+            _tiles2 = new GMareTile[tiles.GetLength(0), tiles.GetLength(1)];
+
+            // Iterate through tiles.
+            for (int y = 0; y < _tiles2.GetLength(1); y++)
+                for (int x = 0; x < _tiles2.GetLength(0); x++)
+                    _tiles2[x, y] = tiles[x, y].Clone();
         }
 
         #endregion
@@ -973,10 +1072,10 @@ namespace GMare.Common
         /// </summary>
         /// <param name="array">The array to empty.</param>
         /// <returns>An empty array.</returns>
-        public static int[,] GetEmptyLayer(int cols, int rows)
+        public static GMareTile[,] GetEmptyLayer(int cols, int rows)
         {
             // Create a new tile array.
-            int[,] tiles = new int[cols, rows];
+            GMareTile[,] tiles = new GMareTile[cols, rows];
 
             // Iterate through columns.
             for (int col = 0; col < cols; col++)
@@ -985,7 +1084,7 @@ namespace GMare.Common
                 for (int row = 0; row < rows; row++)
                 {
                     // Set the tile to empty.
-                    tiles[col, row] = -1;
+                    tiles[col, row] = new GMareTile();
                 }
             }
 
@@ -1000,12 +1099,16 @@ namespace GMare.Common
         public GMareLayer Clone()
         {
             // Create a new layer.
-            GMareLayer layer = new GMareLayer(_tiles.GetLength(0), _tiles.GetLength(1));
+            GMareLayer layer = new GMareLayer(_tiles2.GetLength(0), _tiles2.GetLength(1));
 
             // Set data.
             layer.Name = (string)_name.Clone();
             layer.Depth = _depth;
-            layer.Tiles = (int[,])_tiles.Clone();
+
+            // Iterate through tiles.
+            for (int y = 0; y < _tiles2.GetLength(1); y++)
+                for (int x = 0; x < _tiles2.GetLength(0); x++)
+                    layer.Tiles2[x, y] = _tiles2[x, y].Clone();
 
             return layer;
         }
@@ -1016,12 +1119,12 @@ namespace GMare.Common
         public void Clear()
         {
             // If no tiles exist, return.
-            if (_tiles == null)
+            if (_tiles2 == null)
                 return;
 
             // Get column and row amounts.
-            int cols = _tiles.GetLength(0);
-            int rows = _tiles.GetLength(1);
+            int cols = _tiles2.GetLength(0);
+            int rows = _tiles2.GetLength(1);
 
             // Iterate through columns.
             for (int col = 0; col < cols; col++)
@@ -1029,8 +1132,8 @@ namespace GMare.Common
                 // Iterate through rows.
                 for (int row = 0; row < rows; row++)
                 {
-                    // Set the tile to empty.
-                    _tiles[col, row] = -1;
+                    // Set the tile to new empty tile.
+                    _tiles2[col, row] = new GMareTile();
                 }
             }
         }
@@ -1042,7 +1145,7 @@ namespace GMare.Common
         public void Shift(ShiftDirection direction, int amount)
         {
             // Create a new set of tiles.
-            int[,] tiles = GetEmptyLayer(_tiles.GetLength(0), _tiles.GetLength(1));
+            GMareTile[,] tiles = GetEmptyLayer(_tiles2.GetLength(0), _tiles2.GetLength(1));
 
             // Iterate through columns.
             for (int col = 0; col < tiles.GetLength(0); col++)
@@ -1061,8 +1164,8 @@ namespace GMare.Common
                             target = row + amount;
 
                             // If the target is not out of bounds.
-                            if (target < _tiles.GetLength(1))
-                                tiles[col, row] = _tiles[col, target];
+                            if (target < _tiles2.GetLength(1))
+                                tiles[col, row] = _tiles2[col, target].Clone();
                             break;
 
                         // Shift right.
@@ -1071,8 +1174,8 @@ namespace GMare.Common
                             target = col + amount;
 
                             // If the target is not out of bounds.
-                            if (target < _tiles.GetLength(0))
-                                tiles[target, row] = _tiles[col, row];
+                            if (target < _tiles2.GetLength(0))
+                                tiles[target, row] = _tiles2[col, row].Clone();
                             break;
 
                         // Shift down.
@@ -1081,8 +1184,8 @@ namespace GMare.Common
                             target = row + amount;
 
                             // If the target is not out of bounds.
-                            if (target < _tiles.GetLength(1))
-                                tiles[col, target] = _tiles[col, row];
+                            if (target < _tiles2.GetLength(1))
+                                tiles[col, target] = _tiles2[col, row].Clone();
                             break;
 
                         // Shift left.
@@ -1091,15 +1194,15 @@ namespace GMare.Common
                             target = col + amount;
 
                             // If the target is not out of bounds.
-                            if (target < _tiles.GetLength(0))
-                                tiles[col, row] = _tiles[target, row];
+                            if (target < _tiles2.GetLength(0))
+                                tiles[col, row] = _tiles2[target, row].Clone();
                             break;
                     }
                 }
             }
 
             // Set the tiles to the new shifted tiles.
-            _tiles = tiles;
+            _tiles2 = tiles;
         }
 
         /// <summary>
@@ -1110,14 +1213,14 @@ namespace GMare.Common
         public void Replace(int target, int replacement)
         {
             // Iterate through tile columns.
-            for (int col = 0; col < _tiles.GetLength(0); col++)
+            for (int col = 0; col < _tiles2.GetLength(0); col++)
             {
                 // Iterate through tile rows.
-                for (int row = 0; row < _tiles.GetLength(1); row++)
+                for (int row = 0; row < _tiles2.GetLength(1); row++)
                 {
                     // If the iterated tile id matches the target, swap.
-                    if (_tiles[col, row] == target)
-                        _tiles[col, row] = replacement;
+                    if (_tiles2[col, row].TileId == target)
+                        _tiles2[col, row].TileId = replacement;
                 }
             }
         }
@@ -1127,16 +1230,16 @@ namespace GMare.Common
         /// </summary>
         /// <param name="target">The target tile grid to swap.</param>
         /// <param name="replacement">The replacement tile id to replace the target.</param>
-        public void Replace(TileGrid target, int replacement)
+        public void Replace(GMareBrush target, int replacement)
         {
             // Iterate through tile columns.
-            for (int col = 0; col < target.TileIds.GetLength(0); col++)
+            for (int col = 0; col < target.Tiles.GetLength(0); col++)
             {
                 // Iterate through tile rows.
-                for (int row = 0; row < target.TileIds.GetLength(1); row++)
+                for (int row = 0; row < target.Tiles.GetLength(1); row++)
                 {
                     // Swap tile.
-                    Replace(target.TileIds[col, row], replacement);
+                    Replace(target.Tiles[col, row].TileId, replacement);
                 }
             }
         }
@@ -1167,13 +1270,13 @@ namespace GMare.Common
                 List<Point> points = new List<Point>();
 
                 // Iterate through layer columns.
-                for (int x = 0; x < _tiles.GetLength(0); x++)
+                for (int x = 0; x < _tiles2.GetLength(0); x++)
                 {
                     // Iterate through layer rows.
-                    for (int y = 0; y < _tiles.GetLength(1); y++)
+                    for (int y = 0; y < _tiles2.GetLength(1); y++)
                     {
                         // If the iterated tile id matches the target, add point.
-                        if (_tiles[x, y] == id)
+                        if (_tiles2[x, y].TileId == id)
                             points.Add(new Point(x, y));
                     }
                 }
@@ -1189,7 +1292,7 @@ namespace GMare.Common
                 foreach (Point point in lists[i])
                 {
                     // Replace tile id.
-                    _tiles[point.X, point.Y] = replacements[i];
+                    _tiles2[point.X, point.Y].TileId = replacements[i];
                 }
             }
         }
@@ -1198,18 +1301,34 @@ namespace GMare.Common
         /// Fills in tile sections with the desired tile.
         /// </summary>
         /// <param name="origin">The starting point for the fill, in tiles.</param>
+        /// <param name="tileId">The tile id to fill with.</param>
+        public void Fill(Point origin, int tileId)
+        {
+            // Create a new array of tiles.
+            GMareTile[,] tiles = new GMareTile[1, 1];
+            tiles[0, 0] = new GMareTile();
+            tiles[0, 0].TileId = tileId;
+
+            // Fill with tile array.
+            Fill(origin, tiles);
+        }
+
+        /// <summary>
+        /// Fills in tile sections with the desired brush.
+        /// </summary>
+        /// <param name="origin">The starting point for the fill, in tiles.</param>
         /// <param name="tiles">The array of tiles to fill with.</param>
-        public void Fill(Point origin, int[,] tiles)
+        public void Fill(Point origin, GMareTile[,] tiles)
         {
             // If the origin is out of bounds, return.
-            if (origin.X < 0 || origin.X >= _tiles.GetLength(0) || origin.Y < 0 || origin.Y >= _tiles.GetLength(1))
+            if (origin.X < 0 || origin.X >= _tiles2.GetLength(0) || origin.Y < 0 || origin.Y >= _tiles2.GetLength(1))
                 return;
 
             // Get target tile.
-            int target = _tiles[origin.X, origin.Y];
+            int target = _tiles2[origin.X, origin.Y].TileId;
 
             // Get the valid fill array.
-            bool[,] mask = GetFillMask(origin, target);
+            bool[,] mask = this.GetFillMask(origin, target);
 
             // Calculate fill start offsets.
             int offsetX = origin.X % tiles.GetLength(0);
@@ -1228,14 +1347,14 @@ namespace GMare.Common
             int y = offsetY;
 
             // Iterate through layer columns.
-            for (int col = 0; col < _tiles.GetLength(0); col++)
+            for (int col = 0; col < _tiles2.GetLength(0); col++)
             {
                 // Iterate through layer rows.
-                for (int row = 0; row < _tiles.GetLength(1); row++)
+                for (int row = 0; row < _tiles2.GetLength(1); row++)
                 {
                     // If the coordinate values are allowed by the mask and equal the target, replace the tile.
-                    if (mask[col, row] == true && _tiles[col, row] == target)
-                        _tiles[col, row] = tiles[x, y];
+                    if (mask[col, row] == true && _tiles2[col, row].TileId == target)
+                        _tiles2[col, row] = tiles[x, y].Clone();
 
                     // Increment selection's row index.
                     y++;
@@ -1245,7 +1364,7 @@ namespace GMare.Common
                         y = 0;
 
                     // If at the max height of the layer, reset row index to offsetY.
-                    if (row == _tiles.GetLength(1) - 1)
+                    if (row == _tiles2.GetLength(1) - 1)
                         y = offsetY;
                 }
 
@@ -1257,7 +1376,7 @@ namespace GMare.Common
                     x = 0;
 
                 // If at the max width of the layer, reset column index to offsetX.
-                if (col == _tiles.GetLength(0) - 1)
+                if (col == _tiles2.GetLength(0) - 1)
                     x = offsetX;
             }
         }
@@ -1271,11 +1390,11 @@ namespace GMare.Common
         private bool[,] GetFillMask(Point origin, int target)
         {
             // Create an array of booleans.
-            bool[,] mask = new bool[_tiles.GetLength(0), _tiles.GetLength(1)];
+            bool[,] mask = new bool[_tiles2.GetLength(0), _tiles2.GetLength(1)];
 
             // Iterate through columns and rows, set them all to false.
-            for (int col = 0; col < _tiles.GetLength(0); col++)
-                for (int row = 0; row < _tiles.GetLength(1); row++)
+            for (int col = 0; col < _tiles2.GetLength(0); col++)
+                for (int row = 0; row < _tiles2.GetLength(1); row++)
                     mask[col, row] = false;
 
             // Create a checks queue.
@@ -1291,21 +1410,21 @@ namespace GMare.Common
                 Point check = (Point)checks.Dequeue();
 
                 // If the check point value equals the target value.
-                if (_tiles[check.X, check.Y] == target)
+                if (_tiles2[check.X, check.Y].TileId == target)
                 {
                     // Create linear check points.
                     int west = check.X;
                     int east = check.X;
 
                     // While we're not out of bounds, and the target matches the point, set west coordinate.
-                    while (west > -1 && _tiles[west, check.Y] == target && mask[west, check.Y] == false)
+                    while (west > -1 && _tiles2[west, check.Y].TileId == target && mask[west, check.Y] == false)
                     {
                         // Deincrement west coordinate.
                         west--;
                     }
 
                     // While we're not out of bounds, and the target matches the point, set east coordinate.
-                    while (east < _tiles.GetLength(0) && _tiles[east, check.Y] == target && mask[east, check.Y] == false)
+                    while (east < _tiles2.GetLength(0) && _tiles2[east, check.Y].TileId == target && mask[east, check.Y] == false)
                     {
                         // Increment east coordinate.
                         east++;
@@ -1322,11 +1441,11 @@ namespace GMare.Common
                         int down = check.Y + 1;
 
                         // If within bounds, if the tile above matches the target, and not already set, add point to queue.
-                        if (up > -1 && _tiles[west, up] == target && mask[west, up] == false)
+                        if (up > -1 && _tiles2[west, up].TileId == target && mask[west, up] == false)
                             checks.Enqueue(new Point(west, check.Y - 1));
 
                         // If within bounds, if the tile below matches the target, and not already set, add point to queue.
-                        if (down < _tiles.GetLength(1) && _tiles[west, down] == target && mask[west, down] == false)
+                        if (down < _tiles2.GetLength(1) && _tiles2[west, down].TileId == target && mask[west, down] == false)
                             checks.Enqueue(new Point(west, check.Y + 1));
                     }
                 }
@@ -1334,6 +1453,23 @@ namespace GMare.Common
 
             // Return the valid fill area.
             return mask;
+        }
+
+        /// <summary>
+        /// Converts old integer tile ids to new tile objects.
+        /// </summary>
+        public void Convert()
+        {
+            // Create a new empty layer.
+            _tiles2 = GetEmptyLayer(_tiles.GetLength(0), _tiles.GetLength(1));
+
+            // Get the old tile ids for new tile objects.
+            for (int col = 0; col < _tiles.GetLength(0); col++)
+                for (int row = 0; row < _tiles.GetLength(1); row++)
+                    _tiles2[col, row].TileId = _tiles[col, row];
+
+            // Remove old tile data.
+            _tiles = null;
         }
 
         #endregion
@@ -1353,6 +1489,156 @@ namespace GMare.Common
     }
 
     /// <summary>
+    /// A class that represents a tile's data.
+    /// </summary>
+    [Serializable]
+    public class GMareTile
+    {
+        #region Fields
+
+        private Color _blend = Color.White;      // The blend color.
+        private FlipType _flip = FlipType.None;  // Flip mode.
+        private int _tileId = -1;                // The source tile id.
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the blend color of the tile.
+        /// </summary>
+        public Color Blend
+        {
+            get { return _blend; }
+            set { _blend = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the source tile from a background.
+        /// </summary>
+        public int TileId
+        {
+            get { return _tileId; }
+            set { _tileId = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the horizontal scale factor of the tile.
+        /// </summary>
+        public FlipType FlipMode
+        {
+            get { return _flip; }
+            set { _flip = value; }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Makes a shallow copy of this tile.
+        /// </summary>
+        /// <returns>A shallow copy of this tile.</returns>
+        public GMareTile Clone()
+        {
+            // Create a new tile.
+            GMareTile tile = new GMareTile();
+
+            // Set properties.
+            tile.TileId = _tileId;
+            tile.FlipMode = _flip;
+            tile.Blend = _blend;
+
+            // Return cloned tile.
+            return tile;
+        }
+
+        /// <summary>
+        /// Converts the flipping data to a scale point.
+        /// </summary>
+        /// <returns>A converted flip point.</returns>
+        public PointF GetScale()
+        {
+            // Create a new point.
+            PointF point = new PointF(1.0f, 1.0f);
+
+            // Set flipping data.
+            switch (_flip)
+            {
+                case FlipType.None: break;
+                case FlipType.Horizontal: point.X = -1.0f; break;
+                case FlipType.Vertical: point.Y = -1.0f; break;
+                case FlipType.Both: point.X = -1.0f; point.Y = -1.0f; break;
+            }
+
+            // Return converted data point.
+            return point;
+        }
+
+        /// <summary>
+        /// Sets the tiles flipping mode.
+        /// </summary>
+        /// <param name="direction">The desired direction to flip.</param>
+        public void Flip(FlipDirection direction)
+        {
+            // Set flipping enumeration.
+            switch (_flip)
+            {
+                case FlipType.None:
+                    // If flipping horizontally.
+                    if (direction == FlipDirection.Horizontal)
+                        _flip = FlipType.Horizontal;
+                    else
+                        _flip = FlipType.Vertical;
+                    
+                    break;
+
+                case FlipType.Horizontal:
+                    // If flipping horizontally.
+                    if (direction == FlipDirection.Horizontal)
+                        _flip = FlipType.None;
+                    else
+                        _flip = FlipType.Both;
+
+                    break;
+
+                case FlipType.Vertical:
+                    // If flipping horizontally.
+                    if (direction == FlipDirection.Horizontal)
+                        _flip = FlipType.Both;
+                    else
+                        _flip = FlipType.None;
+                    
+                    break;
+
+                case FlipType.Both:
+                    // If flipping horizontally.
+                    if (direction == FlipDirection.Horizontal)
+                        _flip = FlipType.Vertical;
+                    else
+                        _flip = FlipType.Horizontal;
+                    
+                    break;
+            }
+        }
+
+        #endregion
+
+        #region Overrides
+
+        /// <summary>
+        /// Overrides to string.
+        /// </summary>
+        /// <returns>A string representing a tile object.</returns>
+        public override string ToString()
+        {
+            return "Tile Id: " + _tileId + " Flip Mode: " + _flip.ToString();
+        }
+
+        #endregion
+    }
+
+    /// <summary>
     /// A class that represents a watered down version of a GM object.
     /// </summary>
     [Serializable]
@@ -1361,7 +1647,7 @@ namespace GMare.Common
         #region Fields
 
         private GMResource _resource = new GMResource();           // The resource id of the source object.
-        private Bitmap _image = GMare.Properties.Resources.empty;  // The image to represent this object.
+        private Bitmap _image = GMare.Properties.Resources.instance;  // The image to represent this object.
         private int _depth = 0;                                    // The object depth.
         private int _sprite = -1;                                  // The sprite id.
         private int _originX = 0;                                  // The horizontal offset.

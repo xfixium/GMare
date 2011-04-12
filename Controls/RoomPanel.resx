@@ -121,13 +121,13 @@
     <value>17, 56</value>
   </metadata>
   <metadata name="cms_InstanceOptions.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>188, 17</value>
+    <value>17, 95</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="tsmi_InstanceSnap.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsEAAA7BAbiRa+0AAAE9SURBVDhPY2AgAJYzMCivYGDoW8nAcBCEQWyQGCF9YHmQ
+        YQUAAAAJcEhZcwAADrwAAA68AZW8ckkAAAE9SURBVDhPY2AgAJYzMCivYGDoW8nAcBCEQWyQGCF9YHmQ
         wtU8nHuvx4W+/NBU9QeEQWyQGIohjIyMjUC8BhmDDFgItO1afNjLc3Hh7/v4+C6DMIgNEgPJwV0B1LgO
         xkFmzwI6+VZW0p8uLq7LjQwM1iAMYoPEQHLIBmxAMgDOnsLAcOZyeND/eiANkwexQWIgOWQDNgNthuE2
         EBskCXTjmbvOdhgGgMRAcsgGbENyAZytpaWVeuDAif8aGhrlMHlsYgxAG3ciGQBnCwsLZ589e/U/kC6G
@@ -136,6 +136,9 @@
         rkJggg==
 </value>
   </data>
+  <metadata name="cms_BrushOptions.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 134</value>
+  </metadata>
   <metadata name="$this.TrayLargeIcon" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>

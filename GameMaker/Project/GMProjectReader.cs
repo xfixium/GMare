@@ -548,7 +548,7 @@ namespace GameMaker.Project
             }
 
             // Get last changed.
-            GMTrigger.LastChanged = ReadDouble();
+            GMTrigger.TriggerLastChanged = ReadDouble();
 
             // Return triggers.
             return triggers;

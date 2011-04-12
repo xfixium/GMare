@@ -70,6 +70,7 @@
             // pnl_Room
             // 
             this.pnl_Room.BackColor = System.Drawing.Color.White;
+            this.pnl_Room.Brush = null;
             this.pnl_Room.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.pnl_Room.DepthIndex = 0;
             this.pnl_Room.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -91,14 +92,14 @@
             this.pnl_Room.Size = new System.Drawing.Size(129, 129);
             this.pnl_Room.Snap = true;
             this.pnl_Room.TabIndex = 6;
-            this.pnl_Room.Tiles = null;
-            this.pnl_Room.ToolMode = GMare.Common.ToolType.Pencil;
+            this.pnl_Room.ToolMode = GMare.Common.ToolType.Brush;
             this.pnl_Room.Zoom = 1F;
             this.pnl_Room.PositionChanged += new GMare.Controls.RoomPanel.PositionHandler(this.pnl_Room_PositionChanged);
             this.pnl_Room.SelectedInstanceChanged += new GMare.Controls.RoomPanel.InstanceChangedHandler(this.pnl_Room_InstanceChanged);
-            this.pnl_Room.RoomChanged += new GMare.Controls.RoomPanel.RoomChangedHandler(this.pnl_Room_RoomChanged);
+            this.pnl_Room.RoomChanging += new GMare.Controls.RoomPanel.RoomChangingHandler(this.pnl_Room_RoomChanged);
             this.pnl_Room.ClipboardChanged += new GMare.Controls.RoomPanel.ClipboardChangedHandler(this.pnl_Room_ClipboardChanged);
             this.pnl_Room.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnl_Room_MouseDown);
+            this.pnl_Room.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnl_Room_MouseMove);
             this.pnl_Room.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pnl_Room_MouseUp);
             // 
             // sb_Vertical

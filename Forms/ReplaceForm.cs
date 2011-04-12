@@ -40,8 +40,8 @@ namespace GMare.Forms
         #region Fields
 
         private GMareLayer _layer = null;  // The layer to swap tile ids in. Null value means to swap all layers.
-        private TileGrid _target = null;   // The tile ids to swap out.
-        private TileGrid _swap = null;     // The new tile ids to swap with.
+        private GMareBrush _target = null;   // The tile ids to swap out.
+        private GMareBrush _swap = null;     // The new tile ids to swap with.
 
         #endregion
 
@@ -58,7 +58,7 @@ namespace GMare.Forms
         /// <summary>
         /// Gets the tile ids to swap out.
         /// </summary>
-        public TileGrid Target
+        public GMareBrush Target
         {
             get { return _target; }
         }
@@ -66,7 +66,7 @@ namespace GMare.Forms
         /// <summary>
         /// Gets the tile ids to swap with.
         /// </summary>
-        public TileGrid Swap
+        public GMareBrush Swap
         {
             get { return _swap; }
         }
@@ -127,9 +127,9 @@ namespace GMare.Forms
             if (tsb_Empty.Checked)
             {
                 // Set tile grid to empty tiles.
-                for (int x = 0; x < _swap.TileIds.GetLength(0); x++)
-                    for (int y = 0; y < _swap.TileIds.GetLength(0); y++)
-                        _swap.TileIds[x, y] = -1;
+                for (int x = 0; x < _swap.Tiles.GetLength(0); x++)
+                    for (int y = 0; y < _swap.Tiles.GetLength(0); y++)
+                        _swap.Tiles[x, y].TileId = -1;
             }
 
             // Set dialog result.

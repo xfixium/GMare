@@ -37,14 +37,14 @@ namespace GMare.Forms
             this.btn_Ok = new System.Windows.Forms.Button();
             this.btn_Cancel = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.nud_Amount = new GMare.Controls.NumericUpDownEx();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.cmbobx_Layer = new System.Windows.Forms.ComboBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.nud_Amount = new GMare.Controls.NumericUpDownEx();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nud_Amount)).BeginInit();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -139,28 +139,6 @@ namespace GMare.Forms
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Amount";
             // 
-            // cmbobx_Layer
-            // 
-            this.cmbobx_Layer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmbobx_Layer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbobx_Layer.FormattingEnabled = true;
-            this.cmbobx_Layer.Location = new System.Drawing.Point(8, 18);
-            this.cmbobx_Layer.Name = "cmbobx_Layer";
-            this.cmbobx_Layer.Size = new System.Drawing.Size(136, 21);
-            this.cmbobx_Layer.TabIndex = 0;
-            this.toolTip1.SetToolTip(this.cmbobx_Layer, "Layer to shift tiles");
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.cmbobx_Layer);
-            this.groupBox3.Location = new System.Drawing.Point(8, 8);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(152, 48);
-            this.groupBox3.TabIndex = 0;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Layer To Shift";
-            // 
             // nud_Amount
             // 
             this.nud_Amount.Location = new System.Drawing.Point(8, 18);
@@ -184,6 +162,28 @@ namespace GMare.Forms
             0,
             0});
             // 
+            // cmbobx_Layer
+            // 
+            this.cmbobx_Layer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbobx_Layer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbobx_Layer.FormattingEnabled = true;
+            this.cmbobx_Layer.Location = new System.Drawing.Point(8, 18);
+            this.cmbobx_Layer.Name = "cmbobx_Layer";
+            this.cmbobx_Layer.Size = new System.Drawing.Size(136, 21);
+            this.cmbobx_Layer.TabIndex = 0;
+            this.toolTip1.SetToolTip(this.cmbobx_Layer, "Layer to shift tiles");
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.cmbobx_Layer);
+            this.groupBox3.Location = new System.Drawing.Point(8, 8);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(152, 48);
+            this.groupBox3.TabIndex = 0;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Layer(s) To Shift";
+            // 
             // ShiftForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -206,8 +206,8 @@ namespace GMare.Forms
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
-            this.groupBox3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nud_Amount)).EndInit();
+            this.groupBox3.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

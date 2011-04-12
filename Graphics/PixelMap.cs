@@ -453,6 +453,41 @@ namespace GMare.Graphics
         }
 
         /// <summary>
+        /// Changes a bitmap's transparency.
+        /// </summary>
+        /// <param name="image">The bitmap to change the transparency on.</param>
+        /// <param name="amount">The desired color to blend with.</param>
+        /// <returns>A bitmap with new transparency values.</returns>
+        public static Bitmap BitmapBlend(Bitmap image, Color blend)
+        {
+            // Create a new bitmap to draw on.
+            Bitmap bm = new Bitmap(image.Width, image.Height);
+            System.Drawing.Graphics gfx = System.Drawing.Graphics.FromImage(bm);
+
+            // Alpha changing color matrix.
+            ColorMatrix cm = new ColorMatrix(new float[][] {
+                new float[]{ blend.R * 100f, 0.0f, 0.0f, 0.0f, 0.0f},
+                new float[]{ 0.0f, blend.B * 100f, 0.0f, 0.0f, 0.0f},
+                new float[]{ 0.0f, 0.0f, blend.G * 100f, 0.0f, 0.0f},
+                new float[]{ 0.0f, 0.0f, 0.0f, 1.0f, 0.0f},
+                new float[]{ 0.0f, 0.0f, 0.0f, 0.0f, 1.0f} });
+
+            // Create new image attributes.
+            ImageAttributes ia = new ImageAttributes();
+            ia.SetColorMatrix(cm);
+
+            // Draw the original image with new image attributes.
+            gfx.DrawImage(image, new Rectangle(0, 0, bm.Width, bm.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, ia);
+
+            // Dispose.
+            gfx.Dispose();
+            ia.Dispose();
+
+            // Return changed bitmap.
+            return bm;
+        }
+
+        /// <summary>
         /// Converts pixel data to a compatible OpenGL texture data.
         /// </summary>
         /// <returns>Texture data.</returns>

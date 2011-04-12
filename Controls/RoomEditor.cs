@@ -47,6 +47,10 @@ namespace GMare.Controls
         public event ClipboardChangedHandler ClipboardChanged;  // Clipboard contents changed.
         public delegate void ClipboardChangedHandler();         // Clipboard contents changed handler.
 
+        private Point _previous = Point.Empty;                  // Previous dragging point.
+        private bool _handTool = false;                         // If the hand tool is being pressed.
+        private bool _dragging = false;                         // If Dragging.
+
         #endregion
 
         #region Properties
@@ -91,14 +95,14 @@ namespace GMare.Controls
 
                     // Get Instance rectangle.
                     Rectangle rect = new Rectangle(SelectedInstance.X, SelectedInstance.Y, obj.Image.Width, obj.Image.Height);
-                    Rectangle view = new Rectangle(pnl_Room.Offset.X, pnl_Room.Offset.Y, (int)(pnl_Room.ClientSize.Width / Zoom), (int)(pnl_Room.ClientSize.Height / Zoom));
+                    Rectangle view = new Rectangle(pnl_Room.Offset.X, pnl_Room.Offset.Y, (int)(pnl_Room.ClientSize.Width / pnl_Room.Zoom), (int)(pnl_Room.ClientSize.Height / pnl_Room.Zoom));
                     
                     // If the selected instance is not within the viewport.
                     if (view.IntersectsWith(rect) == false)
                     {
                         // Calculate scroll position on selected instance centered.
-                        int x = rect.X - ((int)(pnl_Room.ClientSize.Width / Zoom) / 2) + (rect.Width / 2);
-                        int y = rect.Y - ((int)(pnl_Room.ClientSize.Height / Zoom) / 2) + (rect.Height / 2);
+                        int x = rect.X - ((int)(pnl_Room.ClientSize.Width / pnl_Room.Zoom) / 2) + (rect.Width / 2);
+                        int y = rect.Y - ((int)(pnl_Room.ClientSize.Height / pnl_Room.Zoom) / 2) + (rect.Height / 2);
 
                         // Stay within minimum and maximum values.
                         x = x < 0 ? 0 : x;
@@ -131,7 +135,7 @@ namespace GMare.Controls
         /// <summary>
         /// Gets the selection clipboard.
         /// </summary>
-        public TileGrid SelectionClipboard
+        public GMareBrush SelectionClipboard
         {
             get { return pnl_Room.SelectionClipboard; }
         }
@@ -175,16 +179,16 @@ namespace GMare.Controls
         /// <summary>
         /// Gets or sets the grid of selected tiles.
         /// </summary>
-        public TileGrid Tiles
+        public GMareBrush Tiles
         {
-            get { return pnl_Room.Tiles; }
-            set { pnl_Room.Tiles = value; }
+            get { return pnl_Room.Brush; }
+            set { pnl_Room.Brush = value; }
         }
 
         /// <summary>
         /// Gets the current selection.
         /// </summary>
-        public TileGrid Selection
+        public GMareBrush Selection
         {
             get { return pnl_Room.Selection; }
         }
@@ -219,15 +223,6 @@ namespace GMare.Controls
         public string MouseSnapped
         {
             get { return pnl_Room.MouseSnapped; }
-        }
-
-        /// <summary>
-        /// Gets or sets the scale factor of the room panel.
-        /// </summary>
-        public float Zoom
-        {
-            get { return pnl_Room.Zoom; }
-            set { pnl_Room.Zoom = value; SetScrollbars(); }
         }
 
         /// <summary>
@@ -285,6 +280,15 @@ namespace GMare.Controls
         }
 
         /// <summary>
+        /// Gets or sets the show instances always.
+        /// </summary>
+        public bool ShowInstances
+        {
+            get { return pnl_Room.ShowInstances; }
+            set { pnl_Room.ShowInstances = value; }
+        }
+
+        /// <summary>
         /// Gets or sets whether to snap instances to the grid.
         /// </summary>
         public bool Snap
@@ -316,7 +320,7 @@ namespace GMare.Controls
         #region Overrides
 
         /// <summary>
-        /// OnPaint override.
+        /// On paint override.
         /// </summary>
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -325,6 +329,57 @@ namespace GMare.Controls
 
             // Invalidate the room panel.
             pnl_Room.Invalidate();
+        }
+
+        protected override void OnKeyPress(KeyPressEventArgs e)
+        {
+            // If holding down the H key for the hand tool.
+            if (e.KeyChar == 'h')
+                pnl_Room.Invalidate();
+        }
+
+        /// <summary>
+        /// On key down override.
+        /// </summary>
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            // If holding down the H key for the hand tool.
+            if (e.KeyCode == Keys.H)
+            {
+                // The hand tool is ready.
+                _handTool = true;
+
+                // Tell the panel to change cursor graphics.
+                pnl_Room.HandKey = true;
+
+                // Don't allow other keys to override.
+                return;
+            }
+
+            // If holding down the shift key
+            if (e.KeyCode == Keys.ShiftKey)
+                pnl_Room.ShiftKey = true;
+        }
+
+        /// <summary>
+        /// On key up override.
+        /// </summary>
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            // Reset.
+            _handTool = false;
+            pnl_Room.ShiftKey = false;
+            pnl_Room.HandKey = false;
+            pnl_Room.ReAquirePosition();
+        }
+
+        /// <summary>
+        /// On mouse enter override.
+        /// </summary>
+        protected override void OnMouseEnter(EventArgs e)
+        {
+            // Focus for scroll support.
+            Focus();
         }
 
         #endregion
@@ -386,23 +441,68 @@ namespace GMare.Controls
         }
 
         /// <summary>
+        /// Mouse down.
+        /// </summary>
+        private void pnl_Room_MouseDown(object sender, MouseEventArgs e)
+        {
+            // If the hand tool is ready to be used.
+            if (_handTool == true)
+            {
+                // Allow dragging.
+                _dragging = true;
+
+                // Record start position.
+                _previous = e.Location;
+
+                // Ignore other calls.
+                return;
+            }
+
+            // If not in view all mode, trigger mouse down event.
+            if (EditMode != EditType.ViewAll)
+                OnMouseDown(e);
+        }
+
+        /// <summary>
+        /// Mouse move.
+        /// </summary>
+        private void pnl_Room_MouseMove(object sender, MouseEventArgs e)
+        {
+            // If dragging, set scroll.
+            if (_dragging == true)
+            {
+                // Get new position.
+                int x = sb_Horizontal.Value - (e.X - _previous.X);
+                int y = sb_Vertical.Value - (e.Y - _previous.Y);
+
+                // Check boundries.
+                if (x >= sb_Horizontal.Minimum && x <= ProjectManager.Room.Width - (int)(pnl_Room.ClientSize.Width / pnl_Room.Zoom) - 1)
+                    sb_Horizontal.Value = x;
+
+                if (y >= sb_Vertical.Minimum && y <= ProjectManager.Room.Height - (int)(pnl_Room.ClientSize.Height / pnl_Room.Zoom) - 1)
+                    sb_Vertical.Value = y;
+
+                // Set new previous location.
+                _previous = e.Location;
+            }
+        }
+
+        /// <summary>
         /// Room panel mouse up.
         /// </summary>
         private void pnl_Room_MouseUp(object sender, MouseEventArgs e)
         {
+            // If previously dragging.
+            if (_dragging == true)
+            {
+                // No more dragging.
+                _dragging = false;
+                return;
+            }
+
             // If not in view all mode, trigger mouse up event.
             if (EditMode != EditType.ViewAll)
                 OnMouseUp(e);
-        }
-
-        /// <summary>
-        /// Room  panel mouse down.
-        /// </summary>
-        private void pnl_Room_MouseDown(object sender, MouseEventArgs e)
-        {
-            // If not in view all mode, trigger mouse down event.
-            if (EditMode != EditType.ViewAll)
-                OnMouseDown(e);
         }
 
         #endregion
@@ -415,10 +515,10 @@ namespace GMare.Controls
         private void SetScrollbars()
         {
             // Zero out minimums, and scrollbar visibility.
-            this.sb_Vertical.Minimum = 0;
-            this.sb_Horizontal.Minimum = 0;
-            this.tlp_Layout.RowStyles[1].Height = 0;
-            this.tlp_Layout.ColumnStyles[1].Width = 0;
+            sb_Vertical.Minimum = 0;
+            sb_Horizontal.Minimum = 0;
+            tlp_Layout.RowStyles[1].Height = 0;
+            tlp_Layout.ColumnStyles[1].Width = 0;
 
             // If no room was loaded, return.
             if (ProjectManager.Room == null)
@@ -428,64 +528,64 @@ namespace GMare.Controls
             int thumb = 2;
 
             // If the room is wider than the room panel, show the horizontal scrollbar.
-            if ((int)(pnl_Room.ClientSize.Width / Zoom) < ProjectManager.Room.Width)
-                this.tlp_Layout.RowStyles[1].Height = 17;
+            if ((int)(pnl_Room.ClientSize.Width / pnl_Room.Zoom) < ProjectManager.Room.Width)
+                tlp_Layout.RowStyles[1].Height = 17;
 
             // If the room is taller than the room panel, show the vertical scrollbar.
-            if ((int)(pnl_Room.ClientSize.Height / Zoom) < ProjectManager.Room.Height)
-                this.tlp_Layout.ColumnStyles[1].Width = 17;
+            if ((int)(pnl_Room.ClientSize.Height / pnl_Room.Zoom) < ProjectManager.Room.Height)
+                tlp_Layout.ColumnStyles[1].Width = 17;
 
             // If the offset does not make the maximum less than zero, set its value. 
-            if ((ProjectManager.Room.Width - (int)(pnl_Room.ClientSize.Width / Zoom)) > 0)
+            if ((ProjectManager.Room.Width - (int)(pnl_Room.ClientSize.Width / pnl_Room.Zoom)) > 0)
             {
-                this.sb_Horizontal.Maximum = ProjectManager.Room.Width - (int)(pnl_Room.ClientSize.Width / Zoom) - 1;
+                sb_Horizontal.Maximum = ProjectManager.Room.Width - (int)(pnl_Room.ClientSize.Width / pnl_Room.Zoom) - 1;
 
                 // If the horizontal maximum is a negative number.
                 if (this.sb_Horizontal.Maximum / thumb < 0)
                 {
                     // Disable the horizontal scrollbar.
-                    this.sb_Horizontal.Maximum = 0;
-                    this.sb_Horizontal.Value = 0;
-                    this.tlp_Layout.RowStyles[1].Height = 0;
+                    sb_Horizontal.Maximum = 0;
+                    sb_Horizontal.Value = 0;
+                    tlp_Layout.RowStyles[1].Height = 0;
                 }
                 else
                 {
                     // Set horizontal large and small changes.
-                    this.sb_Horizontal.LargeChange = this.sb_Horizontal.Maximum / thumb;
-                    this.sb_Horizontal.SmallChange = this.sb_Horizontal.Maximum / 20;
+                    sb_Horizontal.LargeChange = sb_Horizontal.Maximum / thumb;
+                    sb_Horizontal.SmallChange = sb_Horizontal.Maximum / 20;
                 }
 
                 // Adjust the maximum value to make the raw maximum value attainable by user interaction.
-                this.sb_Horizontal.Maximum += this.sb_Horizontal.LargeChange;
+                sb_Horizontal.Maximum += sb_Horizontal.LargeChange;
             }
             else
-                this.sb_Horizontal.Value = 0;
+                sb_Horizontal.Value = 0;
 
             // If the offset does not make the maximum less than zero, set its value.    
-            if ((ProjectManager.Room.Height - (int)(pnl_Room.ClientSize.Height / Zoom)) > 0)
+            if ((ProjectManager.Room.Height - (int)(pnl_Room.ClientSize.Height / pnl_Room.Zoom)) > 0)
             {
-                this.sb_Vertical.Maximum = ProjectManager.Room.Height - (int)(pnl_Room.ClientSize.Height / Zoom) - 1;
+                sb_Vertical.Maximum = ProjectManager.Room.Height - (int)(pnl_Room.ClientSize.Height / pnl_Room.Zoom) - 1;
 
                 // If the vertical maximum is a negative number.
-                if (this.sb_Vertical.Maximum / thumb < 0)
+                if (sb_Vertical.Maximum / thumb < 0)
                 {
                     // Disable the vertical scrollbar.
-                    this.sb_Vertical.Maximum = 0;
-                    this.sb_Vertical.Value = 0;
-                    this.tlp_Layout.ColumnStyles[1].Width = 0;
+                    sb_Vertical.Maximum = 0;
+                    sb_Vertical.Value = 0;
+                    tlp_Layout.ColumnStyles[1].Width = 0;
                 }
                 else
                 {
                     // Set vertical large and small changes.
-                    this.sb_Vertical.LargeChange = this.sb_Vertical.Maximum / thumb;
-                    this.sb_Vertical.SmallChange = this.sb_Vertical.Maximum / 20;
+                    sb_Vertical.LargeChange = sb_Vertical.Maximum / thumb;
+                    sb_Vertical.SmallChange = sb_Vertical.Maximum / 20;
                 }
 
                 // Adjust the maximum value to make the raw maximum value attainable by user interaction.
-                this.sb_Vertical.Maximum += this.sb_Vertical.LargeChange;
+                sb_Vertical.Maximum += sb_Vertical.LargeChange;
             }
             else
-                this.sb_Vertical.Value = 0;
+                sb_Vertical.Value = 0;
         }
 
         /// <summary>
@@ -554,6 +654,85 @@ namespace GMare.Controls
 
             // Reset room panel.
             pnl_Room.Reset();
+        }
+
+        /// <summary>
+        /// Flips brushes or selections.
+        /// </summary>
+        public void Flip(FlipDirection direction)
+        {
+            // If the room is empty, return.
+            if (ProjectManager.Room == null)
+                return;
+
+            // If not editing the layers, return.
+            if (EditMode == EditType.Layers)
+            {
+                // Do action based on key.
+                switch (ToolMode)
+                {
+                    case ToolType.Brush:
+                        // Do action based on key data.
+                        switch (direction)
+                        {
+                            case FlipDirection.Horizontal: pnl_Room.tsmi_BrushFlipHorizontally_Click(this, EventArgs.Empty); Invalidate(); break;
+                            case FlipDirection.Vertical: pnl_Room.tsmi_BrushFlipVertically_Click(this, EventArgs.Empty); Invalidate(); break;
+                        }
+                        break;
+
+                    case ToolType.Bucket:
+                        // Do action based on key data.
+                        switch (direction)
+                        {
+                            case FlipDirection.Horizontal: pnl_Room.tsmi_BrushFlipHorizontally_Click(this, EventArgs.Empty); Invalidate(); break;
+                            case FlipDirection.Vertical: pnl_Room.tsmi_BrushFlipVertically_Click(this, EventArgs.Empty); Invalidate(); break;
+                        }
+                        break;
+
+                    case ToolType.Selection:
+                        // Do action based on key data.
+                        switch (direction)
+                        {
+                            case FlipDirection.Horizontal: pnl_Room.tsmi_SelectionFlipX_Click(this, EventArgs.Empty); Invalidate(); break;
+                            case FlipDirection.Vertical: pnl_Room.tsmi_SelectionFlipY_Click(this, EventArgs.Empty); Invalidate(); break;
+                        }
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Zooms the control.
+        /// </summary>
+        /// <param name="amount">The amount to zoom.</param>
+        public void Zoom(float amount)
+        {
+            // Set zoom.
+            pnl_Room.Zoom = amount;
+
+            // Set scrollbars.
+            SetScrollbars();
+
+            // If the control contains the mouse, zoom and center to mouse point.
+            if (pnl_Room.ClientRectangle.Contains(pnl_Room.PointToClient(Cursor.Position)))
+            {
+                // Calculate scroll position on mouse point centered.
+                int x = pnl_Room.MousePosition.X - ((int)(pnl_Room.ClientSize.Width / pnl_Room.Zoom) / 2);
+                int y = pnl_Room.MousePosition.Y - ((int)(pnl_Room.ClientSize.Height / pnl_Room.Zoom) / 2);
+
+                // Stay within minimum and maximum values.
+                x = x < 0 ? 0 : x;
+                y = y < 0 ? 0 : y;
+                x = x > sb_Horizontal.Maximum ? sb_Horizontal.Maximum : x;
+                y = y > sb_Vertical.Maximum ? sb_Vertical.Maximum : y;
+
+                // Scroll to position.
+                sb_Horizontal.Value = x;
+                sb_Vertical.Value = y;
+
+                // Set scrollbars.
+                SetScrollbars();
+            }
         }
 
         #endregion

@@ -188,7 +188,7 @@ namespace GMare.Controls
                     break;
                 
                 case 2:
-                    image = GMare.Properties.Resources.empty;
+                    image = GMare.Properties.Resources.instance;
                     break;
 
                 // Layers.

@@ -82,14 +82,10 @@ namespace GMare.Forms
             if (lstbx_Backgrounds.Items.Count > 0)
                 lstbx_Backgrounds.SelectedIndex = 0;
 
-            // Get root node.
-            TreeNode root = GMUtilities.GetTreeNodeFromGMNode(_project.ProjectTree.Nodes[8]);
-
             // Add room nodes to treeview.
-            foreach (TreeNode node in root.Nodes)
-            {
-                tv_Rooms.Nodes.Add(node);
-            }
+            tv_Rooms.Nodes.Add(GMUtilities.GetTreeNodeFromGMNode(_project.ProjectTree.Nodes[8]));
+            tv_Rooms.SelectedNode = tv_Rooms.Nodes[0];
+            tv_Rooms.Nodes[0].Expand();
 
             // Set name of room in text box.
             tstb_Name.Text = ProjectManager.Room.Name;
@@ -196,20 +192,14 @@ namespace GMare.Forms
 
                 // Set the tree node tag to Game Maker node.
                 treeNode.Tag = newNode;
+                treeNode.ImageIndex = 2;
 
                 // Add the new node to the tree.
                 tv_Rooms.SelectedNode.Nodes.Add(treeNode);
             }
 
-            // Set the project's tree.
-            List<GMNode> nodes = new List<GMNode>();
-
-            // Iterate through room nodes.
-            foreach (TreeNode n in tv_Rooms.Nodes)
-                nodes.Add(GMUtilities.GetGMNodeFromTreeNode(n));
-
             // Set room nodes.
-            _project.ProjectTree.Nodes[8].Nodes = nodes.ToArray();
+            _project.ProjectTree.Nodes[8] = GMUtilities.GetGMNodeFromTreeNode(tv_Rooms.Nodes[0]);
 
             // If the project's tiles need to be refactored, refactor project tile ids.
             if (cb_RefactorTiles.Checked == true)
@@ -244,6 +234,15 @@ namespace GMare.Forms
         /// </summary>
         private void tv_Rooms_AfterSelect(object sender, TreeViewEventArgs e)
         {
+            // Get the currently selected node.
+            GMNode node = tv_Rooms.SelectedNode.Tag as GMNode;
+
+            // If the node is a child node, disable room name (it will inherit the overwritten room's name), else enable it.
+            if (node.NodeType == GMNodeType.Child)
+                tstb_Name.Enabled = false;
+            else
+                tstb_Name.Enabled = true;
+
             Verify();
         }
 

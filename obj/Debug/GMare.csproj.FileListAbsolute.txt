@@ -49,7 +49,6 @@ C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.ExportGMProjectForm.resources
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.ExportImageForm.resources
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.LayerForm.resources
-C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.TextForm.resources
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.MainForm.resources
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.RoomForm.resources
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.ShiftForm.resources
@@ -62,3 +61,7 @@ C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\bin\Debug\GMare.
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\bin\Debug\GMare.application
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.exe.manifest
 C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.application
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.BrushForm.resources
+C:\Users\Mike\documents\visual studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.ViewForm.resources
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.BrushEditForm.resources
+C:\Users\Mike\Documents\Visual Studio 2010\Projects\GMare\GMare\obj\Debug\GMare.Forms.WarningForm.resources

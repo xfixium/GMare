@@ -118,7 +118,24 @@ namespace GMare.Common
                     // De-Serialize room.
                     try
                     {
+                        // Get room data.
                         room = (GMareRoom)bf.Deserialize(fs);
+
+                        // Iterate through layers.
+                        foreach (GMareLayer layer in room.Layers)
+                        {
+                            // If using old tile data, convert to new tile data.
+                            if (layer.Tiles != null)
+                                layer.Convert();
+                        }
+
+                        // If there is no brush list, create it.
+                        if (room.Brushes == null)
+                        {
+                            room.Brushes = new List<GMareBrush>();
+                            room.BlendWarning = true;
+                            room.ScaleWarning = true;
+                        }
                     }
                     catch (Exception)
                     {
