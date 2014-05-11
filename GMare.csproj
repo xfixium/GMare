@@ -1,0 +1,776 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2A38049A-9CE2-4198-B28A-0E3E1026EBD5}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GMare</RootNamespace>
+    <AssemblyName>GMare</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ProductName>GMare</ProductName>
+    <PublisherName>Pyxosoft</PublisherName>
+    <SuiteName>GMare</SuiteName>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PyxTools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libs\PyxTools.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls\GMareBackgroundPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\GMareBackgroundPanel.designer.cs">
+      <DependentUpon>GMareBackgroundPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\GMareBlockEditor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\GMareBlockEditor.designer.cs">
+      <DependentUpon>GMareBlockEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\GMareCheckedListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\GMareCheckedListBox.Designer.cs">
+      <DependentUpon>GMareCheckedListBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\GMareListbox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\GMareListbox.designer.cs">
+      <DependentUpon>GMareListbox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\GMareRoomEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\GMareRoomEditor.designer.cs">
+      <DependentUpon>GMareRoomEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\GMareRoomPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\GMareRoomPanel.designer.cs">
+      <DependentUpon>GMareRoomPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\GMareTileEditor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\GMareTileEditor.designer.cs">
+      <DependentUpon>GMareTileEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\GMareTileConversionPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\GMareTileConversionPanel.Designer.cs">
+      <DependentUpon>GMareTileConversionPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\AboutForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AboutForm.Designer.cs">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EditBackgroundForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\EditBackgroundForm.Designer.cs">
+      <DependentUpon>EditBackgroundForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EditBrushForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\EditBrushForm.Designer.cs">
+      <DependentUpon>EditBrushForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SaveBrushForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SaveBrushForm.Designer.cs">
+      <DependentUpon>SaveBrushForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ExportBinaryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ExportBinaryForm.Designer.cs">
+      <DependentUpon>ExportBinaryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ExportGMProjectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ExportGMProjectForm.Designer.cs">
+      <DependentUpon>ExportGMProjectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ExportImageForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ExportImageForm.Designer.cs">
+      <DependentUpon>ExportImageForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\GMProjectLoadForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\GMProjectLoadForm.designer.cs">
+      <DependentUpon>GMProjectLoadForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ImportBackgroundForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ImportBackgroundForm.Designer.cs">
+      <DependentUpon>ImportBackgroundForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ImportImageForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ImportImageForm.Designer.cs">
+      <DependentUpon>ImportImageForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\InstanceConflictForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\InstanceConflictForm.Designer.cs">
+      <DependentUpon>InstanceConflictForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\AddEditLayerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AddEditLayerForm.Designer.cs">
+      <DependentUpon>AddEditLayerForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\PositionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PositionForm.Designer.cs">
+      <DependentUpon>PositionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\TileReplacementForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TileReplacementForm.Designer.cs">
+      <DependentUpon>TileReplacementForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ScriptForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ScriptForm.Designer.cs">
+      <DependentUpon>ScriptForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\MoveLayerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MoveLayerForm.Designer.cs">
+      <DependentUpon>MoveLayerForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ViewLayerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ViewLayerForm.Designer.cs">
+      <DependentUpon>ViewLayerForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\WarningForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\WarningForm.Designer.cs">
+      <DependentUpon>WarningForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameMaker\Common\GMEnums.cs" />
+    <Compile Include="GameMaker\Common\GMFileReader.cs" />
+    <Compile Include="GameMaker\Common\GMList.cs" />
+    <Compile Include="GameMaker\Common\GMUtilities.cs" />
+    <Compile Include="GameMaker\Project\GMGameInformation.cs" />
+    <Compile Include="GameMaker\Project\GMProject.cs" />
+    <Compile Include="GameMaker\Project\GMProjectWriter.cs" />
+    <Compile Include="GameMaker\Project\GMSettings.cs" />
+    <Compile Include="GameMaker\Resource\GMAction.cs" />
+    <Compile Include="GameMaker\Resource\GMBackground.cs" />
+    <Compile Include="GameMaker\Resource\GMDataFile.cs" />
+    <Compile Include="GameMaker\Resource\GMEvent.cs" />
+    <Compile Include="GameMaker\Resource\GMFont.cs" />
+    <Compile Include="GameMaker\Resource\GMImage.cs" />
+    <Compile Include="GameMaker\Resource\GMLibrary.cs" />
+    <Compile Include="GameMaker\Resource\GMNode.cs" />
+    <Compile Include="GameMaker\Resource\GMObject.cs" />
+    <Compile Include="GameMaker\Resource\GMPackage.cs" />
+    <Compile Include="GameMaker\Resource\GMPath.cs" />
+    <Compile Include="GameMaker\Resource\GMResource.cs" />
+    <Compile Include="GameMaker\Resource\GMRoom.cs" />
+    <Compile Include="GameMaker\Resource\GMScript.cs" />
+    <Compile Include="GameMaker\Resource\GMSound.cs" />
+    <Compile Include="GameMaker\Resource\GMSprite.cs" />
+    <Compile Include="GameMaker\Resource\GMTimeline.cs" />
+    <Compile Include="GameMaker\Resource\GMTrigger.cs" />
+    <Compile Include="GenericUndoRedo\CompoundMemento.cs" />
+    <Compile Include="GenericUndoRedo\IMemento.cs" />
+    <Compile Include="GenericUndoRedo\RoundStack.cs" />
+    <Compile Include="GenericUndoRedo\UndoRedoHistory.cs" />
+    <Compile Include="Graphics\GraphicsCanvas.cs" />
+    <Compile Include="Graphics\GraphicsManager.cs" />
+    <Compile Include="Graphics\MathMethods.cs" />
+    <Compile Include="Graphics\OpenGL.cs" />
+    <Compile Include="Graphics\PixelMap.cs" />
+    <Compile Include="Graphics\ResTexture.cs" />
+    <Compile Include="Graphics\Vectors.cs" />
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Enums.cs" />
+    <Compile Include="Objects\GMareBrush.cs" />
+    <Compile Include="Objects\GMareRoom.cs" />
+    <Compile Include="Objects\Mementos.cs" />
+    <Compile Include="Objects\ProjectManager.cs" />
+    <Compile Include="Objects\SerializableDictionary.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SharpZipLib\Checksums\Adler32.cs" />
+    <Compile Include="SharpZipLib\Checksums\CRC32.cs" />
+    <Compile Include="SharpZipLib\Checksums\IChecksum.cs" />
+    <Compile Include="SharpZipLib\Checksums\StrangeCRC.cs" />
+    <Compile Include="SharpZipLib\Core\FileSystemScanner.cs" />
+    <Compile Include="SharpZipLib\Core\INameTransform.cs" />
+    <Compile Include="SharpZipLib\Core\IScanFilter.cs" />
+    <Compile Include="SharpZipLib\Core\NameFilter.cs" />
+    <Compile Include="SharpZipLib\Core\PathFilter.cs" />
+    <Compile Include="SharpZipLib\Core\StreamUtils.cs" />
+    <Compile Include="SharpZipLib\Core\WindowsPathUtils.cs" />
+    <Compile Include="SharpZipLib\Encryption\PkzipClassic.cs" />
+    <Compile Include="SharpZipLib\SharpZipBaseException.cs" />
+    <Compile Include="SharpZipLib\Zip\Compression\Deflater.cs" />
+    <Compile Include="SharpZipLib\Zip\Compression\DeflaterConstants.cs" />
+    <Compile Include="SharpZipLib\Zip\Compression\DeflaterEngine.cs" />
+    <Compile Include="SharpZipLib\Zip\Compression\DeflaterHuffman.cs" />
+    <Compile Include="SharpZipLib\Zip\Compression\DeflaterPending.cs" />
+    <Compile Include="SharpZipLib\Zip\Compression\Inflater.cs" />
+    <Compile Include="SharpZipLib\Zip\Compression\InflaterDynHeader.cs" />
+    <Compile Include="SharpZipLib\Zip\Compression\InflaterHuffmanTree.cs" />
+    <Compile Include="SharpZipLib\Zip\Compression\PendingBuffer.cs" />
+    <Compile Include="SharpZipLib\Zip\Compression\Streams\DeflaterOutputStream.cs" />
+    <Compile Include="SharpZipLib\Zip\Compression\Streams\InflaterInputStream.cs" />
+    <Compile Include="SharpZipLib\Zip\Compression\Streams\OutputWindow.cs" />
+    <Compile Include="SharpZipLib\Zip\Compression\Streams\StreamManipulator.cs" />
+    <Compile Include="SharpZipLib\Zip\FastZip.cs" />
+    <Compile Include="SharpZipLib\Zip\IEntryFactory.cs" />
+    <Compile Include="SharpZipLib\Zip\WindowsNameTransform.cs" />
+    <Compile Include="SharpZipLib\Zip\ZipConstants.cs" />
+    <Compile Include="SharpZipLib\Zip\ZipEntry.cs" />
+    <Compile Include="SharpZipLib\Zip\ZipEntryFactory.cs" />
+    <Compile Include="SharpZipLib\Zip\ZipException.cs" />
+    <Compile Include="SharpZipLib\Zip\ZipExtraData.cs" />
+    <Compile Include="SharpZipLib\Zip\ZipFile.cs" />
+    <Compile Include="SharpZipLib\Zip\ZipHelperStream.cs" />
+    <Compile Include="SharpZipLib\Zip\ZipInputStream.cs" />
+    <Compile Include="SharpZipLib\Zip\ZipNameTransform.cs" />
+    <Compile Include="SharpZipLib\Zip\ZipOutputStream.cs" />
+    <EmbeddedResource Include="Controls\GMareListbox.resx">
+      <DependentUpon>GMareListbox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\GMareRoomEditor.resx">
+      <DependentUpon>GMareRoomEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\GMareRoomPanel.resx">
+      <DependentUpon>GMareRoomPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\GMareTileEditor.resx">
+      <DependentUpon>GMareTileEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AboutForm.resx">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\EditBackgroundForm.resx">
+      <DependentUpon>EditBackgroundForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\EditBrushForm.resx">
+      <DependentUpon>EditBrushForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SaveBrushForm.resx">
+      <DependentUpon>SaveBrushForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ExportBinaryForm.resx">
+      <DependentUpon>ExportBinaryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ExportGMProjectForm.resx">
+      <DependentUpon>ExportGMProjectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ExportImageForm.resx">
+      <DependentUpon>ExportImageForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\GMProjectLoadForm.resx">
+      <DependentUpon>GMProjectLoadForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImportBackgroundForm.resx">
+      <DependentUpon>ImportBackgroundForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImportImageForm.resx">
+      <DependentUpon>ImportImageForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\InstanceConflictForm.resx">
+      <DependentUpon>InstanceConflictForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AddEditLayerForm.resx">
+      <DependentUpon>AddEditLayerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PositionForm.resx">
+      <DependentUpon>PositionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TileReplacementForm.resx">
+      <DependentUpon>TileReplacementForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ScriptForm.resx">
+      <DependentUpon>ScriptForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MoveLayerForm.resx">
+      <DependentUpon>MoveLayerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ViewLayerForm.resx">
+      <DependentUpon>ViewLayerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\WarningForm.resx">
+      <DependentUpon>WarningForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="SharpZipLib\.svn\all-wcprops" />
+    <None Include="SharpZipLib\.svn\entries" />
+    <None Include="SharpZipLib\.svn\prop-base\ZipLib.pidb.svn-base" />
+    <None Include="SharpZipLib\.svn\text-base\SharpZipBaseException.cs.svn-base" />
+    <None Include="SharpZipLib\.svn\text-base\ZipLib.pidb.svn-base" />
+    <None Include="SharpZipLib\ZipLib.pidb" />
+    <None Include="SharpZipLib\Zip\.svn\all-wcprops" />
+    <None Include="SharpZipLib\Zip\.svn\entries" />
+    <None Include="SharpZipLib\Zip\.svn\text-base\FastZip.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\.svn\text-base\IEntryFactory.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\.svn\text-base\WindowsNameTransform.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\.svn\text-base\ZipConstants.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\.svn\text-base\ZipEntry.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\.svn\text-base\ZipEntryFactory.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\.svn\text-base\ZipException.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\.svn\text-base\ZipExtraData.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\.svn\text-base\ZipFile.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\.svn\text-base\ZipHelperStream.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\.svn\text-base\ZipInputStream.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\.svn\text-base\ZipNameTransform.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\.svn\text-base\ZipOutputStream.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\Compression\.svn\all-wcprops" />
+    <None Include="SharpZipLib\Zip\Compression\.svn\entries" />
+    <None Include="SharpZipLib\Zip\Compression\.svn\text-base\Deflater.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\Compression\.svn\text-base\DeflaterConstants.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\Compression\.svn\text-base\DeflaterEngine.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\Compression\.svn\text-base\DeflaterHuffman.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\Compression\.svn\text-base\DeflaterPending.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\Compression\.svn\text-base\Inflater.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\Compression\.svn\text-base\InflaterDynHeader.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\Compression\.svn\text-base\InflaterHuffmanTree.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\Compression\.svn\text-base\PendingBuffer.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\Compression\Streams\.svn\all-wcprops" />
+    <None Include="SharpZipLib\Zip\Compression\Streams\.svn\entries" />
+    <None Include="SharpZipLib\Zip\Compression\Streams\.svn\text-base\DeflaterOutputStream.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\Compression\Streams\.svn\text-base\InflaterInputStream.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\Compression\Streams\.svn\text-base\OutputWindow.cs.svn-base" />
+    <None Include="SharpZipLib\Zip\Compression\Streams\.svn\text-base\StreamManipulator.cs.svn-base" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SharpZipLib\.svn\props\" />
+    <Folder Include="SharpZipLib\.svn\tmp\prop-base\" />
+    <Folder Include="SharpZipLib\.svn\tmp\props\" />
+    <Folder Include="SharpZipLib\.svn\tmp\text-base\" />
+    <Folder Include="SharpZipLib\Zip\.svn\prop-base\" />
+    <Folder Include="SharpZipLib\Zip\.svn\props\" />
+    <Folder Include="SharpZipLib\Zip\.svn\tmp\prop-base\" />
+    <Folder Include="SharpZipLib\Zip\.svn\tmp\props\" />
+    <Folder Include="SharpZipLib\Zip\.svn\tmp\text-base\" />
+    <Folder Include="SharpZipLib\Zip\Compression\.svn\prop-base\" />
+    <Folder Include="SharpZipLib\Zip\Compression\.svn\props\" />
+    <Folder Include="SharpZipLib\Zip\Compression\.svn\tmp\prop-base\" />
+    <Folder Include="SharpZipLib\Zip\Compression\.svn\tmp\props\" />
+    <Folder Include="SharpZipLib\Zip\Compression\.svn\tmp\text-base\" />
+    <Folder Include="SharpZipLib\Zip\Compression\Streams\.svn\prop-base\" />
+    <Folder Include="SharpZipLib\Zip\Compression\Streams\.svn\props\" />
+    <Folder Include="SharpZipLib\Zip\Compression\Streams\.svn\tmp\prop-base\" />
+    <Folder Include="SharpZipLib\Zip\Compression\Streams\.svn\tmp\props\" />
+    <Folder Include="SharpZipLib\Zip\Compression\Streams\.svn\tmp\text-base\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tick-circle-frame.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sort-date.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sort-date-descending.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\selection.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\disk-black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\layer-flip.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\layer-flip-vertical.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\magnifier.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\map.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bin.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\plus-circle-frame.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow-curve.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow-curve-180-left.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow-switch.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ui-list-box-blue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cross-circle-frame.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\paint-brush.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\paint-brush--pencil.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\paint-brush--plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\paint-brush--minus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\paint-can-paint-brush.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\paint-can.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\scissors-blue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\clipboard-paste.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\clipboard-text.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cross-button.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\document-copy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\minus-circle-frame.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\color-swatch.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder-horizontal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder-horizontal-open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder-open-image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\status-busy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\control-record.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\layer-transparent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\layer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pipette.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\script-code.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\information.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\selection-select.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\border-outside.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ui-text-field.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\prohibition.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\instance_replace.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\grid.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\grid_iso.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\grid-snap.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\layer--minus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\layer--pencil.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\layer--plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\layers-arrange.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow-move.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\binocular.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\application.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tileset_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\disks-black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\application-import.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\application-import1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\application-export.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\door-open-in.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\globe.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\cur_bucket.cur" />
+    <EmbeddedResource Include="Resources\cur_cross.cur" />
+    <EmbeddedResource Include="Resources\cur_hand_close.cur" />
+    <EmbeddedResource Include="Resources\cur_hand_open.cur" />
+    <EmbeddedResource Include="Resources\cur_pencil.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\eraser.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\book-open-list.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\question-frame.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\show_block.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\hide_blocks.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\import_objects.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\show_instances.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\hide_instances.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\eye.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\eye-close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\image-import.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\image-export.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\clock-history.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\layers-group.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\layers-arrange-back.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sort.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sort-alphabet.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sort-alphabet-descending.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow-090.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow-270.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\clipboard-paste-document-text.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\export_studio.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\export_gm.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\export_bin.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\scrGMareLoadRoom.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\scrGMareReadBytes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\scrGMareReadString.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\scrGMareReadTileAttributes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\scrGMareLoadRoomGMS.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
