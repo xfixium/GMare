@@ -627,6 +627,23 @@ namespace GMare.Objects
             return menu;
         }
 
+        /// <summary>
+        /// Updates instance object names
+        /// </summary>
+        public void UpdateInstanceObjectNames()
+        {
+            // Iterate through existing instances
+            foreach (GMareInstance instance in ProjectManager.Room.Instances)
+            {
+                // Iterate through objects
+                GMareObject obj = this.Objects.Find(o => o.Resource.Id == instance.ObjectId || o.Resource.Name == instance.ObjectName);
+
+                // If the instance does not have an object name, update it
+                if (obj != null && instance.ObjectName == "")
+                    instance.ObjectName = obj.Resource.Name;
+            }
+        }
+
         #endregion
 
         #region Layers

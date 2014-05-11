@@ -141,6 +141,7 @@ namespace GMare.Objects
             // Remove default background, update block instances
             Room.Backgrounds.RemoveAt(0);
             Room.UpdateBlockInstances();
+            Room.UpdateInstanceObjectNames();
 
             // Set edit room and save path, update the UI
             ProjectManager.SavePath = file;
