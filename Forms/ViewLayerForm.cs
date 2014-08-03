@@ -187,10 +187,10 @@ namespace GMare.Forms
             int index = 0;
             int roomWidth = 0;
 
-            if (ProjectManager.Room.Backgrounds[0].Image != null)
-                roomWidth = ProjectManager.Room.Backgrounds[0].Image.Width;
+            if (App.Room.Backgrounds[0].Image != null)
+                roomWidth = App.Room.Backgrounds[0].Image.Width;
 
-            Size roomTileSize = ProjectManager.Room.Backgrounds[0].TileSize;
+            Size roomTileSize = App.Room.Backgrounds[0].TileSize;
             bool tileData = TilesExist(layer.Tiles);
 
             // Create new text

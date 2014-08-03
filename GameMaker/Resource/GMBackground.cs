@@ -39,6 +39,7 @@ namespace GameMaker.Resource
         #region Fields
 
         private GMImage _image = null;
+        private int[] _textureGroups = null;
         private int _width = 0;
         private int _height = 0;
         private int _tileWidth = 16;
@@ -47,7 +48,6 @@ namespace GameMaker.Resource
         private int _verticalOffset = 0;
         private int _horizontalSeperation = 0;
         private int _verticalSeperation = 0;
-        private int _textureGroup = 0;
         private bool _tileHorizontally = false;
         private bool _tileVertically = false;
         private bool _transparent = false;
@@ -68,10 +68,10 @@ namespace GameMaker.Resource
             set { _image = value; }
         }
 
-        public int TextureGroup
+        public int[] TextureGroups
         {
-            get { return _textureGroup; }
-            set { _textureGroup = value; }
+            get { return _textureGroups; }
+            set { _textureGroups = value; }
         }
 
         public int Width
@@ -180,6 +180,130 @@ namespace GameMaker.Resource
 
         #region Methods
 
+        #region Read
+
+        #region Game Maker Studio
+
+        /// <summary>
+        /// Reads all backgrounds from a background XML file
+        /// </summary>
+        /// <param name="directory">The XML (.GMX) file path</param>
+        /// <param name="assets">A list of assets listed in the project GMX</param>
+        /// <returns>A GM background</returns>
+        public static GMList<GMBackground> ReadBackgroundGMX(string directory, ref List<string> assets)
+        {
+            // A list of backgrounds
+            GMList<GMBackground> backgrounds = new GMList<GMBackground>();
+            backgrounds.AutoIncrementIds = false;
+
+            // Iterate through .gmx files in the directory
+            foreach (string file in Directory.GetFiles(directory, "*.gmx"))
+            {
+                // Set name of the background
+                string name = GetResourceName(file);
+
+                // If the file is not in the asset list, it has been orphaned, continue
+                if (!assets.Contains(name))
+                    continue;
+
+                // Create a dictionary of room properties
+                Dictionary<string, string> properties = new Dictionary<string, string>();
+                foreach (GMXBackgroundProperty property in Enum.GetValues(typeof(GMXBackgroundProperty)))
+                    properties.Add(GMXEnumString(property), "");
+
+                // Background image and texture group strings
+                GMImage image = null;
+                string textureGroup = GMXEnumString(GMXBackgroundProperty.TextureGroup);
+                string textureGroup0 = GMXEnumString(GMXBackgroundProperty.TextureGroup0);
+
+                // Create an XMLReader to read in the resource elements
+                using (XmlReader reader = XmlReader.Create(file))
+                {
+                    // Move to a content node
+                    reader.MoveToContent();
+
+                    // Read XML file
+                    while (reader.Read())
+                    {
+                        // If the node is not an element, continue
+                        if (reader.NodeType != XmlNodeType.Element)
+                            continue;
+
+                        // Get the element name
+                        string nodeName = reader.Name;
+
+                        // Read 
+                        reader.Read();
+
+                        // If the element value is null or empty, continue
+                        if (string.IsNullOrEmpty(reader.Value))
+                            continue;
+
+                        // If the element is a frame element create subimage, else normal property
+                        if (nodeName.ToLower() == GMXEnumString(GMXBackgroundProperty.Data))
+                        {
+                            // Create an image and set the image path
+                            image = new GMImage();
+                            image.Compressed = false;
+                            image.FilePath = reader.Value;
+                            image.Data = GMUtilities.LoadBytesFromBitmap(directory + "\\" + image.FilePath);
+                        }
+                        else
+                        {
+                            // Set the property value
+                            properties[nodeName] = reader.Value;
+                        }
+                    }
+                }
+
+                // Create a new background and set its properties
+                GMBackground background = new GMBackground();
+                background.Id = GetIdFromName(name);
+                background.Name = name;
+                background.UseAsTileSet = GMXBool(properties[GMXEnumString(GMXBackgroundProperty.IsTileset)], background.UseAsTileSet);
+                background.TileWidth = GMXInt(properties[GMXEnumString(GMXBackgroundProperty.TileWidth)], background.TileWidth);
+                background.TileHeight = GMXInt(properties[GMXEnumString(GMXBackgroundProperty.TileHeight)], background.TileHeight);
+                background.HorizontalOffset = GMXInt(properties[GMXEnumString(GMXBackgroundProperty.TileXOff)], background.HorizontalOffset);
+                background.VerticalOffset = GMXInt(properties[GMXEnumString(GMXBackgroundProperty.TileYOff)], background.VerticalOffset);
+                background.HorizontalSeperation = GMXInt(properties[GMXEnumString(GMXBackgroundProperty.TileHSep)], background.HorizontalSeperation);
+                background.VerticalSeperation = GMXInt(properties[GMXEnumString(GMXBackgroundProperty.TileVSep)], background.VerticalSeperation);
+                background.TileHorizontally = GMXBool(properties[GMXEnumString(GMXBackgroundProperty.HTile)], background.TileHorizontally);
+                background.TileVertically = GMXBool(properties[GMXEnumString(GMXBackgroundProperty.VTile)], background.TileVertically);
+                background.UsedFor3D = GMXBool(properties[GMXEnumString(GMXBackgroundProperty.For3D)], background.UsedFor3D);
+                background.Width = GMXInt(properties[GMXEnumString(GMXBackgroundProperty.Width)], background.Width);
+                background.Height = GMXInt(properties[GMXEnumString(GMXBackgroundProperty.Height)], background.Height);
+                properties[textureGroup] = properties[textureGroup] == "" ? "0" : properties[textureGroup];
+                properties[textureGroup0] = properties[textureGroup0] == "" ? "0" : properties[textureGroup0];
+                image.Width = background.Width;
+                image.Height = background.Height;
+                background.Image = image;
+
+                // The texture group does not equal zero set texture group 0 to the texture group value
+                if (properties[textureGroup] != "0")
+                    properties[textureGroup0] = properties[textureGroup];
+                // The texture group zero does not equal zero set texture group to the texture group 0 value
+                else if (properties[textureGroup0] != "0")
+                    properties[textureGroup] = properties[textureGroup0];
+
+                // Create a list of texture groups
+                List<int> textureGroups = new List<int>();
+                for (int i = 0; properties.ContainsKey(string.Concat(textureGroup, i)); i++)
+                    textureGroups.Add(Convert.ToInt32(properties[string.Concat(textureGroup, i)]));
+
+                background.TextureGroups = textureGroups.ToArray();
+
+                // Add the background
+                backgrounds.Add(background);
+            }
+
+            // Return the list of backgrounds
+            return backgrounds;
+        }
+
+        #endregion
+
+        #region Game Maker 5 - 8.1
+
         /// <summary>
         /// Reads all backgrounds from a GM file reader
         /// </summary>
@@ -272,6 +396,10 @@ namespace GameMaker.Resource
                         // Create a new image
                         GMImage image = new GMImage();
 
+                        // Set image data
+                        image.Width = background.Width;
+                        image.Height = background.Height;
+
                         // Get size of image data
                         int size = reader.ReadGMInt();
 
@@ -337,110 +465,83 @@ namespace GameMaker.Resource
             return backgrounds;
         }
 
+        #endregion
+
+        #endregion
+
+        #region Write
+
         /// <summary>
-        /// Reads all backgrounds from a background XML file
+        /// Write a Game Maker GMX formatted background
         /// </summary>
-        /// <param name="file">The XML (.GMX) file path</param>
-        /// <returns>A GM background</returns>
-        public static GMList<GMBackground> ReadBackgroundGMX(string directory, List<string> assets)
+        /// <param name="background">The given background to write</param>
+        /// <param name="directory">The room directory</param>
+        public static void WriteBackgroundGMX(GMBackground background, string directory)
         {
-            // A list of backgrounds
-            GMList<GMBackground> backgrounds = new GMList<GMBackground>();
+            // Write a single room
+            WriteBackgroundsGMX(new List<GMBackground>() { background }, directory);
+        }
 
-            // Iterate through .gmx files in the directory
-            foreach (string file in Directory.GetFiles(directory, "*.gmx"))
+        /// <summary>
+        /// Writes a list of Game Maker GMX formatted backgrounds
+        /// </summary>
+        /// <param name="backgrounds">The given backgrounds to write</param>
+        /// <param name="directory">The backgrounds directory</param>
+        public static void WriteBackgroundsGMX(List<GMBackground> backgrounds, string directory)
+        {
+            // If the directory does not exist
+            if (Directory.Exists(directory))
+                throw new Exception("The directory for " + directory + " does not exist. Write failed.");
+
+            // Iterate through rooms
+            foreach (GMBackground background in backgrounds)
             {
-                // Set name of the background
-                string name = GMFileReader.GetResourceName(file);
-
-                // If the file is not in the asset list, it has been orphaned, continue
-                if (!assets.Contains(name))
-                    continue;
-
-                // Create a dictionary of room properties
-                Dictionary<GMXBackgroundProperty, string> properties = new Dictionary<GMXBackgroundProperty, string>();
-
-                foreach (GMXBackgroundProperty property in Enum.GetValues(typeof(GMXBackgroundProperty)))
-                    properties.Add(property, "");
-
-                // Background image
-                GMImage image = null;
-
-                // Create an XMLReader to read in the resource elements
-                using (XmlReader xmlReader = XmlReader.Create(file))
+                // Create a file stream to write the file to
+                using (FileStream fs = new FileStream(directory + background.Name + ".gmx", FileMode.Create))
                 {
-                    // Move to a content node
-                    xmlReader.MoveToContent();
-
-                    // Read XML file
-                    while (xmlReader.Read())
+                    using (StreamWriter sw = new StreamWriter(fs))
                     {
-                        // If the node is not an element, continue
-                        if (xmlReader.NodeType != XmlNodeType.Element)
-                            continue;
-
-                        // Get the element name
-                        string nodeName = xmlReader.Name;
-
-                        // Read element
-                        xmlReader.Read();
-
-                        // If the element value is null or empty, continue
-                        if (String.IsNullOrEmpty(xmlReader.Value))
-                            continue;
-
-                        // If the element is a frame element create subimage, else normal property
-                        if (nodeName.ToLower() == EnumString.GetEnumString(GMXBackgroundProperty.Data).ToLower())
+                        // Create an XML writer for the project nodes
+                        using (XmlTextWriter writer = new XmlTextWriter(sw))
                         {
-                            // Create an image and set the image path
-                            image = new GMImage();
-                            image.Compressed = false;
-                            image.ImagePath = directory + "\\" + xmlReader.Value;
-                            image.Data = GMUtilities.LoadBytesFromBitmap(image.ImagePath);
-                        }
-                        else
-                        {
-                            // Get the enumeration based on the node name
-                            GMXBackgroundProperty? property = EnumString.GetEnumFromString<GMXBackgroundProperty>(nodeName);
+                            // GMX standard header comment
+                            writer.WriteComment(GMUtilities.GMXHeaderComment);
 
-                            // If no match was found, continue
-                            if (property == null)
-                                continue;
+                            // Start writing properties
+                            writer.WriteStartElement(GMXEnumString(GMXBackgroundProperty.Background));
+                            writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.IsTileset), GetGMXBool(background.UseAsTileSet));
+                            writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.TileWidth), background.TileWidth.ToString());
+                            writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.TileHeight), background.TileHeight.ToString());
+                            writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.TileXOff), background.HorizontalOffset.ToString());
+                            writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.TileYOff), background.VerticalOffset.ToString());
+                            writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.TileHSep), background.HorizontalSeperation.ToString());
+                            writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.TileVSep), background.VerticalSeperation.ToString());
+                            writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.HTile), background.TileHorizontally.ToString());
+                            writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.VTile), background.TileVertically.ToString());
 
-                            // Set the property value
-                            properties[(GMXBackgroundProperty)property] = xmlReader.Value;
+                            // Iterate through texture groups
+                            writer.WriteStartElement(GMXEnumString(GMXParallaxProperty.Backgrounds));
+                            foreach (int group in background.TextureGroups)
+                            {
+                                writer.WriteStartElement(GMXEnumString(GMXBackgroundProperty.TextureGroup + group));
+                                writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.VTile), group.ToString());
+                                writer.WriteEndElement();
+                            }
+                            writer.WriteEndElement();
+
+                            // Continue writing properties
+                            writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.For3D), background.UsedFor3D.ToString());
+                            writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.Width), background.Width.ToString());
+                            writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.Height), background.Height.ToString());
+                            writer.WriteElementString(GMXEnumString(GMXBackgroundProperty.Data), background.Image.FilePath);
+                            writer.WriteEndElement();
                         }
                     }
                 }
-
-                // Create a new background and set its properties
-                GMBackground background = new GMBackground();
-                background.Id = GMResource.GetIdFromName(name);
-                background.Name = name;
-                background.UseAsTileSet = GMFileReader.ReadGMXBool(properties[GMXBackgroundProperty.IsTileset]);
-                background.TileWidth = GMFileReader.ReadGMXInt(properties[GMXBackgroundProperty.TileWidth]);
-                background.TileHeight = GMFileReader.ReadGMXInt(properties[GMXBackgroundProperty.TileHeight]);
-                background.HorizontalOffset = GMFileReader.ReadGMXInt(properties[GMXBackgroundProperty.TileXOff]);
-                background.VerticalOffset = GMFileReader.ReadGMXInt(properties[GMXBackgroundProperty.TileYOff]);
-                background.HorizontalSeperation = GMFileReader.ReadGMXInt(properties[GMXBackgroundProperty.TileHSep]);
-                background.VerticalSeperation = GMFileReader.ReadGMXInt(properties[GMXBackgroundProperty.TileVSep]);
-                background.TileHorizontally = GMFileReader.ReadGMXBool(properties[GMXBackgroundProperty.HTile]);
-                background.TileVertically = GMFileReader.ReadGMXBool(properties[GMXBackgroundProperty.VTile]);
-                background.TextureGroup = GMFileReader.ReadGMXInt(properties[GMXBackgroundProperty.TextureGroup0]);
-                background.UsedFor3D = GMFileReader.ReadGMXBool(properties[GMXBackgroundProperty.For3D]);
-                background.Width = GMFileReader.ReadGMXInt(properties[GMXBackgroundProperty.Width]);
-                background.Height = GMFileReader.ReadGMXInt(properties[GMXBackgroundProperty.Height]);
-                image.Width = background.Width;
-                image.Height = background.Height;
-                background.Image = image;
-                
-                // Add the background
-                backgrounds.Add(background);
             }
-
-            // Return the list of backgrounds
-            return backgrounds;
         }
+
+        #endregion
 
         #endregion
     }

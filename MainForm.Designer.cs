@@ -41,11 +41,13 @@
             this.mnuSep02 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuImportFrom = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuImportImage = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuImportGMare = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuExportTo = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuExportImage = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuExportBinary = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuExportGMProject = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuSep03 = new System.Windows.Forms.ToolStripSeparator();
+            this.mnuPreferences = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuExit = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuEdit = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuUndo = new System.Windows.Forms.ToolStripMenuItem();
@@ -84,6 +86,7 @@
             this.pnlBottom = new System.Windows.Forms.Panel();
             this.pnlRight = new System.Windows.Forms.Panel();
             this.grpRoomEditor = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxGroupBox();
+            this.butInvertGridColor = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.pnlRoomEditor = new GMare.Controls.GMareRoomEditor();
             this.butGridSnap = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butShowBlocks = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
@@ -215,6 +218,7 @@
             this.mnuImportFrom,
             this.mnuExportTo,
             this.mnuSep03,
+            this.mnuPreferences,
             this.mnuExit});
             this.mnuFile.Name = "mnuFile";
             this.mnuFile.Size = new System.Drawing.Size(37, 20);
@@ -224,8 +228,8 @@
             // 
             this.mnuNewProject.Image = global::GMare.Properties.Resources.application;
             this.mnuNewProject.Name = "mnuNewProject";
-            this.mnuNewProject.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
-                        | System.Windows.Forms.Keys.N)));
+            this.mnuNewProject.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.N)));
             this.mnuNewProject.Size = new System.Drawing.Size(218, 22);
             this.mnuNewProject.Text = "New Project";
             this.mnuNewProject.Click += new System.EventHandler(this.mnuMenuItem_Click);
@@ -234,8 +238,8 @@
             // 
             this.mnuOpenProject.Image = global::GMare.Properties.Resources.file_open;
             this.mnuOpenProject.Name = "mnuOpenProject";
-            this.mnuOpenProject.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
-                        | System.Windows.Forms.Keys.O)));
+            this.mnuOpenProject.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.O)));
             this.mnuOpenProject.Size = new System.Drawing.Size(218, 22);
             this.mnuOpenProject.Text = "Open Project";
             this.mnuOpenProject.Click += new System.EventHandler(this.mnuMenuItem_Click);
@@ -278,7 +282,8 @@
             // mnuImportFrom
             // 
             this.mnuImportFrom.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mnuImportImage});
+            this.mnuImportImage,
+            this.mnuImportGMare});
             this.mnuImportFrom.Image = global::GMare.Properties.Resources.import;
             this.mnuImportFrom.Name = "mnuImportFrom";
             this.mnuImportFrom.Size = new System.Drawing.Size(218, 22);
@@ -288,9 +293,16 @@
             // 
             this.mnuImportImage.Image = ((System.Drawing.Image)(resources.GetObject("mnuImportImage.Image")));
             this.mnuImportImage.Name = "mnuImportImage";
-            this.mnuImportImage.Size = new System.Drawing.Size(128, 22);
+            this.mnuImportImage.Size = new System.Drawing.Size(149, 22);
             this.mnuImportImage.Text = "Image File";
             this.mnuImportImage.Click += new System.EventHandler(this.mnuMenuItem_Click);
+            // 
+            // mnuImportGMare
+            // 
+            this.mnuImportGMare.Name = "mnuImportGMare";
+            this.mnuImportGMare.Size = new System.Drawing.Size(149, 22);
+            this.mnuImportGMare.Text = "GMare Project";
+            this.mnuImportGMare.Click += new System.EventHandler(this.mnuMenuItem_Click);
             // 
             // mnuExportTo
             // 
@@ -331,6 +343,14 @@
             // 
             this.mnuSep03.Name = "mnuSep03";
             this.mnuSep03.Size = new System.Drawing.Size(215, 6);
+            // 
+            // mnuPreferences
+            // 
+            this.mnuPreferences.Image = global::GMare.Properties.Resources.application_task;
+            this.mnuPreferences.Name = "mnuPreferences";
+            this.mnuPreferences.Size = new System.Drawing.Size(218, 22);
+            this.mnuPreferences.Text = "Preferences";
+            this.mnuPreferences.Click += new System.EventHandler(this.mnuMenuItem_Click);
             // 
             // mnuExit
             // 
@@ -610,8 +630,8 @@
             // 
             // grpRoom
             // 
-            this.grpRoom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpRoom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.grpRoom.BackColor = System.Drawing.Color.Transparent;
             this.grpRoom.CenterStatus = false;
             this.grpRoom.Controls.Add(this.butRoomScript);
@@ -874,6 +894,7 @@
             // grpRoomEditor
             // 
             this.grpRoomEditor.BackColor = System.Drawing.Color.Transparent;
+            this.grpRoomEditor.Controls.Add(this.butInvertGridColor);
             this.grpRoomEditor.Controls.Add(this.pnlRoomEditor);
             this.grpRoomEditor.Controls.Add(this.butGridSnap);
             this.grpRoomEditor.Controls.Add(this.butShowBlocks);
@@ -898,11 +919,33 @@
             this.grpRoomEditor.Text = "Room Editor";
             this.grpRoomEditor.TextBarHeight = 24;
             // 
+            // butInvertGridColor
+            // 
+            this.butInvertGridColor.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.PushButton;
+            this.butInvertGridColor.Checked = false;
+            this.butInvertGridColor.FlatStyled = false;
+            this.butInvertGridColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.butInvertGridColor.Image = global::GMare.Properties.Resources.grid_color;
+            this.butInvertGridColor.ImageXOffset = 0;
+            this.butInvertGridColor.ImageYOffset = 0;
+            this.butInvertGridColor.Location = new System.Drawing.Point(85, 28);
+            this.butInvertGridColor.Name = "butInvertGridColor";
+            this.butInvertGridColor.PushButtonImage = null;
+            this.butInvertGridColor.Size = new System.Drawing.Size(24, 24);
+            this.butInvertGridColor.TabIndex = 13;
+            this.butInvertGridColor.TextXOffset = 0;
+            this.butInvertGridColor.TextYOffset = 0;
+            this.butInvertGridColor.ToolTipText = "Toggle the grid color between black and white";
+            this.butInvertGridColor.ToolTipTitle = "Toggle Grid Color";
+            this.butInvertGridColor.UseDropShadow = true;
+            this.butInvertGridColor.UseVisualStyleBackColor = true;
+            this.butInvertGridColor.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
+            // 
             // pnlRoomEditor
             // 
-            this.pnlRoomEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlRoomEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlRoomEditor.AvoidMouseEvents = false;
             this.pnlRoomEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(171)))), ((int)(((byte)(173)))), ((int)(((byte)(179)))));
             this.pnlRoomEditor.DepthIndex = 0;
@@ -910,6 +953,7 @@
             this.pnlRoomEditor.GridMode = GMare.Objects.GridType.Normal;
             this.pnlRoomEditor.GridX = 16;
             this.pnlRoomEditor.GridY = 16;
+            this.pnlRoomEditor.InvertGridColor = false;
             this.pnlRoomEditor.LayerIndex = -1;
             this.pnlRoomEditor.Level = 0;
             this.pnlRoomEditor.Location = new System.Drawing.Point(12, 56);
@@ -925,8 +969,9 @@
             this.pnlRoomEditor.TabIndex = 12;
             this.pnlRoomEditor.Tiles = null;
             this.pnlRoomEditor.ToolMode = GMare.Objects.ToolType.Brush;
-            this.pnlRoomEditor.PositionChanged += new GMare.Controls.GMareRoomEditor.PositionHandler(this.pnlRoomEditor_PositionChanged);
-            this.pnlRoomEditor.InstanceChanged += new GMare.Controls.GMareRoomEditor.InstanceChangedHandler(this.pnlRoomEditor_InstanceChanged);
+            this.pnlRoomEditor.MousePositionChanged += new GMare.Controls.GMareRoomEditor.MousePositionHandler(this.pnlRoomEditor_MousePositionChanged);
+            this.pnlRoomEditor.InstancesPositionChanged += new GMare.Controls.GMareRoomEditor.InstancePositionHandler(this.pnlRoomEditor_InstancesPositionChanged);
+            this.pnlRoomEditor.InstancesChanged += new GMare.Controls.GMareRoomEditor.InstanceChangedHandler(this.pnlRoomEditor_InstanceChanged);
             this.pnlRoomEditor.RoomChanged += new GMare.Controls.GMareRoomEditor.RoomChangedHandler(this.pnlRoomEditor_RoomChanged);
             this.pnlRoomEditor.ClipboardChanged += new GMare.Controls.GMareRoomEditor.ClipboardChangedHandler(this.pnlRoomEditor_ClipboardChanged);
             this.pnlRoomEditor.EditModeChanged += new GMare.Controls.GMareRoomEditor.EditModeChangedHandler(this.pnlRoomEditor_EditModeChanged);
@@ -963,7 +1008,7 @@
             this.butShowBlocks.Image = ((System.Drawing.Image)(resources.GetObject("butShowBlocks.Image")));
             this.butShowBlocks.ImageXOffset = 0;
             this.butShowBlocks.ImageYOffset = 0;
-            this.butShowBlocks.Location = new System.Drawing.Point(110, 28);
+            this.butShowBlocks.Location = new System.Drawing.Point(135, 28);
             this.butShowBlocks.Name = "butShowBlocks";
             this.butShowBlocks.PushButtonImage = null;
             this.butShowBlocks.Size = new System.Drawing.Size(24, 24);
@@ -1023,7 +1068,7 @@
             // lblRoomMagnify
             // 
             this.lblRoomMagnify.AutoSize = true;
-            this.lblRoomMagnify.Location = new System.Drawing.Point(408, 34);
+            this.lblRoomMagnify.Location = new System.Drawing.Point(432, 34);
             this.lblRoomMagnify.Name = "lblRoomMagnify";
             this.lblRoomMagnify.Size = new System.Drawing.Size(33, 13);
             this.lblRoomMagnify.TabIndex = 11;
@@ -1038,7 +1083,7 @@
             this.butShowInstances.Image = ((System.Drawing.Image)(resources.GetObject("butShowInstances.Image")));
             this.butShowInstances.ImageXOffset = 0;
             this.butShowInstances.ImageYOffset = 0;
-            this.butShowInstances.Location = new System.Drawing.Point(85, 28);
+            this.butShowInstances.Location = new System.Drawing.Point(110, 28);
             this.butShowInstances.Name = "butShowInstances";
             this.butShowInstances.PushButtonImage = null;
             this.butShowInstances.Size = new System.Drawing.Size(24, 24);
@@ -1055,7 +1100,7 @@
             // 
             this.pnlRoomMagnify.BackgroundImage = global::GMare.Properties.Resources.magnifier;
             this.pnlRoomMagnify.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.pnlRoomMagnify.Location = new System.Drawing.Point(304, 28);
+            this.pnlRoomMagnify.Location = new System.Drawing.Point(328, 28);
             this.pnlRoomMagnify.Name = "pnlRoomMagnify";
             this.pnlRoomMagnify.Size = new System.Drawing.Size(24, 24);
             this.pnlRoomMagnify.TabIndex = 9;
@@ -1064,7 +1109,7 @@
             // 
             this.trkRoomMagnify.BackColor = System.Drawing.Color.Transparent;
             this.trkRoomMagnify.LargeChange = 1;
-            this.trkRoomMagnify.Location = new System.Drawing.Point(324, 30);
+            this.trkRoomMagnify.Location = new System.Drawing.Point(348, 30);
             this.trkRoomMagnify.Maximum = 7;
             this.trkRoomMagnify.Minimum = 1;
             this.trkRoomMagnify.Name = "trkRoomMagnify";
@@ -1080,7 +1125,7 @@
             // nudRoomGridY
             // 
             this.nudRoomGridY.IgnoreHeight = true;
-            this.nudRoomGridY.Location = new System.Drawing.Point(260, 30);
+            this.nudRoomGridY.Location = new System.Drawing.Point(284, 30);
             this.nudRoomGridY.Maximum = new decimal(new int[] {
             999,
             0,
@@ -1106,7 +1151,7 @@
             // nudRoomGridX
             // 
             this.nudRoomGridX.IgnoreHeight = true;
-            this.nudRoomGridX.Location = new System.Drawing.Point(176, 30);
+            this.nudRoomGridX.Location = new System.Drawing.Point(200, 30);
             this.nudRoomGridX.Maximum = new decimal(new int[] {
             999,
             0,
@@ -1132,7 +1177,7 @@
             // lblRoomGridY
             // 
             this.lblRoomGridY.AutoSize = true;
-            this.lblRoomGridY.Location = new System.Drawing.Point(220, 34);
+            this.lblRoomGridY.Location = new System.Drawing.Point(244, 34);
             this.lblRoomGridY.Name = "lblRoomGridY";
             this.lblRoomGridY.Size = new System.Drawing.Size(39, 13);
             this.lblRoomGridY.TabIndex = 7;
@@ -1141,7 +1186,7 @@
             // lblRoomGridX
             // 
             this.lblRoomGridX.AutoSize = true;
-            this.lblRoomGridX.Location = new System.Drawing.Point(136, 34);
+            this.lblRoomGridX.Location = new System.Drawing.Point(160, 34);
             this.lblRoomGridX.Name = "lblRoomGridX";
             this.lblRoomGridX.Size = new System.Drawing.Size(39, 13);
             this.lblRoomGridX.TabIndex = 5;
@@ -1352,6 +1397,7 @@
             this.trkBackgroundMagnify.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trkBackgroundMagnify.ToolTipText = "Slide to set the magnification level";
             this.trkBackgroundMagnify.ToolTipTitle = "Background Magnification";
+            this.trkBackgroundMagnify.Value = 1;
             this.trkBackgroundMagnify.ValueChanged += new System.EventHandler(this.trkMagnify_ValueChanged);
             // 
             // butReplace
@@ -1378,11 +1424,12 @@
             // 
             // pnlBackground
             // 
-            this.pnlBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlBackground.AutoScroll = true;
             this.pnlBackground.AutoScrollMinSize = new System.Drawing.Size(256, 148);
+            this.pnlBackground.AvoidMouseEvents = false;
             this.pnlBackground.BackColor = System.Drawing.Color.White;
             this.pnlBackground.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pnlBackground.CheckerColor = System.Drawing.Color.Silver;
@@ -1592,9 +1639,9 @@
             // 
             // lstLayers
             // 
-            this.lstLayers.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstLayers.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lstLayers.CheckBoxCheckedImage = global::GMare.Properties.Resources.eye;
             this.lstLayers.CheckBoxImageOffsetX = 0;
             this.lstLayers.CheckBoxImageOffsetY = -1;
@@ -1638,8 +1685,8 @@
             // 
             // txtObject
             // 
-            this.txtObject.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtObject.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtObject.ButtonImage = null;
             this.txtObject.ButtonImageXOffset = 0;
             this.txtObject.ButtonImageYOffset = 0;
@@ -1676,9 +1723,9 @@
             // 
             // tabInstancesMain
             // 
-            this.tabInstancesMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabInstancesMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabInstancesMain.BackColor = System.Drawing.Color.Transparent;
             this.tabInstancesMain.Controls.Add(this.tabInstances);
             this.tabInstancesMain.Controls.Add(this.tabBlocks);
@@ -1707,9 +1754,9 @@
             // 
             // lstInstances
             // 
-            this.lstInstances.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstInstances.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lstInstances.CellSize = new System.Drawing.Size(16, 16);
             this.lstInstances.ContextMenuStrip = this.mnuInstances;
             this.lstInstances.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
@@ -1974,13 +2021,14 @@
             this.trkBlockMagnify.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trkBlockMagnify.ToolTipText = "Slide to set the magnification level";
             this.trkBlockMagnify.ToolTipTitle = "Block Magnification";
+            this.trkBlockMagnify.Value = 1;
             this.trkBlockMagnify.ValueChanged += new System.EventHandler(this.trkMagnify_ValueChanged);
             // 
             // pnlBlockEditor
             // 
-            this.pnlBlockEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlBlockEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlBlockEditor.AutoScroll = true;
             this.pnlBlockEditor.AutoScrollMinSize = new System.Drawing.Size(256, 263);
             this.pnlBlockEditor.BackColor = System.Drawing.Color.White;
@@ -2273,6 +2321,9 @@
         private System.Windows.Forms.ToolStripMenuItem mnuSortStandard;
         private System.Windows.Forms.ToolStripMenuItem mnuSortAscending;
         private System.Windows.Forms.ToolStripMenuItem mnuSortDescending;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butInvertGridColor;
+        private System.Windows.Forms.ToolStripMenuItem mnuImportGMare;
+        private System.Windows.Forms.ToolStripMenuItem mnuPreferences;
     }
 }
 

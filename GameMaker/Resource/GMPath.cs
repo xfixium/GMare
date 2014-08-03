@@ -26,6 +26,9 @@
 #endregion
 
 using System;
+using System.IO;
+using System.Xml;
+using System.Collections.Generic;
 using GameMaker.Common;
 
 namespace GameMaker.Resource
@@ -37,6 +40,7 @@ namespace GameMaker.Resource
 
         private GMPoint[] _points = null;
         private ActionAtTheEnd _actionAtTheEnd = ActionAtTheEnd.MoveToStart;
+        private string _roomName = "";
         private int _precision = 4;
         private int _roomId = -1;
         private int _snapX = 16;
@@ -58,6 +62,12 @@ namespace GameMaker.Resource
         {
             get { return _actionAtTheEnd; }
             set { _actionAtTheEnd = value; }
+        }
+
+        public string RoomName
+        {
+            get { return _roomName; }
+            set { _roomName = value; }
         }
 
         public int Precision
@@ -100,17 +110,96 @@ namespace GameMaker.Resource
 
         #region Methods
 
-        public int GetSize()
+        /// <summary>
+        /// Reads all GMX paths from a directory
+        /// </summary>
+        /// <param name="file">The XML (.GMX) file path</param>
+        /// <returns>A list of paths</returns>
+        public static GMList<GMPath> ReadPathsGMX(string directory, ref List<string> assets)
         {
-            int size = 36 + Name.Length;
+            // A list of paths
+            GMList<GMPath> paths = new GMList<GMPath>();
+            paths.AutoIncrementIds = false;
 
-            if (_points != null)
+            // Iterate through .gmx files in the directory
+            foreach (string file in Directory.GetFiles(directory, "*.gmx"))
             {
-                foreach (GMPoint point in _points)
-                    size += point.GetSize();
+                // Set name of the path
+                string name = GetResourceName(file);
+
+                // If the file is not in the asset list, it has been orphaned, continue
+                if (!assets.Contains(name))
+                    continue;
+
+                // Create a dictionary of path properties
+                Dictionary<string, string> properties = new Dictionary<string, string>();
+                foreach (GMXPathProperty property in Enum.GetValues(typeof(GMXPathProperty)))
+                    properties.Add(GMXEnumString(property), "");
+
+                // Local variables
+                List<GMPoint> points = new List<GMPoint>();
+
+                // Create an xml reader
+                using (XmlReader reader = XmlReader.Create(file))
+                {
+                    // Seek to content
+                    reader.MoveToContent();
+
+                    // Read the GMX file
+                    while (reader.Read())
+                    {
+                        // If the node is not an element, continue
+                        if (reader.NodeType != XmlNodeType.Element)
+                            continue;
+
+                        // Get the element name
+                        string nodeName = reader.Name;
+
+                        // Read element
+                        reader.Read();
+
+                        // If the element value is null or empty, continue
+                        if (String.IsNullOrEmpty(reader.Value))
+                            continue;
+
+                        // If the element is a point element, else normal property
+                        if (nodeName.ToLower() == GMXEnumString(GMXPathProperty.Point).ToLower())
+                        {
+                            // Get the point data and add it to the points list
+                            GMPoint point = new GMPoint();
+                            string[] data = reader.Value.Split(',');
+                            point.X = GMXDouble(data[0], point.X);
+                            point.Y = GMXDouble(data[1], point.Y);
+                            point.Speed = GMXDouble(data[2], point.Speed);
+                            points.Add(point);
+                        }
+                        else
+                        {
+                            // Set the property value
+                            properties[nodeName] = reader.Value;
+                        }
+                    }
+                }
+
+                // Create a new path, set properties
+                GMPath path = new GMPath();
+                path.Id = GetIdFromName(name);
+                path.Name = name;
+                path.Smooth = GMXBool(properties[GMXEnumString(GMXPathProperty.Kind)], path.Smooth);
+                path.Closed = GMXBool(properties[GMXEnumString(GMXPathProperty.Closed)], path.Closed);
+                path.Precision = GMXInt(properties[GMXEnumString(GMXPathProperty.Precision)], path.Precision);
+                path.RoomName = GMXString(properties[GMXEnumString(GMXPathProperty.Backroom)], path.RoomName);
+                path.RoomId = path.RoomName == "" ? -1 : GetIdFromName(path.RoomName);
+                path.SnapX = GMXInt(properties[GMXEnumString(GMXPathProperty.HSnap)], path.SnapX);
+                path.SnapY = GMXInt(properties[GMXEnumString(GMXPathProperty.VSnap)], path.SnapY);
+                path.Points = points.ToArray();
+
+                // Add the path
+                paths.Add(path);
             }
 
-            return size;
+            // Return the list of paths
+            return paths;
         }
 
         /// <summary>
@@ -246,15 +335,6 @@ namespace GameMaker.Resource
         {
             get { return _speed; }
             set { _speed = value; }
-        }
-
-        #endregion
-
-        #region Methods
-
-        public int GetSize()
-        {
-            return 24;
         }
 
         #endregion

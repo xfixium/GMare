@@ -28,6 +28,7 @@
 using System;
 using System.IO;
 using System.Xml;
+using System.Linq;
 using System.Collections.Generic;
 using GameMaker.Common;
 
@@ -40,12 +41,12 @@ namespace GameMaker.Resource
 
         private GMInstance[] _instances = null;
         private GMTile[] _tiles = null;
-        private TabSetting _currentTab = TabSetting.Objects;
         private GMParallax[] _parallaxes = new GMParallax[8];
         private GMView[] _views = new GMView[8];
         private string _caption = "";
         private string _creationCode = "";
         private double _physicsWorldPixToMeters = 0.100000001490116;
+        private int _currentTab = 0;
         private int _width = 640;
         private int _height = 480;
         private int _speed = 30;
@@ -62,12 +63,15 @@ namespace GameMaker.Resource
         private int _backgroundColor = 0;
         private int _scrollBarX = 0;
         private int _scrollBarY = 0;
+        private int _windowWidth = 640;
+        private int _windowHeight = 480;
         private int _physicsWorldTop = 0;
         private int _physicsWorldLeft = 0;
         private int _physicsWorldRight = 640;
         private int _physicsWorldBottom = 480;
         private int _physicsWorldGravityX = 0;
         private int _physicsWorldGravityY = 10;
+        private bool _isSet = true;
         private bool _persistent = false;
         private bool _drawBackgroundColor = true;
         private bool _enableViews = false;
@@ -81,8 +85,9 @@ namespace GameMaker.Resource
         private bool _showViews = false;
         private bool _deleteUnderlyingObjects = true;
         private bool _deleteUnderlyingTiles = true;
-        private bool _clearViewBackground = false;
+        private bool _clearViewBackground = true;
         private bool _physicsWorld = false;
+        private bool _clearDisplayBuffer = true;
 
         #endregion
 
@@ -98,12 +103,6 @@ namespace GameMaker.Resource
         {
             get { return _tiles; }
             set { _tiles = value; }
-        }
-
-        public TabSetting CurrentTab
-        {
-            get { return _currentTab; }
-            set { _currentTab = value; }
         }
 
         public GMParallax[] Parallaxes
@@ -134,6 +133,12 @@ namespace GameMaker.Resource
         {
             get { return _physicsWorldPixToMeters; }
             set { _physicsWorldPixToMeters = value; }
+        }
+
+        public int CurrentTab
+        {
+            get { return _currentTab; }
+            set { _currentTab = value; }
         }
 
         public int Width
@@ -268,6 +273,24 @@ namespace GameMaker.Resource
             set { _physicsWorldGravityY = value; }
         }
 
+        public int WindowWidth
+        {
+            get { return _windowWidth; }
+            set { _windowWidth = value; }
+        }
+
+        public int WindowHeight
+        {
+            get { return _windowHeight; }
+            set { _windowHeight = value; }
+        }
+
+        public bool IsSet
+        {
+            get { return _isSet; }
+            set { _isSet = value; }
+        }
+
         public bool Persistent
         {
             get { return _persistent; }
@@ -352,6 +375,12 @@ namespace GameMaker.Resource
             set { _clearViewBackground = value; }
         }
 
+        public bool ClearDisplayBuffer
+        {
+            get { return _clearDisplayBuffer; }
+            set { _clearDisplayBuffer = value; }
+        }
+
         public bool PhysicsWorld
         {
             get { return _physicsWorld; }
@@ -379,6 +408,212 @@ namespace GameMaker.Resource
         #endregion
 
         #region Methods
+
+        #region Read
+
+        #region Game Maker Studio
+
+        /// <summary>
+        /// Reads all GMX rooms from a directory
+        /// </summary>
+        /// <param name="file">The XML (.GMX) file path</param>
+        /// <returns>A list of rooms</returns>
+        public static GMList<GMRoom> ReadRoomsGMX(string directory, ref List<string> assets, out int lastTileId)
+        {
+            // Last tile id counter
+            lastTileId = 0;
+
+            // A list of rooms
+            GMList<GMRoom> rooms = new GMList<GMRoom>();
+            rooms.AutoIncrementIds = false;
+
+            // Iterate through .gmx files in the directory
+            foreach (string file in Directory.GetFiles(directory, "*.gmx"))
+            {
+                // Set name of the room
+                string name = GetResourceName(file);
+
+                // If the file is not in the asset list, it has been orphaned, continue
+                if (!assets.Contains(name))
+                    continue;
+
+                // Create a dictionary of room properties
+                Dictionary<string, string> properties = new Dictionary<string, string>();
+                foreach (GMXRoomProperty property in Enum.GetValues(typeof(GMXRoomProperty)))
+                    properties.Add(GMXEnumString(property), "");
+
+                // Local variables
+                List<GMTile> tiles = new List<GMTile>();
+                List<GMParallax> backgrounds = new List<GMParallax>();
+                List<GMView> views = new List<GMView>();
+                List<GMInstance> instances = new List<GMInstance>();
+
+                // Create an xml reader
+                using (XmlReader reader = XmlReader.Create(file))
+                {
+                    // Seek to content
+                    reader.MoveToContent();
+
+                    // Read the GMX file
+                    while (reader.Read())
+                    {
+                        // If the node is not an element, continue
+                        if (reader.NodeType != XmlNodeType.Element)
+                            continue;
+
+                        // Get the element name
+                        string nodeName = reader.Name;
+
+                        // If the element is a background element, else if a view, else if an instance, else a normal property
+                        if (nodeName.ToLower() == GMXEnumString(GMXBackgroundProperty.Background).ToLower())
+                        {
+                            // Create a background and add it to the list of backgrounds
+                            GMParallax background = new GMParallax();
+                            background.Visible = GMXBool(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Visible)), background.Visible);
+                            background.Foreground = GMXBool(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Visible)), background.Foreground);
+                            background.BackgroundName = GMXString(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Name)),background.BackgroundName);
+                            background.BackgroundId = background.BackgroundName == "" ? -1 : GetIdFromName(background.BackgroundName);
+                            background.X = GMXInt(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.X)), background.X);
+                            background.Y = GMXInt(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Y)), background.Y);
+                            background.TileHorizontally = GMXBool(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.HTiled)), background.TileHorizontally);
+                            background.TileVertically = GMXBool(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.VTiled)), background.TileVertically);
+                            background.HorizontalSpeed = GMXInt(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.HSpeed)), background.HorizontalSpeed);
+                            background.VerticalSpeed = GMXInt(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.VSpeed)), background.VerticalSpeed);
+                            background.Stretch = GMXBool(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Stretch)), background.Stretch);
+                            backgrounds.Add(background);
+                        }
+                        else if (nodeName.ToLower() == GMXEnumString(GMXViewProperty.View).ToLower())
+                        {
+                            // Create a view and add it to the list of views
+                            GMView view = new GMView();
+                            view.Visible = GMXBool(reader.GetAttribute(GMXEnumString(GMXViewProperty.Visible)), view.Visible);
+                            view.ObjectToFollowName = GMXString(reader.GetAttribute(GMXEnumString(GMXViewProperty.ObjName)), view.ObjectToFollowName);
+                            view.ObjectToFollow = view.ObjectToFollowName == "" ? -1 : GetIdFromName(view.ObjectToFollowName);
+                            view.ViewX = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.XView)), view.ViewX);
+                            view.ViewY = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.YView)), view.ViewX);
+                            view.ViewWidth = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.WView)), view.ViewWidth);
+                            view.ViewHeight = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.HView)), view.ViewHeight);
+                            view.PortX = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.XPort)), view.PortX);
+                            view.PortY = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.YPort)), view.PortY);
+                            view.PortWidth = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.WPort)), view.PortWidth);
+                            view.PortHeight = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.HPort)), view.PortHeight);
+                            view.HorizontalBorder = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.HBorder)), view.HorizontalBorder);
+                            view.VerticalBorder = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.VBorder)), view.VerticalBorder);
+                            view.HorizontalSpeed = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.HSpeed)), view.HorizontalSpeed);
+                            view.VerticalSpeed = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.VSpeed)), view.VerticalSpeed);
+                            views.Add(view);
+                        }
+                        else if (nodeName.ToLower() == GMXEnumString(GMXInstanceProperty.Instance).ToLower())
+                        {
+                            // Create an instance and add it to the list of instances
+                            GMInstance instance = new GMInstance();
+                            instance.ObjectName = GMXString(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.ObjName)), instance.ObjectName);
+                            instance.ObjectId = instance.ObjectName == "" ? -1 : GetIdFromName(instance.ObjectName);
+                            instance.X = GMXInt(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.X)), instance.X);
+                            instance.Y = GMXInt(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.Y)), instance.Y);
+                            instance.Name = GMXString(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.Name)), instance.Name);
+                            instance.Locked = GMXBool(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.Locked)), instance.Locked);
+                            instance.CreationCode = GMXString(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.Code)), instance.CreationCode);
+                            instance.ScaleX = GMXDouble(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.ScaleX)), instance.ScaleX);
+                            instance.ScaleY = GMXDouble(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.ScaleY)), instance.ScaleY);
+                            instance.UBlendColor = GMXUInt(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.Colour)), instance.UBlendColor);
+                            instance.Rotation = GMXDouble(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.Rotation)), instance.Rotation);
+                            instances.Add(instance);
+                        }
+                        else if (nodeName.ToLower() == GMXEnumString(GMXTileProperty.Tile).ToLower())
+                        {
+                            // Create an tile and add it to the list of tiles
+                            GMTile tile = new GMTile();
+                            tile.BackgroundName = GMXString(reader.GetAttribute(GMXEnumString(GMXTileProperty.BGName)), tile.BackgroundName);
+                            tile.BackgroundId = tile.BackgroundName == "" ? -1 : GetIdFromName(tile.BackgroundName);
+                            tile.BackgroundX = GMXInt(reader.GetAttribute(GMXEnumString(GMXTileProperty.X)), tile.BackgroundX);
+                            tile.BackgroundY = GMXInt(reader.GetAttribute(GMXEnumString(GMXTileProperty.Y)), tile.BackgroundY);
+                            tile.Width = GMXInt(reader.GetAttribute(GMXEnumString(GMXTileProperty.W)), tile.Width);
+                            tile.Height = GMXInt(reader.GetAttribute(GMXEnumString(GMXTileProperty.H)), tile.Height);
+                            tile.X = GMXInt(reader.GetAttribute(GMXEnumString(GMXTileProperty.XO)), tile.X);
+                            tile.Y = GMXInt(reader.GetAttribute(GMXEnumString(GMXTileProperty.YO)), tile.Y);
+                            tile.Id = GMXInt(reader.GetAttribute(GMXEnumString(GMXTileProperty.Id)), tile.Id);
+                            tile.Name = GMXString(reader.GetAttribute(GMXEnumString(GMXTileProperty.Name), tile.Name), tile.Name);
+                            tile.Depth = GMXInt(reader.GetAttribute(GMXEnumString(GMXTileProperty.Depth)), tile.Depth);
+                            tile.Locked = GMXBool(reader.GetAttribute(GMXEnumString(GMXTileProperty.Locked)), tile.Locked);
+                            tile.UBlendColor = GMXUInt(reader.GetAttribute(GMXEnumString(GMXTileProperty.Colour)), tile.UBlendColor);
+                            tile.ScaleX = GMXDouble(reader.GetAttribute(GMXEnumString(GMXTileProperty.ScaleX)), tile.ScaleX);
+                            tile.ScaleY = GMXDouble(reader.GetAttribute(GMXEnumString(GMXTileProperty.ScaleY)), tile.ScaleY);
+                            tiles.Add(tile);
+
+                            // If the tile id is greater than the current tile id
+                            if (tile.Id > lastTileId)
+                                lastTileId = tile.Id;
+                        }
+
+                        // Read element
+                        reader.Read();
+
+                        // If the element value is null or empty, continue
+                        if (String.IsNullOrEmpty(reader.Value))
+                            continue;
+
+                        // Set the property value
+                        properties[nodeName] = reader.Value;
+                    }
+                }
+
+                // Create a new room, set properties
+                GMRoom room = new GMRoom();
+                room.Id = GetIdFromName(name);
+                room.Name = name;
+                room.Caption = GMXString(properties[GMXEnumString(GMXRoomProperty.Caption)], room.Caption);
+                room.Width = GMXInt(properties[GMXEnumString(GMXRoomProperty.Width)], room.Width);
+                room.Height = GMXInt(properties[GMXEnumString(GMXRoomProperty.Height)], room.Height);
+                room.SnapX = GMXInt(properties[GMXEnumString(GMXRoomProperty.HSnap)], room.SnapX);
+                room.SnapY = GMXInt(properties[GMXEnumString(GMXRoomProperty.VSnap)], room.SnapY);
+                room.IsometricGrid = GMXBool(properties[GMXEnumString(GMXRoomProperty.Isometric)], room.IsometricGrid);
+                room.Speed = GMXInt(properties[GMXEnumString(GMXRoomProperty.Speed)], room.Speed);
+                room.Persistent = GMXBool(properties[GMXEnumString(GMXRoomProperty.Persistent)], room.Persistent);
+                room.BackgroundColor = GMXInt(properties[GMXEnumString(GMXRoomProperty.Colour)], room.BackgroundColor);
+                room.DrawBackgroundColor = GMXBool(properties[GMXEnumString(GMXRoomProperty.ShowColour)], room.DrawBackgroundColor);
+                room.CreationCode = GMXString(properties[GMXEnumString(GMXRoomProperty.Code)], room.CreationCode);
+                room.EnableViews = GMXBool(properties[GMXEnumString(GMXRoomProperty.EnableViews)], room.EnableViews);
+                room.ClearViewBackground = GMXBool(properties[GMXEnumString(GMXRoomProperty.ClearViewBackground)], room.ClearViewBackground);
+                room.ClearDisplayBuffer = GMXBool(properties[GMXEnumString(GMXRoomProperty.ClearDisplayBuffer)], room.ClearDisplayBuffer);
+                room.IsSet = GMXBool(properties[GMXEnumString(GMXRoomProperty.IsSet)], room.IsSet);
+                room.WindowWidth = GMXInt(properties[GMXEnumString(GMXRoomProperty.W)], room.WindowWidth);
+                room.WindowHeight = GMXInt(properties[GMXEnumString(GMXRoomProperty.H)], room.WindowHeight);
+                room.ShowGrid = GMXBool(properties[GMXEnumString(GMXRoomProperty.ShowGrid)], room.ShowGrid);
+                room.ShowObjects = GMXBool(properties[GMXEnumString(GMXRoomProperty.ShowObjects)], room.ShowObjects);
+                room.ShowTiles = GMXBool(properties[GMXEnumString(GMXRoomProperty.ShowTiles)], room.ShowTiles);
+                room.ShowBackgrounds = GMXBool(properties[GMXEnumString(GMXRoomProperty.ShowBackgrounds)], room.ShowBackgrounds);
+                room.ShowForegrounds = GMXBool(properties[GMXEnumString(GMXRoomProperty.ShowForegrounds)], room.ShowForegrounds);
+                room.ShowViews = GMXBool(properties[GMXEnumString(GMXRoomProperty.ShowViews)], room.ShowViews);
+                room.DeleteUnderlyingObjects = GMXBool(properties[GMXEnumString(GMXRoomProperty.DeleteUnderlyingObj)], room.DeleteUnderlyingObjects);
+                room.DeleteUnderlyingTiles = GMXBool(properties[GMXEnumString(GMXRoomProperty.DeleteUnderlyingTiles)], room.DeleteUnderlyingTiles);
+                room.CurrentTab = GMXInt(properties[GMXEnumString(GMXRoomProperty.Page)], room.CurrentTab);
+                room.ScrollBarX = GMXInt(properties[GMXEnumString(GMXRoomProperty.XOffset)], room.ScrollBarX);
+                room.ScrollBarY = GMXInt(properties[GMXEnumString(GMXRoomProperty.YOffset)], room.ScrollBarY);
+                room.PhysicsWorld = GMXBool(properties[GMXEnumString(GMXRoomProperty.PhysicsWorld)], room.PhysicsWorld);
+                room.PhysicsWorldTop = GMXInt(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldTop)], room.PhysicsWorldTop);
+                room.PhysicsWorldLeft = GMXInt(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldLeft)], room.PhysicsWorldLeft);
+                room.PhysicsWorldRight = GMXInt(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldRight)], room.PhysicsWorldRight);
+                room.PhysicsWorldBottom = GMXInt(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldBottom)], room.PhysicsWorldBottom);
+                room.PhysicsWorldGravityX = GMXInt(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldGravityX)], room.PhysicsWorldGravityX);
+                room.PhysicsWorldGravityY = GMXInt(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldGravityY)], room.PhysicsWorldGravityY);
+                room.PhysicsWorldPixToMeters = GMXDouble(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldPixToMeters)], room.PhysicsWorldPixToMeters);
+                room.Parallaxes = backgrounds.ToArray();
+                room.Views = views.ToArray();
+                room.Instances = instances.ToArray();
+                room.Tiles = tiles.ToArray();
+
+                // Add the room
+                rooms.Add(room);
+            }
+
+            // Return the list of rooms
+            return rooms;
+        }
+
+        #endregion
+
+        #region Game Maker 5 - 8.1
 
         /// <summary>
         /// Reads all rooms from a GM file reader stream
@@ -588,7 +823,7 @@ namespace GameMaker.Resource
                 if (version2 > 520)
                 {
                     // Read room tile data.
-                    room.CurrentTab = (TabSetting)(reader.ReadGMInt());
+                    room.CurrentTab = reader.ReadGMInt();
                     room.ScrollBarX = reader.ReadGMInt();
                     room.ScrollBarY = reader.ReadGMInt();
                 }
@@ -601,7 +836,7 @@ namespace GameMaker.Resource
                     room.TileVerticalSeperation = reader.ReadGMInt();
                     room.TileHorizontalOffset = reader.ReadGMInt();
                     room.TileVerticalOffset = reader.ReadGMInt();
-                    room.CurrentTab = (TabSetting)(reader.ReadGMInt());
+                    room.CurrentTab = reader.ReadGMInt();
                     room.ScrollBarX = reader.ReadGMInt();
                     room.ScrollBarY = reader.ReadGMInt();
                 }
@@ -617,205 +852,202 @@ namespace GameMaker.Resource
             return rooms;
         }
 
+        #endregion
+
+        #endregion
+
+        #region Write
+
+        #region Game Maker Studio
+
         /// <summary>
-        /// Reads all GMX rooms from a directory
+        /// Write a Game Maker GMX formatted room
         /// </summary>
-        /// <param name="file">The XML (.GMX) file path</param>
-        /// <returns>A list of rooms</returns>
-        public static GMList<GMRoom> ReadRoomsGMX(string directory, List<string> assets, out int lastTileId)
+        /// <param name="room">The given room to write</param>
+        /// <param name="directory">The room directory</param>
+        public static void WriteRoomGMX(GMRoom room, string directory)
         {
-            // Last tile id counter
-            lastTileId = 0;
+            // Write a single room
+            WriteRoomsGMX(new List<GMRoom>() { room }, directory);
+        }
 
-            // A list of rooms
-            GMList<GMRoom> rooms = new GMList<GMRoom>();
+        /// <summary>
+        /// Writes a list of Game Maker GMX formatted rooms
+        /// </summary>
+        /// <param name="rooms">The given rooms to write</param>
+        /// <param name="directory">The room directory</param>
+        public static void WriteRoomsGMX(List<GMRoom> rooms, string directory)
+        {
+            // If the directory does not exist
+            if (!Directory.Exists(directory))
+                throw new Exception("The directory for " + directory + " does not exist. Write failed.");
 
-            // Iterate through .gmx files in the directory
-            foreach (string file in Directory.GetFiles(directory, "*.gmx"))
+            // If the directory does not have a trailing backslash, add it
+            if (directory[directory.Length - 1] != '\\')
+                directory += "\\";
+
+            // Iterate through rooms
+            foreach (GMRoom room in rooms)
             {
-                // Set name of the room
-                string name = GMFileReader.GetResourceName(file);
-
-                // If the file is not in the asset list, it has been orphaned, continue
-                if (!assets.Contains(name))
-                    continue;
-
-                // Create a dictionary of room properties
-                Dictionary<GMXRoomProperty, string> properties = new Dictionary<GMXRoomProperty, string>();
-
-                foreach (GMXRoomProperty property in Enum.GetValues(typeof(GMXRoomProperty)))
-                    properties.Add(property, "");
-
-                // Local variables
-                List<GMTile> tiles = new List<GMTile>();
-                List<GMParallax> backgrounds = new List<GMParallax>();
-                List<GMView> views = new List<GMView>();
-                List<GMInstance> instances = new List<GMInstance>();
-
-                // Create an xml reader
-                using (XmlReader xmlReader = XmlReader.Create(file))
+                // Create a file stream to write the file to
+                using (FileStream fs = new FileStream(directory + room.Name + ".room.gmx", FileMode.Create))
                 {
-                    // Seek to content
-                    xmlReader.MoveToContent();
-
-                    // Read the GMX file
-                    while (xmlReader.Read())
+                    using (StreamWriter sw = new StreamWriter(fs))
                     {
-                        // If the node is not an element, continue
-                        if (xmlReader.NodeType != XmlNodeType.Element)
-                            continue;
-
-                        // Get the element name
-                        string nodeName = xmlReader.Name;
-
-                        // If the element is a background element, else if a view, else if an instance, else a normal property
-                        if (nodeName.ToLower() == EnumString.GetEnumString(GMXRoomProperty.Background).ToLower())
+                        // Create an XML writer for the project nodes
+                        using (XmlTextWriter writer = new XmlTextWriter(sw))
                         {
-                            // Create a background and add it to the list of backgrounds
-                            GMParallax background = new GMParallax();
-                            background.Visible = GMFileReader.ReadGMXBool(xmlReader.GetAttribute(EnumString.GetEnumString(GMXParallaxProperty.Visible)));
-                            background.Foreground = GMFileReader.ReadGMXBool(xmlReader.GetAttribute(EnumString.GetEnumString(GMXParallaxProperty.Visible)));
-                            background.BackgroundName = xmlReader.GetAttribute(EnumString.GetEnumString(GMXParallaxProperty.Name));
-                            background.X = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXParallaxProperty.X)));
-                            background.Y = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXParallaxProperty.Y)));
-                            background.TileHorizontally = GMFileReader.ReadGMXBool(xmlReader.GetAttribute(EnumString.GetEnumString(GMXParallaxProperty.HTiled)));
-                            background.TileVertically = GMFileReader.ReadGMXBool(xmlReader.GetAttribute(EnumString.GetEnumString(GMXParallaxProperty.VTiled)));
-                            background.HorizontalSpeed = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXParallaxProperty.HSpeed)));
-                            background.VerticalSpeed = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXParallaxProperty.VSpeed)));
-                            background.Stretch = GMFileReader.ReadGMXBool(xmlReader.GetAttribute(EnumString.GetEnumString(GMXParallaxProperty.Stretch)));
-                            backgrounds.Add(background);
+                            // Same setup as Game Maker
+                            writer.Formatting = Formatting.Indented;
+                            writer.Indentation = 2;
+
+                            // GMX standard header comment
+                            writer.WriteComment(GMUtilities.GMXHeaderComment);
+
+                            // Start writing properties
+                            writer.WriteStartElement(GMXEnumString(GMXRoomProperty.Room));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.Caption), room.Caption);
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.Width), room.Width.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.Height), room.Height.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.VSnap), room.SnapY.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.HSnap), room.SnapX.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.Isometric), GetGMXBool(room.IsometricGrid));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.Speed), room.Speed.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.Persistent), GetGMXBool(room.Persistent));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.Colour), room.BackgroundColor.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.ShowColour), GetGMXBool(room.DrawBackgroundColor));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.Code), room.CreationCode);
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.EnableViews), GetGMXBool(room.EnableViews));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.ClearViewBackground), GetGMXBool(room.ClearViewBackground));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.ClearDisplayBuffer), GetGMXBool(room.ClearDisplayBuffer));
+
+                            // Write static room settings
+                            writer.WriteStartElement(GMXEnumString(GMXRoomProperty.MakerSettings));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.IsSet), GetGMXBool(room.RememberWindowSize));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.W), room.WindowWidth.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.H), room.WindowHeight.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.ShowGrid), GetGMXBool(room.ShowGrid));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.ShowObjects), GetGMXBool(room.ShowObjects));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.ShowTiles), GetGMXBool(room.ShowTiles));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.ShowBackgrounds), GetGMXBool(room.ShowBackgrounds));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.ShowForegrounds), GetGMXBool(room.ShowForegrounds));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.ShowViews), GetGMXBool(room.ShowViews));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.DeleteUnderlyingObj), GetGMXBool(room.DeleteUnderlyingObjects));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.DeleteUnderlyingTiles), GetGMXBool(room.DeleteUnderlyingTiles));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.Page), ((int)room.CurrentTab).ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.XOffset), room.ScrollBarX.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.YOffset), room.ScrollBarY.ToString());
+                            writer.WriteEndElement();
+
+                            // Iterate through parallaxes
+                            writer.WriteStartElement(GMXEnumString(GMXParallaxProperty.Backgrounds));
+                            foreach (GMParallax parallax in room.Parallaxes)
+                            {
+                                writer.WriteStartElement(GMXEnumString(GMXParallaxProperty.Background));
+                                writer.WriteAttributeString(GMXEnumString(GMXParallaxProperty.Visible), GetGMXBool(parallax.Visible));
+                                writer.WriteAttributeString(GMXEnumString(GMXParallaxProperty.Foreground), GetGMXBool(parallax.Foreground));
+                                writer.WriteAttributeString(GMXEnumString(GMXParallaxProperty.Name), parallax.BackgroundName);
+                                writer.WriteAttributeString(GMXEnumString(GMXParallaxProperty.X), parallax.X.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXParallaxProperty.Y), parallax.Y.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXParallaxProperty.HTiled), GetGMXBool(parallax.TileHorizontally));
+                                writer.WriteAttributeString(GMXEnumString(GMXParallaxProperty.VTiled), GetGMXBool(parallax.TileVertically));
+                                writer.WriteAttributeString(GMXEnumString(GMXParallaxProperty.HSpeed), parallax.HorizontalSpeed.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXParallaxProperty.VSpeed), parallax.VerticalSpeed.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXParallaxProperty.Stretch), GetGMXBool(parallax.Stretch));
+                                writer.WriteEndElement();
+                            }
+                            writer.WriteEndElement();
+
+                            // Iterate through views
+                            writer.WriteStartElement(GMXEnumString(GMXViewProperty.Views));
+                            foreach (GMView view in room.Views)
+                            {
+                                writer.WriteStartElement(GMXEnumString(GMXViewProperty.View));
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.Visible), GetGMXBool(view.Visible));
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.ObjName), view.ObjectToFollowName == "" ? GMXEnumString(GMXViewProperty.Undefined) : view.ObjectToFollowName);
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.XView), view.ViewX.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.YView), view.ViewY.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.WView), view.ViewWidth.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.HView), view.ViewHeight.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.XPort), view.PortX.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.YPort), view.PortY.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.WPort), view.PortWidth.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.HPort), view.PortHeight.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.HBorder), view.HorizontalBorder.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.VBorder), view.VerticalBorder.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.HSpeed), view.HorizontalSpeed.ToString());
+                                writer.WriteAttributeString(GMXEnumString(GMXViewProperty.VSpeed), view.VerticalSpeed.ToString());
+                                writer.WriteEndElement();
+                            }
+                            writer.WriteEndElement();
+
+                            // Iterate through instances
+                            writer.WriteStartElement(GMXEnumString(GMXInstanceProperty.Instances));
+                            if (room.Instances != null)
+                            {
+                                foreach (GMInstance instance in room.Instances)
+                                {
+                                    writer.WriteStartElement(GMXEnumString(GMXInstanceProperty.Instance));
+                                    writer.WriteAttributeString(GMXEnumString(GMXInstanceProperty.ObjName), instance.ObjectName);
+                                    writer.WriteAttributeString(GMXEnumString(GMXInstanceProperty.X), instance.X.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXInstanceProperty.Y), instance.Y.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXInstanceProperty.Name), instance.Name.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXInstanceProperty.Locked), GetGMXBool(instance.Locked));
+                                    writer.WriteAttributeString(GMXEnumString(GMXInstanceProperty.Code), instance.CreationCode);
+                                    writer.WriteAttributeString(GMXEnumString(GMXInstanceProperty.ScaleX), instance.ScaleX.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXInstanceProperty.ScaleY), instance.ScaleY.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXInstanceProperty.Colour), instance.UBlendColor.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXInstanceProperty.Rotation), instance.Rotation.ToString());
+                                    writer.WriteEndElement();
+                                }
+                            }
+                            writer.WriteEndElement();
+
+                            // Iterate through tiles
+                            writer.WriteStartElement(GMXEnumString(GMXTileProperty.Tiles));
+                            if (room.Tiles != null)
+                            {
+                                foreach (GMTile tile in room.Tiles.OrderByDescending(t => t.Depth))
+                                {
+                                    writer.WriteStartElement(GMXEnumString(GMXTileProperty.Tile));
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.BGName), tile.BackgroundName);
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.X), tile.X.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.Y), tile.Y.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.W), tile.Width.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.H), tile.Height.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.XO), tile.BackgroundX.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.YO), tile.BackgroundY.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.Id), tile.Id.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.Name), tile.Name);
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.Depth), tile.Depth.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.Locked), GetGMXBool(tile.Locked));
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.Colour), tile.UBlendColor.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.ScaleX), tile.ScaleX.ToString());
+                                    writer.WriteAttributeString(GMXEnumString(GMXTileProperty.ScaleY), tile.ScaleY.ToString());
+                                    writer.WriteEndElement();
+                                }
+                            }
+                            writer.WriteEndElement();
+
+                            // Continue writing room properties
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.PhysicsWorld), GetGMXBool(room.PhysicsWorld));
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.PhysicsWorldTop), room.PhysicsWorldTop.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.PhysicsWorldLeft), room.PhysicsWorldLeft.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.PhysicsWorldRight), room.PhysicsWorldRight.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.PhysicsWorldBottom), room.PhysicsWorldBottom.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.PhysicsWorldGravityX), room.PhysicsWorldGravityX.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.PhysicsWorldGravityY), room.PhysicsWorldGravityY.ToString());
+                            XMLWriteFullElement(writer, GMXEnumString(GMXRoomProperty.PhysicsWorldPixToMeters), room.PhysicsWorldPixToMeters.ToString());
+                            writer.WriteEndElement();
                         }
-                        else if (nodeName.ToLower() == EnumString.GetEnumString(GMXRoomProperty.View).ToLower())
-                        {
-                            // Create a view and add it to the list of views
-                            GMView view = new GMView();
-                            view.Visible = GMFileReader.ReadGMXBool(xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.Visible)));
-                            view.ObjectToFollowName = xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.ObjName));
-                            view.ViewX = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.XView)));
-                            view.ViewY = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.YView)));
-                            view.ViewWidth = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.WView)));
-                            view.ViewHeight = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.HView)));
-                            view.PortX = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.XPort)));
-                            view.PortY = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.YPort)));
-                            view.PortWidth = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.WPort)));
-                            view.PortHeight = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.HPort)));
-                            view.HorizontalBorder = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.HBorder)));
-                            view.VerticalBorder = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.VBorder)));
-                            view.HorizontalSpeed = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.HSpeed)));
-                            view.VerticalSpeed = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXViewProperty.VSpeed)));
-                            views.Add(view);
-                        }
-                        else if (nodeName.ToLower() == EnumString.GetEnumString(GMXRoomProperty.Instance).ToLower())
-                        {
-                            // Create an instance and add it to the list of instances
-                            GMInstance instance = new GMInstance();
-                            instance.ObjectName = xmlReader.GetAttribute(EnumString.GetEnumString(GMXInstanceProperty.ObjName));
-                            instance.X = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXInstanceProperty.X)));
-                            instance.Y = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXInstanceProperty.Y)));
-                            instance.Name = xmlReader.GetAttribute(EnumString.GetEnumString(GMXInstanceProperty.Name));
-                            instance.Locked = GMFileReader.ReadGMXBool(xmlReader.GetAttribute(EnumString.GetEnumString(GMXInstanceProperty.Locked)));
-                            instance.CreationCode = xmlReader.GetAttribute(EnumString.GetEnumString(GMXInstanceProperty.Code));
-                            instance.ScaleX = GMFileReader.ReadGMXDouble(xmlReader.GetAttribute(EnumString.GetEnumString(GMXInstanceProperty.ScaleX)));
-                            instance.ScaleY = GMFileReader.ReadGMXDouble(xmlReader.GetAttribute(EnumString.GetEnumString(GMXInstanceProperty.ScaleY)));
-                            instance.BlendColor = GMFileReader.ReadGMXUInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXInstanceProperty.Colour)));
-                            instance.Rotation = GMFileReader.ReadGMXDouble(xmlReader.GetAttribute(EnumString.GetEnumString(GMXInstanceProperty.Rotation)));
-                            instances.Add(instance);
-                        }
-                        else if (nodeName.ToLower() == EnumString.GetEnumString(GMXRoomProperty.Tile).ToLower())
-                        {
-                            // Create an tile and add it to the list of tiles
-                            GMTile tile = new GMTile();
-                            tile.BackgroundName = xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.BGName));
-                            tile.BackgroundX = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.X)));
-                            tile.BackgroundY = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.Y)));
-                            tile.Width = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.W)));
-                            tile.Height = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.H)));
-                            tile.X = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.XO)));
-                            tile.Y = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.YO)));
-                            tile.Id = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.Id)));
-                            tile.Name = xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.Name));
-                            tile.Depth = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.Depth)));
-                            tile.Locked = GMFileReader.ReadGMXBool(xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.Locked)));
-                            tile.BlendColor = GMFileReader.ReadGMXUInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.Colour)));
-                            tile.ScaleX = GMFileReader.ReadGMXDouble(xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.ScaleX)));
-                            tile.ScaleY = GMFileReader.ReadGMXDouble(xmlReader.GetAttribute(EnumString.GetEnumString(GMXTileProperty.ScaleY)));
-                            tiles.Add(tile);
-
-                            // If the tile id is greater than the current tile id
-                            if (tile.Id > lastTileId)
-                                lastTileId = tile.Id;
-                        }
-
-                        // Read element
-                        xmlReader.Read();
-
-                        // If the element value is null or empty, continue
-                        if (String.IsNullOrEmpty(xmlReader.Value))
-                            continue;
-
-                        // Get the enumeration based on the node name
-                        GMXRoomProperty? property = EnumString.GetEnumFromString<GMXRoomProperty>(nodeName);
-
-                        // If no match was found, continue
-                        if (property == null)
-                            continue;
-
-                        // Set the property value
-                        properties[(GMXRoomProperty)property] = xmlReader.Value;
                     }
                 }
-
-                // Create a new room, set properties
-                GMRoom room = new GMRoom();
-                room.Id = GMResource.GetIdFromName(name);
-                room.Name = name;
-                room.Caption = properties[GMXRoomProperty.Caption];
-                room.Width = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.Width]);
-                room.Height = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.Height]);
-                room.SnapY = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.VSnap]);
-                room.SnapX = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.HSnap]);
-                room.IsometricGrid = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.Isometric]);
-                room.Speed = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.Speed]);
-                room.Persistent = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.Persistent]);
-                room.BackgroundColor = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.Colour]);
-                room.DrawBackgroundColor = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.ShowColour]);
-                room.CreationCode = properties[GMXRoomProperty.Code];
-                room.EnableViews = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.EnableViews]);
-                room.ClearViewBackground = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.ClearViewBackground]);
-                room.RememberWindowSize = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.IsSet]);
-                room.SnapX = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.W]);
-                room.SnapY = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.H]);
-                room.ShowGrid = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.ShowGrid]);
-                room.ShowObjects = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.ShowObjects]);
-                room.ShowTiles = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.ShowTiles]);
-                room.ShowBackgrounds = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.ShowBackgrounds]);
-                room.ShowForegrounds = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.ShowForegrounds]);
-                room.ShowViews = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.ShowViews]);
-                room.DeleteUnderlyingObjects = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.DeleteUnderlyingObj]);
-                room.DeleteUnderlyingTiles = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.DeleteUnderlyingTiles]);
-                room.CurrentTab = (TabSetting)GMFileReader.ReadGMXInt(properties[GMXRoomProperty.Page]);
-                room.ScrollBarX = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.XOffset]);
-                room.ScrollBarY = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.YOffset]);
-                room.PhysicsWorld = GMFileReader.ReadGMXBool(properties[GMXRoomProperty.PhysicsWorld]);
-                room.PhysicsWorldTop = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.PhysicsWorldTop]);
-                room.PhysicsWorldLeft = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.PhysicsWorldLeft]);
-                room.PhysicsWorldRight = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.PhysicsWorldRight]);
-                room.PhysicsWorldBottom = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.PhysicsWorldBottom]);
-                room.PhysicsWorldGravityX = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.PhysicsWorldGravityX]);
-                room.PhysicsWorldGravityY = GMFileReader.ReadGMXInt(properties[GMXRoomProperty.PhysicsWorldGravityY]);
-                room.PhysicsWorldPixToMeters = GMFileReader.ReadGMXDouble(properties[GMXRoomProperty.PhysicsWorldPixToMeters]);
-                room.Parallaxes = backgrounds.ToArray();
-                room.Views = views.ToArray();
-                room.Instances = instances.ToArray();
-                room.Tiles = tiles.ToArray();
-
-                // Add the room
-                rooms.Add(room);
             }
-
-            // Return the list of rooms
-            return rooms;
         }
+
+        #endregion
+
+        #endregion
 
         #endregion
     }
@@ -905,15 +1137,6 @@ namespace GameMaker.Resource
         {
             get { return _stretch; }
             set { _stretch = value; }
-        }
-
-        #endregion
-
-        #region Methods
-
-        public int GetSize()
-        {
-            return 30;
         }
 
         #endregion
@@ -1035,15 +1258,6 @@ namespace GameMaker.Resource
         }
 
         #endregion
-
-        #region Methods
-
-        public int GetSize()
-        {
-            return 58;
-        }
-
-        #endregion
     }
 
     [Serializable]
@@ -1053,13 +1267,14 @@ namespace GameMaker.Resource
 
         private string _objectName = "";
         private string _creationCode = "";
-        private double _scaleX = 0;
-        private double _scaleY = 0;
+        private double _scaleX = 1;
+        private double _scaleY = 1;
         private double _rotation = 0;
+        private uint _uBlendColor = 4294967295;
         private int _x = 0;
         private int _y = 0;
         private int _objectId = -1;
-        private uint _blendColor = 0;
+        private int _blendColor = 0;
         private bool _locked = false;
 
         #endregion
@@ -1114,25 +1329,22 @@ namespace GameMaker.Resource
             set { _objectId = value; }
         }
 
-        public uint BlendColor
+        public int BlendColor
         {
             get { return _blendColor; }
-            set { _blendColor = value; }
+            set { _blendColor = value; _uBlendColor = GMUtilities.GMColorToGMSColor(value); }
+        }
+
+        public uint UBlendColor
+        {
+            get { return _uBlendColor; }
+            set { _uBlendColor = value; _blendColor = GMUtilities.GMSColorToGMColor(value); }
         }
 
         public bool Locked
         {
             get { return _locked; }
             set { _locked = value; }
-        }
-
-        #endregion
-
-        #region Methods
-
-        public int GetSize()
-        {
-            return 22 + _creationCode.Length + Name.Length;
         }
 
         #endregion
@@ -1146,7 +1358,8 @@ namespace GameMaker.Resource
         private string _backgroundName = "";
         private double _scaleX = 1;
         private double _scaleY = 1;
-        private uint _blendColor = 0;
+        private int _blendColor = 0;
+        private uint _uBlendColor = 4294967295;
         private int _x = 0;
         private int _y = 0;
         private int _width = 16;
@@ -1179,10 +1392,16 @@ namespace GameMaker.Resource
             set { _scaleY = value; }
         }
 
-        public uint BlendColor
+        public int BlendColor
         {
             get { return _blendColor; }
-            set { _blendColor = value; }
+            set { _blendColor = value; _uBlendColor = GMUtilities.GMColorToGMSColor(value); }
+        }
+
+        public uint UBlendColor
+        {
+            get { return _uBlendColor; }
+            set { _uBlendColor = value; _blendColor = GMUtilities.GMSColorToGMColor(value); }
         }
 
         public int X
@@ -1237,15 +1456,6 @@ namespace GameMaker.Resource
         {
             get { return _locked; }
             set { _locked = value; }
-        }
-
-        #endregion
-
-        #region Methods
-
-        public int GetSize()
-        {
-            return 38 + Name.Length;
         }
 
         #endregion

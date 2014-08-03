@@ -105,10 +105,10 @@ namespace GMare.Controls
             tileSize.Height += 1;
 
             // Iterate through instances
-            foreach (GMareInstance inst in ProjectManager.Room.Blocks)
+            foreach (GMareInstance inst in App.Room.Blocks)
             {
                 // Get the object associated with this instance
-                GMareObject obj = ProjectManager.Room.Objects.Find(delegate(GMareObject o) { return o.Resource.Id == inst.ObjectId; });
+                GMareObject obj = App.Room.Objects.Find(delegate(GMareObject o) { return o.Resource.Id == inst.ObjectId; });
 
                 // If no object was found, continue
                 if (obj == null)
@@ -119,8 +119,11 @@ namespace GMare.Controls
                 point.X += 1;
                 point.Y += 1;
 
+                Bitmap image = obj.Image.ToBitmap();
+
                 // Draw glyph
-                gfx.DrawImage(obj.Image, new Rectangle(point.X, point.Y, obj.Image.Width, obj.Image.Height), 0, 0, obj.Image.Width, obj.Image.Height, GraphicsUnit.Pixel, ia);
+                gfx.DrawImage(image, new Rectangle(point.X, point.Y, obj.Image.Width, obj.Image.Height), 0, 0, obj.Image.Width, obj.Image.Height, GraphicsUnit.Pixel, ia);
+                image.Dispose();
             }
 
             // Dispose.
@@ -133,7 +136,7 @@ namespace GMare.Controls
         protected override void OnMouseDown(MouseEventArgs e)
         {
             // If the project or tileset do not exist or the object id is empty, return
-            if (ProjectManager.Room == null || Image == null)
+            if (App.Room == null || Image == null)
                 return;
 
             // Focus for scroll support
@@ -155,9 +158,9 @@ namespace GMare.Controls
 
             // If left click and not an empty tile id, set object, if right click, erase
             if (e.Button == MouseButtons.Left && _objectId != -1)
-                ProjectManager.Room.AddBlock(_objectId, tileId);
+                App.Room.AddBlock(_objectId, tileId);
             else if (e.Button == MouseButtons.Right)
-                ProjectManager.Room.DeleteBlock(_objectId, tileId);
+                App.Room.DeleteBlock(_objectId, tileId);
 
             // Update backbuffer
             UpdateBackBuffer();

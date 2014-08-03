@@ -81,9 +81,9 @@ namespace GMare.Forms
             _new = true;
 
             // Create layer properties
-            int cols = ProjectManager.Room.Columns;
-            int rows = ProjectManager.Room.Rows;
-            int depth = ProjectManager.Room.GetUniqueDepth();
+            int cols = App.Room.Columns;
+            int rows = App.Room.Rows;
+            int depth = App.Room.GetUniqueDepth();
             GMareTile[,] tiles = GMareLayer.GetEmptyLayer(cols, rows);
 
             // Create a new layer
@@ -141,7 +141,7 @@ namespace GMare.Forms
             }
 
             // Check depth redundancy
-            bool match = ProjectManager.Room.CheckDepth((int)nudDepth.Value);
+            bool match = App.Room.CheckDepth((int)nudDepth.Value);
 
             // The depth has been used already
             if (match == true)

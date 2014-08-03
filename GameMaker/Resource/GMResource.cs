@@ -28,6 +28,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Xml;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using GameMaker.Common;
@@ -79,6 +80,16 @@ namespace GameMaker.Resource
         #region Methods
 
         /// <summary>
+        /// Gets the GMX property string for the given string enum
+        /// </summary>
+        /// <param name="e">The numeration to extract the property srting from</param>
+        /// <returns>A string representation of an enumeration elelment</returns>
+        public static string GMXEnumString(Enum e)
+        {
+            return EnumString.GetEnumString(e);
+        }
+
+        /// <summary>
         /// Creates an id from a name
         /// </summary>
         /// <param name="name">The name of the object</param>
@@ -111,6 +122,109 @@ namespace GameMaker.Resource
 
             // Return int representing string
             return (id);
+        }
+
+        /// <summary>
+        /// Gets the resource name from a file path
+        /// </summary>
+        /// <param name="file">File path</param>
+        /// <returns>Resource name</returns>
+        public static string GetResourceName(string file)
+        {
+            // Set name of the room
+            string name = file.Remove(0, file.LastIndexOf("\\"));
+            return name.Remove(name.IndexOf(".")).Replace("\\", "");
+        }
+
+        /// <summary>
+        /// Converts a string to a boolean
+        /// </summary>
+        /// <returns>A boolean.</returns>
+        public static bool GMXBool(string boolean, bool defaultBool)
+        {
+            // Read a boolean from stream
+            return boolean == "" ? defaultBool : boolean == "-1";
+        }
+
+        /// <summary>
+        /// Converts a string to an integer
+        /// </summary>
+        /// <returns>A boolean.</returns>
+        public static string GMXString(string str, string defaultString)
+        {
+            // If string empty use default value
+            return str == "" ? defaultString : str;
+        }
+
+        /// <summary>
+        /// Converts a string to an integer
+        /// </summary>
+        /// <returns>A boolean.</returns>
+        public static int GMXInt(string integer, int defaultInt)
+        {
+            // Convert string to int
+            return integer == "" ? defaultInt : Convert.ToInt32(integer);
+        }
+
+        /// <summary>
+        /// Converts a string to an unsigned integer
+        /// </summary>
+        /// <returns>A boolean.</returns>
+        public static uint GMXUInt(string unsignedInt, uint defaultUInt)
+        {
+            // Convert string to uint
+            return unsignedInt == "" ? defaultUInt : Convert.ToUInt32(unsignedInt);
+        }
+
+        /// <summary>
+        /// Converts a string to an integer
+        /// </summary>
+        /// <returns>A boolean.</returns>
+        public static double GMXDouble(string d, double defaultDouble)
+        {
+            // Read a boolean from stream.
+            return d == "" ? defaultDouble : Convert.ToDouble(d);
+        }
+
+        /// <summary>
+        /// Gets a string value of a boolean from the given boolean
+        /// </summary>
+        /// <param name="b">The boolean to convert to a string</param>
+        /// <returns>Either -1 for true or 0 for false</returns>
+        public static string GetGMXBool(bool b)
+        {
+            return b ? "-1" : "0";
+        }
+
+        /// <summary>
+        /// Write a fully tagged element
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="element"></param>
+        /// <param name="value"></param>
+        public static void XMLWriteFullElement(XmlTextWriter writer, string element, string value)
+        {
+            // Write an element with a forced closed element tag
+            writer.WriteStartElement(element);
+            writer.WriteRaw(value);
+            writer.WriteFullEndElement();
+        }
+
+        /// <summary>
+        /// Write a fully tagged element with an attribute
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="element"></param>
+        /// <param name="value"></param>
+        /// <param name="attribute"></param>
+        /// <param name="attributeValue"></param>
+        public static void XMLWriteFullElement(XmlTextWriter writer, string element, string value, string attribute, string attributeValue)
+        {
+            // Write an element with a forced closed element tag
+            writer.WriteStartElement(element);
+            writer.WriteAttributeString(attribute, attributeValue);
+            writer.WriteRaw(value);
+            writer.WriteFullEndElement();
         }
 
         #endregion

@@ -602,7 +602,7 @@ namespace GMare.Graphics
         /// </summary>
         /// <param name="image">The bitmap image used as a texture</param>
         /// <param name="id">The id of the texture.</param>
-        public static void LoadTexture(Bitmap image, int id)
+        public static void LoadTexture(PixelMap image, int id)
         {
             // If the key already exists
             if (_sprites.ContainsKey(id))
@@ -624,9 +624,7 @@ namespace GMare.Graphics
         {
             // Iterate through textures, and dispose of them.
             foreach (ResTexture texture in _sprites.Values)
-            {
                 texture.Dispose();
-            }
 
             // Clear all texture elements.
             _sprites.Clear();

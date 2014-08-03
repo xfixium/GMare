@@ -58,6 +58,8 @@ namespace GMare.Forms
             this.lblMagnify = new System.Windows.Forms.Label();
             this.pnlMagnify = new System.Windows.Forms.Panel();
             this.trkMagnify = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTrackBar();
+            this.lblName = new System.Windows.Forms.Label();
+            this.txtName = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTextBox();
             this.ssMain.SuspendLayout();
             this.grpTileSize.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudTileY)).BeginInit();
@@ -81,7 +83,7 @@ namespace GMare.Forms
             this.ssMain.Name = "ssMain";
             this.ssMain.ShowItemToolTips = true;
             this.ssMain.Size = new System.Drawing.Size(448, 24);
-            this.ssMain.TabIndex = 11;
+            this.ssMain.TabIndex = 14;
             this.ssMain.Text = "statusStrip1";
             // 
             // tsslWidth
@@ -172,7 +174,7 @@ namespace GMare.Forms
             // pnlImage
             // 
             this.pnlImage.AutoScroll = true;
-            this.pnlImage.AutoScrollMinSize = new System.Drawing.Size(432, 304);
+            this.pnlImage.AutoScrollMinSize = new System.Drawing.Size(432, 280);
             this.pnlImage.BackColor = System.Drawing.Color.White;
             this.pnlImage.Blink = false;
             this.pnlImage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
@@ -192,13 +194,13 @@ namespace GMare.Forms
             this.pnlImage.ColorKey = System.Drawing.Color.Black;
             this.pnlImage.Image = null;
             this.pnlImage.ImageScale = 1;
-            this.pnlImage.Location = new System.Drawing.Point(6, 96);
+            this.pnlImage.Location = new System.Drawing.Point(6, 124);
             this.pnlImage.Name = "pnlImage";
-            this.pnlImage.SetKey = true;
+            this.pnlImage.SetKey = false;
             this.pnlImage.ShowCells = true;
-            this.pnlImage.Size = new System.Drawing.Size(436, 308);
+            this.pnlImage.Size = new System.Drawing.Size(436, 284);
             this.pnlImage.SnapSize = new System.Drawing.Size(16, 16);
-            this.pnlImage.TabIndex = 3;
+            this.pnlImage.TabIndex = 11;
             this.pnlImage.Title = "Background Image";
             this.pnlImage.ToolTipText = "";
             this.pnlImage.ToolTipTitle = "";
@@ -213,11 +215,11 @@ namespace GMare.Forms
             this.grpTileSize.Controls.Add(this.lblTileWidth);
             this.grpTileSize.Controls.Add(this.lblTileHeight);
             this.grpTileSize.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.grpTileSize.Location = new System.Drawing.Point(4, 4);
+            this.grpTileSize.Location = new System.Drawing.Point(4, 32);
             this.grpTileSize.Name = "grpTileSize";
             this.grpTileSize.Padding = new System.Windows.Forms.Padding(10, 12, 10, 0);
             this.grpTileSize.Size = new System.Drawing.Size(144, 88);
-            this.grpTileSize.TabIndex = 0;
+            this.grpTileSize.TabIndex = 8;
             this.grpTileSize.TabStop = false;
             this.grpTileSize.Text = "Tile Size";
             this.grpTileSize.TextBarHeight = 24;
@@ -282,11 +284,11 @@ namespace GMare.Forms
             this.grpTileOffset.Controls.Add(this.lblOffsetY);
             this.grpTileOffset.Controls.Add(this.lblOffsetX);
             this.grpTileOffset.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.grpTileOffset.Location = new System.Drawing.Point(152, 4);
+            this.grpTileOffset.Location = new System.Drawing.Point(152, 32);
             this.grpTileOffset.Name = "grpTileOffset";
             this.grpTileOffset.Padding = new System.Windows.Forms.Padding(10, 12, 10, 0);
             this.grpTileOffset.Size = new System.Drawing.Size(144, 88);
-            this.grpTileOffset.TabIndex = 1;
+            this.grpTileOffset.TabIndex = 9;
             this.grpTileOffset.TabStop = false;
             this.grpTileOffset.Text = "Tile Offset";
             this.grpTileOffset.TextBarHeight = 24;
@@ -331,11 +333,11 @@ namespace GMare.Forms
             this.grpTileSeparation.Controls.Add(this.lblSeparationY);
             this.grpTileSeparation.Controls.Add(this.lblSeparationX);
             this.grpTileSeparation.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.grpTileSeparation.Location = new System.Drawing.Point(300, 4);
+            this.grpTileSeparation.Location = new System.Drawing.Point(300, 32);
             this.grpTileSeparation.Name = "grpTileSeparation";
             this.grpTileSeparation.Padding = new System.Windows.Forms.Padding(10, 12, 10, 0);
             this.grpTileSeparation.Size = new System.Drawing.Size(144, 88);
-            this.grpTileSeparation.TabIndex = 2;
+            this.grpTileSeparation.TabIndex = 10;
             this.grpTileSeparation.TabStop = false;
             this.grpTileSeparation.Text = "Tile Separation";
             this.grpTileSeparation.TextBarHeight = 24;
@@ -380,11 +382,11 @@ namespace GMare.Forms
             this.butOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.butOk.ImageXOffset = 0;
             this.butOk.ImageYOffset = 0;
-            this.butOk.Location = new System.Drawing.Point(284, 410);
+            this.butOk.Location = new System.Drawing.Point(284, 412);
             this.butOk.Name = "butOk";
             this.butOk.PushButtonImage = null;
             this.butOk.Size = new System.Drawing.Size(76, 24);
-            this.butOk.TabIndex = 10;
+            this.butOk.TabIndex = 12;
             this.butOk.Text = "OK";
             this.butOk.TextXOffset = 0;
             this.butOk.TextYOffset = 0;
@@ -402,11 +404,11 @@ namespace GMare.Forms
             this.butCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.butCancel.ImageXOffset = 0;
             this.butCancel.ImageYOffset = 0;
-            this.butCancel.Location = new System.Drawing.Point(364, 410);
+            this.butCancel.Location = new System.Drawing.Point(364, 412);
             this.butCancel.Name = "butCancel";
             this.butCancel.PushButtonImage = null;
             this.butCancel.Size = new System.Drawing.Size(76, 24);
-            this.butCancel.TabIndex = 11;
+            this.butCancel.TabIndex = 13;
             this.butCancel.Text = "Cancel";
             this.butCancel.TextXOffset = 0;
             this.butCancel.TextYOffset = 0;
@@ -425,15 +427,14 @@ namespace GMare.Forms
             this.butImage.Image = global::GMare.Properties.Resources.folder_image;
             this.butImage.ImageXOffset = -1;
             this.butImage.ImageYOffset = 0;
-            this.butImage.Location = new System.Drawing.Point(8, 410);
+            this.butImage.Location = new System.Drawing.Point(8, 6);
             this.butImage.Name = "butImage";
             this.butImage.PushButtonImage = null;
             this.butImage.Size = new System.Drawing.Size(24, 24);
-            this.butImage.TabIndex = 4;
+            this.butImage.TabIndex = 0;
             this.butImage.TextXOffset = 0;
             this.butImage.TextYOffset = 0;
-            this.butImage.ToolTipText = "Get an image from disk, or import a background \r\nfrom an existing Game Maker proj" +
-                "ect";
+            this.butImage.ToolTipText = "Get an image from disk, or import a \r\nbackground from a Game Maker project";
             this.butImage.ToolTipTitle = "Get Background";
             this.butImage.UseDropShadow = true;
             this.butImage.UseVisualStyleBackColor = true;
@@ -448,11 +449,11 @@ namespace GMare.Forms
             this.butSetColorKey.Image = global::GMare.Properties.Resources.point;
             this.butSetColorKey.ImageXOffset = 0;
             this.butSetColorKey.ImageYOffset = 0;
-            this.butSetColorKey.Location = new System.Drawing.Point(32, 410);
+            this.butSetColorKey.Location = new System.Drawing.Point(32, 6);
             this.butSetColorKey.Name = "butSetColorKey";
             this.butSetColorKey.PushButtonImage = null;
             this.butSetColorKey.Size = new System.Drawing.Size(24, 24);
-            this.butSetColorKey.TabIndex = 5;
+            this.butSetColorKey.TabIndex = 1;
             this.butSetColorKey.TextXOffset = 0;
             this.butSetColorKey.TextYOffset = 0;
             this.butSetColorKey.ToolTipText = "Use the bottom left pixel of the image as the transparent color";
@@ -470,11 +471,11 @@ namespace GMare.Forms
             this.butShowGrid.Image = ((System.Drawing.Image)(resources.GetObject("butShowGrid.Image")));
             this.butShowGrid.ImageXOffset = 1;
             this.butShowGrid.ImageYOffset = 0;
-            this.butShowGrid.Location = new System.Drawing.Point(56, 410);
+            this.butShowGrid.Location = new System.Drawing.Point(56, 6);
             this.butShowGrid.Name = "butShowGrid";
             this.butShowGrid.PushButtonImage = null;
             this.butShowGrid.Size = new System.Drawing.Size(25, 24);
-            this.butShowGrid.TabIndex = 6;
+            this.butShowGrid.TabIndex = 2;
             this.butShowGrid.TextXOffset = 0;
             this.butShowGrid.TextYOffset = 0;
             this.butShowGrid.ToolTipText = "Show or hide the cell grid";
@@ -486,42 +487,64 @@ namespace GMare.Forms
             // lblMagnify
             // 
             this.lblMagnify.AutoSize = true;
-            this.lblMagnify.Location = new System.Drawing.Point(198, 416);
+            this.lblMagnify.Location = new System.Drawing.Point(412, 12);
             this.lblMagnify.Name = "lblMagnify";
             this.lblMagnify.Size = new System.Drawing.Size(33, 13);
-            this.lblMagnify.TabIndex = 9;
+            this.lblMagnify.TabIndex = 7;
             this.lblMagnify.Text = "100%";
             // 
             // pnlMagnify
             // 
             this.pnlMagnify.BackgroundImage = global::GMare.Properties.Resources.magnifier;
             this.pnlMagnify.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.pnlMagnify.Location = new System.Drawing.Point(82, 410);
+            this.pnlMagnify.Location = new System.Drawing.Point(296, 6);
             this.pnlMagnify.Name = "pnlMagnify";
             this.pnlMagnify.Size = new System.Drawing.Size(24, 24);
-            this.pnlMagnify.TabIndex = 7;
+            this.pnlMagnify.TabIndex = 5;
             // 
             // trkMagnify
             // 
             this.trkMagnify.BackColor = System.Drawing.Color.Transparent;
             this.trkMagnify.LargeChange = 1;
-            this.trkMagnify.Location = new System.Drawing.Point(102, 412);
+            this.trkMagnify.Location = new System.Drawing.Point(316, 8);
             this.trkMagnify.Maximum = 5;
             this.trkMagnify.Minimum = 1;
             this.trkMagnify.Name = "trkMagnify";
             this.trkMagnify.Size = new System.Drawing.Size(104, 20);
-            this.trkMagnify.TabIndex = 8;
+            this.trkMagnify.TabIndex = 6;
             this.trkMagnify.TabStop = true;
             this.trkMagnify.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trkMagnify.ToolTipText = "Slide to set the magnification level of the graphic";
             this.trkMagnify.ToolTipTitle = "Image Magnification";
+            this.trkMagnify.Value = 1;
             this.trkMagnify.ValueChanged += new System.EventHandler(this.trkMagnify_ValueChanged);
+            // 
+            // lblName
+            // 
+            this.lblName.AutoSize = true;
+            this.lblName.Location = new System.Drawing.Point(84, 12);
+            this.lblName.Name = "lblName";
+            this.lblName.Size = new System.Drawing.Size(38, 13);
+            this.lblName.TabIndex = 3;
+            this.lblName.Text = "Name:";
+            // 
+            // txtName
+            // 
+            this.txtName.Location = new System.Drawing.Point(124, 8);
+            this.txtName.MaxLength = 255;
+            this.txtName.Name = "txtName";
+            this.txtName.Size = new System.Drawing.Size(168, 20);
+            this.txtName.TabIndex = 4;
+            this.txtName.ToolTipText = "The name of the background";
+            this.txtName.ToolTipTitle = "Background Name";
             // 
             // EditBackgroundForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(448, 465);
+            this.Controls.Add(this.txtName);
+            this.Controls.Add(this.lblName);
             this.Controls.Add(this.lblMagnify);
             this.Controls.Add(this.pnlMagnify);
             this.Controls.Add(this.trkMagnify);
@@ -593,5 +616,7 @@ namespace GMare.Forms
         private System.Windows.Forms.Label lblMagnify;
         private System.Windows.Forms.Panel pnlMagnify;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTrackBar trkMagnify;
+        private System.Windows.Forms.Label lblName;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTextBox txtName;
     }
 }

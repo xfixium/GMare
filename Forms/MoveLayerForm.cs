@@ -85,7 +85,7 @@ namespace GMare.Forms
             cboLayer.Items.Add("All Layers");
 
             // Add all the layers to the list box
-            cboLayer.Items.AddRange(ProjectManager.Room.Layers.ToArray());
+            cboLayer.Items.AddRange(App.Room.Layers.ToArray());
 
             // Set selected layer index
             cboLayer.SelectedIndex = 0;

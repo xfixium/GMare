@@ -57,6 +57,7 @@ namespace GMare.Controls
         private GMareBrush _tileBrush = null;                // Tile brush
         private Rectangle _selection = new Rectangle();      // Selection rectangle
         private Point _origin = Point.Empty;                 // Origin point of the selection
+        private bool _avoidMouseEvents = false;              // If avoiding mouse events
 
         #endregion
 
@@ -87,6 +88,15 @@ namespace GMare.Controls
 
                 UpdateBackBuffer();
             }
+        }
+
+        /// <summary>
+        /// Gets or sets if mouse events should be ignored because of a dialog double click
+        /// </summary>
+        public bool AvoidMouseEvents
+        {
+            get { return _avoidMouseEvents; }
+            set { _avoidMouseEvents = value; }
         }
 
         #endregion
@@ -201,10 +211,13 @@ namespace GMare.Controls
         {
             // Do base mouse move
             base.OnMouseMove(e);
-
+            
             // If not pressing the left mouse button or if the image is empty or fixed selection, return
-            if (e.Button != MouseButtons.Left || Image == null || _selectMode == SelectType.Fixed)
+            if (_avoidMouseEvents || e.Button != MouseButtons.Left || Image == null || _selectMode == SelectType.Fixed)
+            {
+                _avoidMouseEvents = false;
                 return;
+            }
 
             // Get the snapped point
             Point snap = GetSnappedPoint(e.Location);

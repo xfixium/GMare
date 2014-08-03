@@ -414,7 +414,8 @@ namespace GameMaker.Common
     {
         Parent = 1,
         Group = 2,
-        Child = 3
+        Child = 3,
+        Root = 4
     };
 
     /// <summary>
@@ -422,21 +423,95 @@ namespace GameMaker.Common
     /// </summary>
     public enum GMResourceType : int
     {
+        [EnumString("objects")]
         Objects = 1,
+        [EnumString("sprites")]
         Sprites = 2,
+        [EnumString("sounds")]
         Sounds = 3,
+        [EnumString("rooms")]
         Rooms = 4,
+        [EnumString("backgrounds")]
         Backgrounds = 6,
+        [EnumString("scripts")]
         Scripts = 7,
+        [EnumString("paths")]
         Paths = 8,
+        [EnumString("datafonts")]
         DataFonts = 9,
+        [EnumString("gameinformation")]
         GameInformation = 10,
+        [EnumString("settings")]
         Settings = 11,
+        [EnumString("timelines")]
         TimeLines = 12,
+        [EnumString("newextensions")]
         Extensions = 13,
+        [EnumString("shaders")]
         Shaders = 14,
+        [EnumString("assets")]
         Assets = 15,
+        [EnumString("Configs")]
+        Configs = 16,
+        [EnumString("constants")]
+        Constants = 17,
+        [EnumString("datafiles")]
+        DataFiles = 18,
+        [EnumString("hash")]
+        Hash = 19,
+        [EnumString("help")]
+        Help = 20,
+        [EnumString("TutorialState")]
+        TutorialState = 21,
+        [EnumString("fonts")]
+        Fonts = 22,
+        [EnumString("NewExtensions")]
+        NewExtensions = 23,
+        [EnumString("ConfigOptions")]
+        ConfigOptions = 24,
+        [EnumString("none")]
         None = -1
+    };
+
+    /// <summary>
+    /// Describes any resource type within a project
+    /// </summary>
+    public enum GMResourceSubType : int
+    {
+        [EnumString("font")]
+        Font,
+        [EnumString("object")]
+        Object,
+        [EnumString("sprite")]
+        Sprite,
+        [EnumString("sound")]
+        Sound,
+        [EnumString("room")]
+        Room,
+        [EnumString("background")]
+        Background,
+        [EnumString("script")]
+        Script,
+        [EnumString("path")]
+        Path,
+        [EnumString("timeline")]
+        TimeLine,
+        [EnumString("extension")]
+        Extension,
+        [EnumString("shader")]
+        Shader,
+        [EnumString("Config")]
+        Config,
+        [EnumString("constant")]
+        Constant,
+        [EnumString("datafile")]
+        DataFile,
+        [EnumString("hash")]
+        Hash,
+        [EnumString("rtf")]
+        Help,
+        [EnumString("none")]
+        None
     };
 
     /// <summary>
@@ -498,6 +573,7 @@ namespace GameMaker.Common
         Wave = 0,
         Midi = 1,
         Mp3 = 2,
+        Ogg = 3,
         Unknown = 10
 
     };
@@ -643,6 +719,40 @@ namespace GameMaker.Common
     };
 
     /// <summary>
+    /// Defines properties of a GMX config
+    /// </summary>
+    public enum GMXConfigProperty
+    {
+        [EnumString("Configs")]
+        Configs,
+        [EnumString("configs")]
+        Configs2,
+        [EnumString("Config")]
+        Config,
+        [EnumString("CopyToMask")]
+        CopyToMask,
+        [EnumString("help")]
+        Help,
+        [EnumString("ConfigOptions")]
+        ConfigOptions,
+        [EnumString("name")]
+        Name
+    };
+
+    /// <summary>
+    /// Defines properties of a GMX constant
+    /// </summary>
+    public enum GMXConstantProperty
+    {
+        [EnumString("constant")]
+        Constant,
+        [EnumString("name")]
+        Name,
+        [EnumString("value")]
+        Value
+    };
+
+    /// <summary>
     /// Defines properties of a GMX action
     /// </summary>
     public enum GMXActionProperty
@@ -689,6 +799,10 @@ namespace GameMaker.Common
     /// </summary>
     public enum GMXBackgroundProperty
     {
+        [EnumString("backgrounds")]
+        Backgrounds,
+        [EnumString("background")]
+        Background,
         [EnumString("istileset")]
         IsTileset,
         [EnumString("tilewidth")]
@@ -707,6 +821,8 @@ namespace GameMaker.Common
         HTile,
         [EnumString("VTile")]
         VTile,
+        [EnumString("TextureGroup")]
+        TextureGroup,
         [EnumString("TextureGroup0")]
         TextureGroup0,
         [EnumString("For3D")]
@@ -814,6 +930,8 @@ namespace GameMaker.Common
         HTile,
         [EnumString("VTile")]
         VTile,
+        [EnumString("TextureGroup")]
+        TextureGroup,
         [EnumString("TextureGroup0")]
         TextureGroup0,
         [EnumString("For3D")]
@@ -831,6 +949,10 @@ namespace GameMaker.Common
     /// </summary>
     public enum GMXTileProperty
     {
+        [EnumString("tiles")]
+        Tiles,
+        [EnumString("tile")]
+        Tile,
         [EnumString("bgName")]
         BGName,
         [EnumString("x")]
@@ -866,6 +988,12 @@ namespace GameMaker.Common
     /// </summary>
     public enum GMXRoomProperty
     {
+        [EnumString("rooms")]
+        Rooms,
+        [EnumString("room")]
+        Room,
+        [EnumString("makerSettings")]
+        MakerSettings,
         [EnumString("caption")]
         Caption,
         [EnumString("width")]
@@ -892,6 +1020,8 @@ namespace GameMaker.Common
         EnableViews,
         [EnumString("clearViewBackground")]
         ClearViewBackground,
+        [EnumString("clearDisplayBuffer")]
+        ClearDisplayBuffer,
         [EnumString("isSet")]
         IsSet,
         [EnumString("w")]
@@ -920,14 +1050,6 @@ namespace GameMaker.Common
         XOffset,
         [EnumString("yoffset")]
         YOffset,
-        [EnumString("background")]
-        Background,
-        [EnumString("view")]
-        View,
-        [EnumString("instance")]
-        Instance,
-        [EnumString("tile")]
-        Tile,
         [EnumString("PhysicsWorld")]
         PhysicsWorld,
         [EnumString("PhysicsWorldTop")]
@@ -951,6 +1073,10 @@ namespace GameMaker.Common
     /// </summary>
     public enum GMXParallaxProperty
     {
+        [EnumString("backgrounds")]
+        Backgrounds,
+        [EnumString("background")]
+        Background,
         [EnumString("visible")]
         Visible,
         [EnumString("foreground")]
@@ -978,6 +1104,10 @@ namespace GameMaker.Common
     /// </summary>
     public enum GMXViewProperty
     {
+        [EnumString("views")]
+        Views,
+        [EnumString("view")]
+        View,
         [EnumString("visible")]
         Visible,
         [EnumString("objName")]
@@ -1005,7 +1135,9 @@ namespace GameMaker.Common
         [EnumString("hspeed")]
         HSpeed,
         [EnumString("vspeed")]
-        VSpeed
+        VSpeed,
+        [EnumString("<undefined>")]
+        Undefined
     };
 
     /// <summary>
@@ -1013,6 +1145,10 @@ namespace GameMaker.Common
     /// </summary>
     public enum GMXInstanceProperty
     {
+        [EnumString("instances")]
+        Instances,
+        [EnumString("instance")]
+        Instance,
         [EnumString("objName")]
         ObjName,
         [EnumString("x")]
@@ -1033,5 +1169,111 @@ namespace GameMaker.Common
         Colour,
         [EnumString("rotation")]
         Rotation
+    };
+
+    /// <summary>
+    /// Defines properties of a GMX sound
+    /// </summary>
+    public enum GMXSoundProperty
+    {
+        [EnumString("kind")]
+        Kind,
+        [EnumString("extension")]
+        Extension,
+        [EnumString("origname")]
+        Origname,
+        [EnumString("effects")]
+        Effects,
+        [EnumString("volume")]
+        Volume,
+        [EnumString("pan")]
+        Pan,
+        [EnumString("bitRate")]
+        BitRate,
+        [EnumString("mp3BitRate")]
+        Mp3BitRate,
+        [EnumString("oggQuality")]
+        OggQuality,
+        [EnumString("preload")]
+        Preload,
+        [EnumString("data")]
+        Data,
+        [EnumString("sampleRate")]
+        SampleRate,
+        [EnumString("type")]
+        Type,
+        [EnumString("bitDepth")]
+        BitDepth,
+        [EnumString("streamed")]
+        Streamed,
+        [EnumString("uncompressOnLoad")]
+        UncompressOnLoad,
+        [EnumString("compressed")]
+        Compressed
+    };
+
+    /// <summary>
+    /// Defines properties of a GMX sound
+    /// </summary>
+    public enum GMXPathProperty
+    {
+        [EnumString("kind")]
+        Kind,
+        [EnumString("closed")]
+        Closed,
+        [EnumString("precision")]
+        Precision,
+        [EnumString("backroom")]
+        Backroom,
+        [EnumString("hsnap")]
+        HSnap,
+        [EnumString("vsnap")]
+        VSnap,
+        [EnumString("points")]
+        Points,
+        [EnumString("point")]
+        Point
+    };
+
+    /// <summary>
+    /// Defines properties of a GMX data file
+    /// </summary>
+    public enum GMXDataFileProperty
+    {
+        [EnumString("number")]
+        Number,
+        [EnumString("name")]
+        Name,
+        [EnumString("exists")]
+        Exists,
+        [EnumString("size")]
+        Size,
+        [EnumString("exportAction")]
+        ExportAction,
+        [EnumString("exportDir")]
+        ExportDir,
+        [EnumString("overwrite")]
+        Overwrite,
+        [EnumString("freeData")]
+        FreeData,
+        [EnumString("removeEnd")]
+        RemoveEnd,
+        [EnumString("store")]
+        Store,
+        [EnumString("filename")]
+        Filename
+    };
+
+    /// <summary>
+    /// Defines properties of a GMX data file
+    /// </summary>
+    public enum GMXTutorialStateProperty
+    {
+        [EnumString("IsTutorial")]
+        IsTutorial,
+        [EnumString("TutorialName")]
+        TutorialName,
+        [EnumString("TutorialPage")]
+        TutorialPage
     };
 }

@@ -92,7 +92,7 @@ namespace GMare.Forms
             cboLayers.Items.Add("All Layers");
 
             // Add all the rooms layers
-            foreach (GMareLayer layer in ProjectManager.Room.Layers)
+            foreach (GMareLayer layer in App.Room.Layers)
                 cboLayers.Items.Add(layer);
 
             // Select the first element

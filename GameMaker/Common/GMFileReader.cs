@@ -114,16 +114,6 @@ namespace GameMaker.Common
         }
 
         /// <summary>
-        /// Converts a string to a boolean
-        /// </summary>
-        /// <returns>A boolean.</returns>
-        public static bool ReadGMXBool(string boolean)
-        {
-            // Read a boolean from stream.
-            return Convert.ToBoolean(ReadGMXInt(boolean));
-        }
-
-        /// <summary>
         /// Reads a short from file.
         /// </summary>
         /// <returns>An integer.</returns>
@@ -157,26 +147,6 @@ namespace GameMaker.Common
 
             // Return integer from bytes.
             return BitConverter.ToInt32(bytes, 0);
-        }
-
-        /// <summary>
-        /// Converts a string to an integer
-        /// </summary>
-        /// <returns>A boolean.</returns>
-        public static int ReadGMXInt(string integer)
-        {
-            // Read a boolean from stream.
-            return Convert.ToInt32(integer);
-        }
-
-        /// <summary>
-        /// Converts a string to an unsigned integer
-        /// </summary>
-        /// <returns>A boolean.</returns>
-        public static uint ReadGMXUInt(string unsignedInt)
-        {
-            // Read a boolean from stream.
-            return Convert.ToUInt32(unsignedInt);
         }
 
         /// <summary>
@@ -222,16 +192,6 @@ namespace GameMaker.Common
         }
 
         /// <summary>
-        /// Converts a string to an integer
-        /// </summary>
-        /// <returns>A boolean.</returns>
-        public static double ReadGMXDouble(string d)
-        {
-            // Read a boolean from stream.
-            return Convert.ToDouble(d);
-        }
-
-        /// <summary>
         /// Reads a string from file.
         /// </summary>
         public string ReadGMString()
@@ -250,18 +210,6 @@ namespace GameMaker.Common
 
             // Return string.
             return new string(chars);
-        }
-
-        /// <summary>
-        /// Gets the resource name from a file path
-        /// </summary>
-        /// <param name="file">File path</param>
-        /// <returns>Resource name</returns>
-        public static string GetResourceName(string file)
-        {
-            // Set name of the room
-            string name = file.Remove(0, file.LastIndexOf("\\"));
-            return name.Remove(name.IndexOf(".")).Replace("\\", "");
         }
 
         #endregion

@@ -42,20 +42,22 @@ namespace GMare.Controls
     {
         #region Fields
 
-        public event PositionHandler PositionChanged;           // Mouse position changed event
-        public delegate void PositionHandler();                 // Mouse poisition changed event handler
-        public event InstanceChangedHandler InstanceChanged;    // Selected instance changed event
-        public delegate void InstanceChangedHandler();          // Selected instance changed event handler
-        public event RoomChangedHandler RoomChanged;            // Room changed event
-        public delegate void RoomChangedHandler();              // Room changed event handler
-        public event ClipboardChangedHandler ClipboardChanged;  // Clipboard contents changed
-        public delegate void ClipboardChangedHandler();         // Clipboard contents changed handler
-        public event EditModeChangedHandler EditModeChanged;    // Editmode changed
-        public delegate void EditModeChangedHandler();          // Editmode changed handler
+        public event MousePositionHandler MousePositionChanged;         // Mouse position changed event
+        public delegate void MousePositionHandler();                    // Mouse position changed event handler
+        public event InstancePositionHandler InstancesPositionChanged;  // Selected instances position changed event
+        public delegate void InstancePositionHandler();                 // Selected instances position changed event handler
+        public event InstanceChangedHandler InstancesChanged;           // Selected instances changed event
+        public delegate void InstanceChangedHandler();                  // Selected instances changed event handler
+        public event RoomChangedHandler RoomChanged;                    // Room changed event
+        public delegate void RoomChangedHandler();                      // Room changed event handler
+        public event ClipboardChangedHandler ClipboardChanged;          // Clipboard contents changed
+        public delegate void ClipboardChangedHandler();                 // Clipboard contents changed handler
+        public event EditModeChangedHandler EditModeChanged;            // Editmode changed
+        public delegate void EditModeChangedHandler();                  // Editmode changed handler
 
-        private Point _previous = Point.Empty;                  // Previous dragging point
-        private bool _handTool = false;                         // If the hand tool is being pressed
-        private bool _dragging = false;                         // If Dragging
+        private Point _previous = Point.Empty;                          // Previous dragging point
+        private bool _handTool = false;                                 // If the hand tool is being pressed
+        private bool _dragging = false;                                 // If Dragging
 
         #endregion
 
@@ -92,11 +94,11 @@ namespace GMare.Controls
                 pnlRoom.SelectedInstances = value;
 
                 // If the selected instance is empty or not in object edit mode or the room is empty, return
-                if (pnlRoom.SelectedInstances.Count == 0 || EditMode != EditType.Objects || ProjectManager.Room == null)
+                if (pnlRoom.SelectedInstances.Count == 0 || EditMode != EditType.Objects || App.Room == null)
                     return;
 
                 // Get selected instance object id
-                GMareObject obj = ProjectManager.Room.Objects.Find(delegate(GMareObject o) { return o.Resource.Id == SelectedInstances[0].ObjectId; });
+                GMareObject obj = App.Room.Objects.Find(delegate(GMareObject o) { return o.Resource.Id == SelectedInstances[0].ObjectId; });
 
                 // If no object was found or the object's image data does not exist, return
                 if (obj == null || obj.Image == null)
@@ -322,6 +324,15 @@ namespace GMare.Controls
             set { pnlRoom.AvoidMouseEvents = value; }
         }
 
+        /// <summary>
+        /// Gets or sets toggling between white and black for the grid color
+        /// </summary>
+        public bool InvertGridColor
+        {
+            get { return pnlRoom.InvertGridColor; }
+            set { pnlRoom.InvertGridColor = value; }
+        }
+
         #endregion
 
         #region Constructor
@@ -376,6 +387,7 @@ namespace GMare.Controls
             {
                 case Keys.Shift: case Keys.ShiftKey: pnlRoom.ShiftKey = true; break;
                 case Keys.Control: case Keys.ControlKey: pnlRoom.ControlKey = true; break;
+                case Keys.Menu: pnlRoom.AltKey = true; e.Handled = true; break;
                 case Keys.H:
                     // The hand tool is ready
                     _handTool = true;
@@ -393,10 +405,15 @@ namespace GMare.Controls
         /// </summary>
         protected override void OnKeyUp(KeyEventArgs e)
         {
+            // Ignore alt key on parent
+            if (e.KeyData == Keys.Menu)
+                e.Handled = true;
+
             // Reset any shortcut modifiers
             _handTool = false;
             pnlRoom.ShiftKey = false;
             pnlRoom.ControlKey = false;
+            pnlRoom.AltKey = false;
             pnlRoom.HandKey = false;
             pnlRoom.ReAcquirePosition();
         }
@@ -426,19 +443,28 @@ namespace GMare.Controls
         /// <summary>
         /// Room panel position changed
         /// </summary>
-        private void pnlRoom_PositionChanged()
+        private void pnlRoom_MousePositionChanged()
         {
-            if (PositionChanged != null)
-                PositionChanged();
+            if (MousePositionChanged != null)
+                MousePositionChanged();
         }
 
         /// <summary>
         /// Room panel instance changed
         /// </summary>
-        private void pnlRoom_InstanceChanged()
+        private void pnlRoom_InstancesPositionChanged()
         {
-            if (InstanceChanged != null)
-                InstanceChanged();
+            if (InstancesPositionChanged != null)
+                InstancesPositionChanged();
+        }
+
+        /// <summary>
+        /// Room panel instance changed
+        /// </summary>
+        private void pnlRoom_InstancesChanged()
+        {
+            if (InstancesChanged != null)
+                InstancesChanged();
         }
 
         /// <summary>
@@ -498,10 +524,10 @@ namespace GMare.Controls
             int y = sbVertical.Value - (e.Y - _previous.Y);
 
             // Check boundries
-            if (x >= sbHorizontal.Minimum && x <= ProjectManager.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom) - 1)
+            if (x >= sbHorizontal.Minimum && x <= App.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom) - 1)
                 sbHorizontal.Value = x;
 
-            if (y >= sbVertical.Minimum && y <= ProjectManager.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom) - 1)
+            if (y >= sbVertical.Minimum && y <= App.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom) - 1)
                 sbVertical.Value = y;
 
             // Set new previous location
@@ -541,24 +567,24 @@ namespace GMare.Controls
             pnlLayout.ColumnStyles[1].Width = 0;
 
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
                 return;
 
             // Thumb size
             int thumb = 2;
 
             // If the room is wider than the room panel, show the horizontal scrollbar
-            if ((int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom) < ProjectManager.Room.Width)
+            if ((int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom) < App.Room.Width)
                 pnlLayout.RowStyles[1].Height = 17;
 
             // If the room is taller than the room panel, show the vertical scrollbar
-            if ((int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom) < ProjectManager.Room.Height)
+            if ((int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom) < App.Room.Height)
                 pnlLayout.ColumnStyles[1].Width = 17;
 
             // If the offset does not make the maximum less than zero, set its value
-            if ((ProjectManager.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom)) > 0)
+            if ((App.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom)) > 0)
             {
-                sbHorizontal.Maximum = ProjectManager.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom) - 1;
+                sbHorizontal.Maximum = App.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom) - 1;
 
                 // If the horizontal maximum is a negative number
                 if (this.sbHorizontal.Maximum / thumb < 0)
@@ -582,9 +608,9 @@ namespace GMare.Controls
                 sbHorizontal.Value = 0;
 
             // If the offset does not make the maximum less than zero, set its value
-            if ((ProjectManager.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom)) > 0)
+            if ((App.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom)) > 0)
             {
-                sbVertical.Maximum = ProjectManager.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom) - 1;
+                sbVertical.Maximum = App.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom) - 1;
 
                 // If the vertical maximum is a negative number
                 if (sbVertical.Maximum / thumb < 0)
@@ -739,7 +765,12 @@ namespace GMare.Controls
             // Do action based on edit mode
             switch (EditMode)
             {
-                case EditType.Layers: if (ToolMode == ToolType.Selection) { pnlRoom.mnuSelectionDelete_Click(this, EventArgs.Empty); } break;
+                case EditType.Layers:
+                    // If using the selection tool, delete the selection
+                    if (ToolMode == ToolType.Selection)
+                        pnlRoom.mnuSelectionDelete_Click(this, EventArgs.Empty);
+                        
+                    break;
                 case EditType.Objects: pnlRoom.mnuInstanceDelete_Click(this, EventArgs.Empty); break;
             }
         }
@@ -786,7 +817,7 @@ namespace GMare.Controls
         public void Flip(FlipDirectionType direction)
         {
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
                 return;
 
             // If not editing the layers, return

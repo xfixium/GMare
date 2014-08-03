@@ -104,6 +104,18 @@ namespace GMare.Graphics
         /// Constructs a new texture resource.
         /// </summary>
         /// <param name="image">The pixel map to use for the texture.</param>
+        public ResTexture(PixelMap image)
+        {
+            _width = image.Width;
+            _height = image.Height;
+            _pixels = (int[,])image.Pixels.Clone();
+            SetTexture(image);
+        }
+
+        /// <summary>
+        /// Constructs a new texture resource.
+        /// </summary>
+        /// <param name="image">The pixel map to use for the texture.</param>
         public ResTexture(Bitmap image)
         {
             PixelMap map = new PixelMap(image);
@@ -117,63 +129,63 @@ namespace GMare.Graphics
         #region Methods
 
         /// <summary>
-        /// Sets the texture id.
+        /// Sets the texture id
         /// </summary>
-        /// <param name="pixelMap">Pixel map to use as a texture.</param>
+        /// <param name="pixelMap">Pixel map to use as a texture</param>
         private unsafe void SetTexture(PixelMap pixelMap)
         {
-            // Original size.
+            // Original size
             _width = pixelMap.Width;
             _height = pixelMap.Height;
 
-            // Get a power of 2.
+            // Get a power of 2
             if (_width > _height)
                 _textureSize = MathMethods.Pow(_width, 2);
             else
                 _textureSize = MathMethods.Pow(_height, 2);
 
-            // Copy the pixel map and resize it.
+            // Copy the pixel map and resize it
             PixelMap copy = new PixelMap(_textureSize, _textureSize, Color.Black);
             copy.Paste(pixelMap, 0, 0);
 
             byte[] data = copy.ToOpenGLTexture();
 
-            // Get texture pointer.
+            // Get texture pointer
             fixed (uint* id = &_textureId) { OpenGL.glGenTextures(1, id); }
 
-            // If a valid texture was created.
+            // If a valid texture was created
             if (_textureId != 0)
             {
-                // Bind the new opengl texture.
+                // Bind the new opengl texture
                 OpenGL.glBindTexture(GLTexture.Texture2D, _textureId);
 
-                // Allocate some native memory to store data in.
+                // Allocate some native memory to store data in
                 IntPtr textureData = Marshal.AllocHGlobal(data.Length);
                 Marshal.Copy(data, 0, textureData, data.Length);
 
-                // Set filters.
+                // Set filters
                 OpenGL.glTexParameteri(GLTexture.Texture2D, GLTexParamPName.TextureMinFilter, GLTextureFilter.Nearest);
                 OpenGL.glTexParameteri(GLTexture.Texture2D, GLTexParamPName.TextureMagFilter, GLTextureFilter.Nearest);
 
                 
-                // Place data into video memory.
+                // Place data into video memory
                 OpenGL.glTexImage2D(GLTexture.Texture2D, 0, GLInternalFormat.RGBA8, _textureSize, _textureSize, 0, GLPixelFormat.RGBA, GLDataType.UnsignedByte, textureData);
 
-                // Deallocate native memory.
+                // Deallocate native memory
                 Marshal.FreeHGlobal(textureData);
             }
         }
 
         /// <summary>
-        /// Dispose.
+        /// Dispose
         /// </summary>
         public void Dispose()
         {
-            // Create a texture array.
+            // Create a texture id array
             uint[] texture = new uint[1];
             texture[0] = _textureId;
 
-            // Delete texture.
+            // Delete texture
             OpenGL.glDeleteTextures(1, texture);
         }
 
