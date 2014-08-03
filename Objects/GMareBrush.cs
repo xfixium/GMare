@@ -266,33 +266,9 @@ namespace GMare.Objects
         /// <returns>A new brush copy</returns>
         public GMareBrush Clone()
         {
-            // Create a new tile grid
-            GMareBrush brush = new GMareBrush();
-
-            // If there is a glyph to clone
-            if (_glyph != null)
-                brush.Glyph = (Bitmap)_glyph.Clone();
-
-            // If there are tiles to copy
-            if (_tiles != null)
-            {
-                // Create a new array of tiles
-                brush.Tiles = new GMareTile[_tiles.GetLength(0), _tiles.GetLength(1)];
-
-                // Iterate through tiles
-                for (int y = 0; y < _tiles.GetLength(1); y++)
-                    for (int x = 0; x < _tiles.GetLength(0); x++)
-                        brush.Tiles[x, y] = _tiles[x, y].Clone();
-            }
-
-            // Set properties
-            brush.Name = (string)_name.Clone();
-            brush.StartX = _startX;
-            brush.StartY = _startY;
-            brush.EndX = _endX;
-            brush.EndY = _endY;
-
-            // Return copy
+            GMareBrush brush = (GMareBrush)this.MemberwiseClone();
+            brush.Glyph = _glyph == null ? null : (Bitmap)_glyph.Clone();
+            brush.Tiles = (GMareTile[,])_tiles.Clone();
             return brush;
         }
 

@@ -216,6 +216,7 @@ namespace GMare.Objects
         /// <summary>
         /// Gets the width of the room
         /// </summary>
+        
         public int Width
         {
             get { return _columns * _backgrounds[0].TileWidth; }
@@ -224,6 +225,7 @@ namespace GMare.Objects
         /// <summary>
         /// Gets the height of the room
         /// </summary>
+        
         public int Height
         {
             get { return _rows * _backgrounds[0].TileHeight; }
@@ -232,6 +234,8 @@ namespace GMare.Objects
         /// <summary>
         /// Gets or sets the columns of the room
         /// </summary>
+        [XmlIgnore]
+        
         public int Columns
         {
             get { return _columns; }
@@ -246,8 +250,20 @@ namespace GMare.Objects
         }
 
         /// <summary>
+        /// XML will trigger a resize when deserializing, necessary to avoid it
+        /// </summary>
+        [XmlElement("Columns")]
+        public int XMLColumns
+        {
+            get { return _columns; }
+            set { _columns = value; }
+        }
+
+        /// <summary>
         /// Gets or sets the rows of the room
         /// </summary>
+        [XmlIgnore]
+        
         public int Rows
         {
             get { return _rows; }
@@ -262,6 +278,16 @@ namespace GMare.Objects
         }
 
         /// <summary>
+        /// XML will trigger a resize when deserializing, necessary to avoid it
+        /// </summary>
+        [XmlElement("Rows")]
+        public int XMLRows
+        {
+            get { return _rows; }
+            set { _rows = value; }
+        }
+
+        /// <summary>
         /// Gets or sets the speed of the room
         /// </summary>
         public int Speed
@@ -273,6 +299,7 @@ namespace GMare.Objects
         /// <summary>
         /// Gets the room size
         /// </summary>
+        
         public Size RoomSize
         {
             get { return new Size(Width, Height); }
@@ -335,6 +362,21 @@ namespace GMare.Objects
             _backgrounds.Add(new GMareBackground());
         }
 
+        /// <summary>
+        /// Constructs a new room
+        /// </summary>
+        private GMareRoom(int columns, int rows, int tileWidth, int tileHeight, bool noLayer)
+        {
+            // Set Properties, to auto set actual width and height
+            Columns = columns;
+            Rows = rows;
+
+            // Set fields
+            _backgrounds.Add(new GMareBackground());
+            _backgrounds[0].TileWidth = tileWidth;
+            _backgrounds[0].TileHeight = tileHeight;
+        }
+
         #endregion
 
         #region Methods
@@ -347,66 +389,68 @@ namespace GMare.Objects
         /// <returns>A new room copy</returns>
         public GMareRoom Clone()
         {
-            // Create a new room
-            GMareRoom room = new GMareRoom(_columns, _rows, _backgrounds[0].TileWidth, _backgrounds[0].TileHeight);
+            // Get a copy of the room
+            GMareRoom room = (GMareRoom)this.MemberwiseClone();
+            room.Projects = _projects.ConvertAll(p => p.Clone());
+            room.Brushes = _brushes.ConvertAll(b => b.Clone());
+            room.Objects = _objects.ConvertAll(o => o.Clone());
+            room.RecentObjects = _recentObjects.ConvertAll(ro => ro.Clone());
+            room.Instances = _instances.ConvertAll(i => i.Clone());
+            room.Blocks = _blocks.ConvertAll(b => b.Clone());
+            room.Layers = _layers.ConvertAll(l => l.Clone());
+            room.Backgrounds = _backgrounds.ConvertAll(b => b.Clone());
+            room.Nodes = CloneNodes();
 
-            // Clone this room
-            room.Layers.Clear();
-
-            // Iterate through export projects
-            foreach (ExportProject project in _projects)
-                room.Projects.Add(project.Clone());
-
-            // Iterate through brushes
-            foreach (GMareBrush brush in _brushes)
-                room.Brushes.Add(brush.Clone());
-
-            // Iterate through objects
-            foreach (GMareObject obj in _objects)
-                room.Objects.Add(obj.Clone());
-
-            // Iterate through recent objects
-            foreach (GMareObject obj in _recentObjects)
-                room.RecentObjects.Add(obj.Clone());
-
-            // Iterate through instances
-            foreach (GMareInstance instance in _instances)
-                room.Instances.Add(instance.Clone());
-
-            // Iterate through instances
-            foreach (GMareInstance block in _blocks)
-                room.Blocks.Add(block.Clone());
-
-            // Iterate through layers
-            foreach (GMareLayer layer in _layers)
-                room.Layers.Add(layer.Clone());
-
-            // If a background exists, clone it
-            if (_backgrounds != null)
-                room.Backgrounds[0] = _backgrounds[0].Clone();
-
-            // If project nodes exist, clone it
-            if (_nodes != null)
-                room.Nodes = (GMNode[])_nodes.Clone();
-
-            // If custom colors exist, clone them
             if (_customColors != null)
                 room.CustomColors = (int[])_customColors.Clone();
 
-            // Clone the rest of the properties
-            room.BackColor = _backColor;
-            room.Name = _name == null ? string.Empty : (string)_name.Clone();
-            room.Caption = _caption == null ? string.Empty : (string)_caption.Clone();
-            room.CreationCode = _creationCode == null ? string.Empty : (string)_creationCode.Clone();
-            room.Speed = _speed;
-            room.Columns = _columns;
-            room.Rows = _rows;
-            room.Persistent = _persistent;
-            room.ScaleWarning = _scaleWarning;
-            room.BlendWarning = _blendWarning;
-
-            // Return copy
             return room;
+        }
+
+        /// <summary>
+        /// Clones this room's nodes
+        /// </summary>
+        /// <returns>A deep clone of this room's nodes</returns>
+        public GMNode[] CloneNodes()
+        {
+            // if the room does not have any nodes. return null
+            if (_nodes == null || _nodes.Length == 0)
+                return null;
+
+            // Node array
+            GMNode[] nodes = new GMNode[_nodes.Length];
+
+            // Iterate through nodes to clone them
+            for (int i = 0; i < _nodes.Length; i++)
+                nodes[i] = CloneNode(_nodes[i]);
+
+            // Return cloned nodes
+            return nodes;
+        }
+
+        /// <summary>
+        /// Clones a single node
+        /// </summary>
+        /// <param name="source">The given source node</param>
+        /// <returns>A cloned source node</returns>
+        private GMNode CloneNode(GMNode source)
+        {
+            // Create a new node
+            GMNode clone = new GMNode();
+            clone.Children = source.Children;
+            clone.Id = source.Id;
+            clone.LastChanged = source.LastChanged;
+            clone.Name = (string)source.Name.Clone();
+            clone.NodeType = source.NodeType;
+            clone.ResourceType = source.ResourceType;
+            clone.Nodes = clone.Children == 0 ? null : new GMNode[clone.Children];
+
+            // Iterate through node children
+            for (int i = 0; i < source.Children; i++)
+                clone.Nodes[i] = CloneNode(source.Nodes[i]);
+
+            // Return cloned node
+            return clone;
         }
 
         /// <summary>
@@ -508,7 +552,7 @@ namespace GMare.Objects
         private void ResizeWidth(int columns)
         {
             // If the sizes are the same, return
-            if (columns == _columns)
+            if (columns == (_layers.Count < 1 ? _columns : _layers[0].Tiles.GetLength(0)))
                 return;
 
             // Get the amount of columns we can copy
@@ -540,7 +584,7 @@ namespace GMare.Objects
         private void ResizeHeight(int rows)
         {
             // If the sizes are the same, return
-            if (rows == _rows)
+            if (rows == (_layers.Count < 1 ? _rows : _layers[0].Tiles.GetLength(1)))
                 return;
 
             // Get the amount of rows we can copy
@@ -611,7 +655,9 @@ namespace GMare.Objects
                 if (obj != null)
                 {
                     Size size = new Size(Math.Min(obj.Image.Width, 22), Math.Min(obj.Image.Height, 22));
-                    menu.Image = obj != null ? PixelMap.BitmapResize(obj.Image, size) : menu.Image;
+                    Bitmap image = obj.Image.ToBitmap();
+                    menu.Image = obj != null ? PixelMap.BitmapResize(image, size) : menu.Image;
+                    image.Dispose();
                 }
             }
 
@@ -633,7 +679,7 @@ namespace GMare.Objects
         public void UpdateInstanceObjectNames()
         {
             // Iterate through existing instances
-            foreach (GMareInstance instance in ProjectManager.Room.Instances)
+            foreach (GMareInstance instance in App.Room.Instances)
             {
                 // Iterate through objects
                 GMareObject obj = this.Objects.Find(o => o.Resource.Id == instance.ObjectId || o.Resource.Name == instance.ObjectName);
@@ -790,28 +836,27 @@ namespace GMare.Objects
                             // Get tile id
                             int sector = layer.Tiles[col, row].TileId;
 
-                            // If the tile is not empty
-                            if (sector != -1)
-                            {
-                                // Create a new GM tile
-                                GMTile tile = new GMTile();
+                            // If the tile is empty, continue
+                            if (sector == -1)
+                                continue;
 
-                                tile.Id = lastTileId++;
-                                tile.Depth = depth;
-                                tile.BackgroundId = background.GameMakerId;
-                                tile.X = col * _backgrounds[0].TileWidth;
-                                tile.Y = row * _backgrounds[0].TileHeight;
-                                tile.Width = _backgrounds[0].TileWidth;
-                                tile.Height = _backgrounds[0].TileHeight;
-                                tile.BackgroundX = (sector - (sector / tileCols) * tileCols) * tileSize.Width;
-                                tile.BackgroundY = (sector / tileCols) * tileSize.Height;
-                                tile.BackgroundX += ((tile.BackgroundX / tileSize.Width) * spacing.X) + offset.X;
-                                tile.BackgroundY += ((tile.BackgroundY / tileSize.Height) * spacing.Y) + offset.Y;
-                                
+                            // Create a new GM tile
+                            GMTile tile = new GMTile();
+                            tile.Id = lastTileId++;
+                            tile.Depth = depth;
+                            tile.BackgroundId = background.GameMakerId;
+                            tile.BackgroundName = background.Name;
+                            tile.X = col * _backgrounds[0].TileWidth;
+                            tile.Y = row * _backgrounds[0].TileHeight;
+                            tile.Width = _backgrounds[0].TileWidth;
+                            tile.Height = _backgrounds[0].TileHeight;
+                            tile.BackgroundX = (sector - (sector / tileCols) * tileCols) * tileSize.Width;
+                            tile.BackgroundY = (sector / tileCols) * tileSize.Height;
+                            tile.BackgroundX += ((tile.BackgroundX / tileSize.Width) * spacing.X) + offset.X;
+                            tile.BackgroundY += ((tile.BackgroundY / tileSize.Height) * spacing.Y) + offset.Y;
 
-                                // Add the Game Maker tile to the list
-                                tiles.Add(tile);
-                            }
+                            // Add the Game Maker tile to the list
+                            tiles.Add(tile);
                         }
                     }
                 }
@@ -858,7 +903,7 @@ namespace GMare.Objects
             }
 
             // Get the object associated with the object id
-            GMareObject obj = ProjectManager.Room.Objects.Find(GMareObject => GMareObject.Resource.Id == objectId);
+            GMareObject obj = App.Room.Objects.Find(GMareObject => GMareObject.Resource.Id == objectId);
 
             // If no object was found, return
             if (obj == null)
@@ -950,7 +995,7 @@ namespace GMare.Objects
                         for (int y = 0; y < layer.Tiles.GetLength(1); y++)
                         {
                             // Get the object associated with this instance
-                            GMareObject obj = ProjectManager.Room.Objects.Find(delegate(GMareObject o) { return o.Resource.Id == block.ObjectId; });
+                            GMareObject obj = App.Room.Objects.Find(delegate(GMareObject o) { return o.Resource.Id == block.ObjectId; });
 
                             // If no object was found, return
                             if (obj == null)
@@ -1274,17 +1319,15 @@ namespace GMare.Objects
         /// <returns>A new layer copy</returns>
         public GMareLayer Clone()
         {
-            // Create a new layer, copy this layer
-            GMareLayer layer = new GMareLayer(_tiles.GetLength(0), _tiles.GetLength(1));
-            layer.Name = (string)_name.Clone();
-            layer.Depth = _depth;
-            layer.Visible = _visible;
+            GMareLayer layer = (GMareLayer)this.MemberwiseClone();
+            GMareTile[,] tiles = new GMareTile[_tiles.GetLength(0), _tiles.GetLength(1)];
 
-            // Iterate through tiles
-            for (int y = 0; y < _tiles.GetLength(1); y++)
-                for (int x = 0; x < _tiles.GetLength(0); x++)
-                    layer.Tiles[x, y] = _tiles[x, y].Clone();
+            // Deep clone
+            for (int x = 0; x < _tiles.GetLength(0); x++)
+                for (int y = 0; y < _tiles.GetLength(1); y++)
+                    tiles[x, y] = _tiles[x, y].Clone();
 
+            layer.Tiles = tiles;
             return layer;
         }
 
@@ -1823,7 +1866,7 @@ namespace GMare.Objects
                     Rectangle rect = new Rectangle(x * tileSize.Width, y * tileSize.Height, cols * tileSize.Width, rows * tileSize.Height);
 
                     // Add calculated rectangle
-                    ExportTile tile = new ExportTile(++lastId, location, rect, background.GameMakerId, _depth, flipMode, blendColor);
+                    ExportTile tile = new ExportTile(++lastId, location, rect, background.GameMakerId, background.Name, _depth, flipMode, blendColor);
                     tiles.Add(tile);
                 }
             }
@@ -2038,22 +2081,13 @@ namespace GMare.Objects
         /// <returns>A new background copy</returns>
         public GMareBackground Clone()
         {
-            // Create a new background, copy this background
-            GMareBackground background = new GMareBackground();
-            background.Name = (string)_name.Clone();
+            GMareBackground background = (GMareBackground)this.MemberwiseClone();
             background.Image = _image == null ? null : _image.Clone();
-            background.GameMakerId = _gmId;
-            background.TileWidth = _tileWidth;
-            background.TileHeight = _tileHeight;
-            background.SeparationX = _separationX;
-            background.SeparationY = _separationY;
-            background.OffsetX = _offsetX;
-            background.OffsetY = _offsetY;
             return background;
         }
 
         /// <summary>
-        /// Compares a desired background against this background
+        /// Compares a given background against this background
         /// </summary>
         /// <param name="background">The background to compare this background with</param>
         /// <returns>If the backgrounds are the same</returns>
@@ -2068,6 +2102,33 @@ namespace GMare.Objects
                 background.OffsetX != _offsetX ||
                 background.OffsetY != _offsetY ||
                 PixelMap.Same(background.Image, _image) == false
+            )
+                return false;
+
+            // The backgrounds are identical
+            return true;
+        }
+
+        /// <summary>
+        /// Compares the given background's tile settings and dimensions to this background (Actual pixel data is ignored)
+        /// </summary>
+        /// <param name="background">The background to compare this background with</param>
+        /// <returns>If the backgrounds are the same</returns>
+        public bool SameSimple(GMareBackground background)
+        {
+            // If the background does not exist
+            if (background == null || background.Image == null)
+                return false;
+
+            // If the backgrounds do not match
+            if (background.TileWidth != _tileWidth ||
+                background.TileHeight != _tileHeight ||
+                background.SeparationX != _separationX ||
+                background.SeparationY != _separationY ||
+                background.OffsetX != _offsetX ||
+                background.OffsetY != _offsetY ||
+                background.Image.Width != _image.Width ||
+                background.Image.Height != _image.Height
             )
                 return false;
 
@@ -2348,13 +2409,7 @@ namespace GMare.Objects
         /// <returns>A new tile copy</returns>
         public GMareTile Clone()
         {
-            // Create a new tile, copy this tile
-            GMareTile tile = new GMareTile();
-            tile.Blend = Color.FromArgb(_blend.ToArgb());
-            tile.FlipMode = _flip;
-            tile.TileId = _tileId;
-            tile.BackgroundId = _backgroundId;
-            return tile;
+            return (GMareTile)this.MemberwiseClone();
         }
 
         /// <summary>
@@ -2451,7 +2506,7 @@ namespace GMare.Objects
         #region Fields
 
         private GMResource _resource = new GMResource();              // The resource id of the source object
-        private Bitmap _image = GMare.Properties.Resources.instance;  // The image to represent this object
+        private PixelMap _image = null;                               // The image to represent this object
         private int _depth = 0;                                       // The object depth
         private int _sprite = -1;                                     // The sprite id
         private int _originX = 0;                                     // The horizontal offset
@@ -2500,7 +2555,7 @@ namespace GMare.Objects
         /// Gets the sprite associated with this object
         /// </summary>
         [XmlIgnore]
-        public Bitmap Image
+        public PixelMap Image
         {
             get { return _image; }
             set { _image = value; }
@@ -2521,7 +2576,7 @@ namespace GMare.Objects
                 // Copy the bitmap into memory, return byte array
                 using (MemoryStream ms = new MemoryStream())
                 {
-                    _image.Save(ms, ImageFormat.Png);
+                    _image.ToBitmap().Save(ms, ImageFormat.Png);
                     return ms.ToArray();
                 }
             }
@@ -2535,7 +2590,8 @@ namespace GMare.Objects
                     // Copy the bitmap data into memory, create a pixel map from data
                     using (MemoryStream ms = new MemoryStream(value))
                     {
-                        _image = new Bitmap(ms);
+                        Bitmap test = new Bitmap(ms);
+                        _image = new PixelMap(test);
                     }
                 }
             }
@@ -2586,6 +2642,7 @@ namespace GMare.Objects
         /// </summary>
         public GMareObject()
         {
+            _image = new PixelMap(GMare.Properties.Resources.instance);
         }
 
         /// <summary>
@@ -2595,7 +2652,9 @@ namespace GMare.Objects
         {
             // If the image is not empty, use it
             if (image != null)
-                _image = image;
+                _image = new PixelMap(image);
+            else
+                _image = new PixelMap(GMare.Properties.Resources.instance);
 
             // Set fields
             _resource = resource;
@@ -2615,17 +2674,9 @@ namespace GMare.Objects
         /// <returns>A new object copy</returns>
         public GMareObject Clone()
         {
-            // Get resource id
-            GMResource res = new GMResource();
-            res.Name = (string)_resource.Name.Clone();
-            res.Id = _resource.Id;
-            res.LastChanged = _resource.LastChanged;
-
-            // Get bitmap
-            Bitmap image = (Bitmap)_image.Clone();
-
-            // Return shallow copy
-            return new GMareObject(res, image, _sprite, _depth, _originX, _originY);
+            GMareObject obj = (GMareObject)this.MemberwiseClone();
+            obj.Image = _image == null ? null : _image.Clone();
+            return obj;
         }
 
         #endregion
@@ -2658,6 +2709,7 @@ namespace GMare.Objects
         /// Gets the location point of the instance within a room
         /// </summary>
         [XmlIgnore]
+        
         public Point Location
         {
             get { return new Point(X, Y); }
@@ -2707,18 +2759,7 @@ namespace GMare.Objects
         /// <returns>A new instance copy</returns>
         public GMareInstance Clone()
         {
-            // Create new instance, copy this instance
-            GMareInstance instance = new GMareInstance(_tileId);
-            instance.CreationCode = (string)CreationCode.Clone();
-            instance.Id = Id;
-            instance.LastChanged = LastChanged;
-            instance.Locked = Locked;
-            instance.Name = (string)Name.Clone();
-            instance.ObjectId = ObjectId;
-            instance.ObjectName = (string)ObjectName.Clone();
-            instance.X = X;
-            instance.Y = Y;
-            return instance;
+            return (GMareInstance)this.MemberwiseClone();
         }
 
         #endregion
@@ -2739,6 +2780,7 @@ namespace GMare.Objects
     /// <summary>
     /// Class that holds project data for binary export
     /// </summary>
+    [Serializable]
     public class ExportProject
     {
         #region Fields
@@ -2792,19 +2834,8 @@ namespace GMare.Objects
         /// <returns>A new export project copy</returns>
         public ExportProject Clone()
         {
-            // Create a copy of this project
-            ExportProject project = new ExportProject();
+            ExportProject project = (ExportProject)this.MemberwiseClone();
             project.Background = _background.Clone();
-            project.MethodMode = _methodMode;
-            project.Name = (string)_name.Clone();
-            project.RoomPath = (string)_roomPath.Clone();
-            project.WriteTiles = _writeTiles;
-            project.UseFlipValues = _useFlipValues;
-            project.UseBlendColor = _useBlendColor;
-            project.WriteInstances = _writeInstances;
-            project.WriteBlocks = _writeBlocks;
-            project.Exporting = _exporting;
-            project.Native = _native;
             return project;
         }
 
@@ -2874,7 +2905,7 @@ namespace GMare.Objects
         /// <param name="rect">The dimensions of the tile</param>
         /// <param name="flipMode">The flip mode of the tile</param>
         /// <param name="blendColor">The blend color of the tile</param>
-        public ExportTile(int id, Point location, Rectangle rect, int background, int depth, FlipType flipMode, Color blendColor)
+        public ExportTile(int id, Point location, Rectangle rect, int background, string backgroundName, int depth, FlipType flipMode, Color blendColor)
         {
             Id = id;
             X = rect.X;
@@ -2885,6 +2916,7 @@ namespace GMare.Objects
             BackgroundY = location.Y;
             BackgroundId = background;
             Depth = depth;
+            BackgroundName = backgroundName;
             _flipMode = flipMode;
             _blendColor = blendColor;
         }

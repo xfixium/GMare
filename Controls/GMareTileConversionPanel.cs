@@ -59,8 +59,8 @@ namespace GMare.Controls
                 _layer = value;
 
                 // Update canvas size for scrollbars
-                if (ProjectManager.Room != null)
-                    CanvasSize = new Size(ProjectManager.Room.Width + 1, ProjectManager.Room.Height + 1);
+                if (App.Room != null)
+                    CanvasSize = new Size(App.Room.Width + 1, App.Room.Height + 1);
 
                 UpdateBackBuffer();
             }
@@ -96,14 +96,14 @@ namespace GMare.Controls
         protected override void OnDrawOnBackbuffer(ref System.Drawing.Graphics gfx)
         {
             // If layer is empty or background is empty, return
-            if (_layer == null || ProjectManager.Room.Backgrounds[0] == null || ProjectManager.Room.Backgrounds[0].Image == null)
+            if (_layer == null || App.Room.Backgrounds[0] == null || App.Room.Backgrounds[0].Image == null)
                 return;
 
             // Draw layer
-            gfx.DrawImageUnscaled(_layer.GetLayerImage(ProjectManager.Room.Backgrounds[0], ProjectManager.Room.Backgrounds[0].GetCondensedTileset(), .5f), Point.Empty);
+            gfx.DrawImageUnscaled(_layer.GetLayerImage(App.Room.Backgrounds[0], App.Room.Backgrounds[0].GetCondensedTileset(), .5f), Point.Empty);
         
             // Convert tile ids to optimized binary tiles and reset the tile count
-            ExportTile[] tiles = _layer.GetExportTiles(ProjectManager.Room.Backgrounds[0], false, -1);
+            ExportTile[] tiles = _layer.GetExportTiles(App.Room.Backgrounds[0], false, -1);
             _tileCount = 0;
 
             // If there are rectangles to draw, draw them

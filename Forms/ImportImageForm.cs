@@ -102,7 +102,7 @@ namespace GMare.Forms
             txtName.Text = _newRoom.Name;
 
             // Create new undo/redo history
-            _history = new UndoRedoHistory<ITilesOwner>(this, 10);
+            _history = new UndoRedoHistory<ITilesOwner>(this, 20);
 
             // Check for ok button enable
             CheckAccept();
@@ -512,7 +512,7 @@ namespace GMare.Forms
         }
 
         /// <summary>
-        /// Sets the history.
+        /// Sets the history
         /// </summary>
         private void PushHistory()
         {

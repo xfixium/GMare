@@ -39,8 +39,9 @@ namespace GameMaker.Resource
         #region Fields
 
         private GMImage[] _subImages = null;
-        private BoundingBoxType _boundingBoxMode = BoundingBoxType.Auto;
-        private ShapeType _shapeMode = ShapeType.Rectange;
+        private int[] _textureGroups = null;
+        private int _boundingBoxMode = 0;
+        private int _shapeMode = 1;
         private int _width = 32;
         private int _height = 32;
         private int _originX = 0;
@@ -50,7 +51,6 @@ namespace GameMaker.Resource
         private int _boundingBoxTop = 0;
         private int _boundingBoxBottom = 0;
         private int _alphaTolerance = 0;
-        private int _textureGroup = 0;
         private bool _tileHorizontally = false;
         private bool _tileVertically = false;
         private bool _transparent = true;
@@ -72,13 +72,19 @@ namespace GameMaker.Resource
             set { _subImages = value; }
         }
 
-        public BoundingBoxType BoundingBoxMode
+        public int[] TextureGroups
+        {
+            get { return _textureGroups; }
+            set { _textureGroups = value; }
+        }
+
+        public int BoundingBoxMode
         {
             get { return _boundingBoxMode; }
             set { _boundingBoxMode = value; }
         }
 
-        public ShapeType ShapeMode
+        public int ShapeMode
         {
             get { return _shapeMode; }
             set { _shapeMode = value; }
@@ -136,12 +142,6 @@ namespace GameMaker.Resource
         {
             get { return _alphaTolerance; }
             set { _alphaTolerance = value; }
-        }
-
-        public int TextureGroup
-        {
-            get { return _textureGroup; }
-            set { _textureGroup = value; }
         }
 
         public bool TileHorizontally
@@ -207,6 +207,128 @@ namespace GameMaker.Resource
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Reads sprites from Game Maker project file.
+        /// </summary>
+        public static GMList<GMSprite> ReadSpritesGMX(string directory, ref List<string> assets)
+        {
+            // A list of sprites
+            GMList<GMSprite> sprites = new GMList<GMSprite>();
+            sprites.AutoIncrementIds = false;
+
+            // Iterate through .gmx files in the directory
+            foreach (string file in Directory.GetFiles(directory, "*.gmx"))
+            {
+                // Set name of the sprite
+                string name = GetResourceName(file);
+
+                // If the file is not in the asset list, it has been orphaned, continue
+                if (!assets.Contains(name))
+                    continue;
+
+                // Create a dictionary of sprite properties 
+                Dictionary<string, string> properties = new Dictionary<string, string>();
+                foreach (GMXSpriteProperty property in Enum.GetValues(typeof(GMXSpriteProperty)))
+                    properties.Add(GMXEnumString(property), "");
+
+                // Local variables and texture group strings
+                List<GMImage> subImages = new List<GMImage>();
+                string textureGroup = GMXEnumString(GMXSpriteProperty.TextureGroup);
+                string textureGroup0 = GMXEnumString(GMXSpriteProperty.TextureGroup0);
+
+                // Create an xml reader
+                using (XmlReader reader = XmlReader.Create(file))
+                {
+                    // Seek to content
+                    reader.MoveToContent();
+
+                    // Read the GMX file
+                    while (reader.Read())
+                    {
+                        // If the node is not an element, continue
+                        if (reader.NodeType != XmlNodeType.Element)
+                            continue;
+
+                        // Get the element name
+                        string nodeName = reader.Name;
+
+                        // Read element
+                        reader.Read();
+
+                        // If the element value is null or empty, continue
+                        if (String.IsNullOrEmpty(reader.Value))
+                            continue;
+
+                        // If the element is a frame element create subimage, else normal property
+                        if (nodeName.ToLower() == GMXEnumString(GMXSpriteProperty.Frame).ToLower())
+                        {
+                            // Create a sub image and set the image path
+                            GMImage subImage = new GMImage();
+                            subImage.Compressed = false;
+                            subImage.FilePath = reader.Value;
+                            subImage.Data = GMUtilities.LoadBytesFromBitmap(directory + "\\" + subImage.FilePath);
+                            subImages.Add(subImage);
+                        }
+                        else
+                        {
+                            // Set the property value
+                            properties[nodeName] = reader.Value;
+                        }
+                    }
+                }
+
+                // Create a new sprite, set properties
+                GMSprite sprite = new GMSprite();
+                sprite.Id = GetIdFromName(name);
+                sprite.Name = name;
+                sprite.OriginX = GMXInt(properties[GMXEnumString(GMXSpriteProperty.XOrigin)], sprite.OriginX);
+                sprite.OriginY = GMXInt(properties[GMXEnumString(GMXSpriteProperty.YOrigin)], sprite.OriginY);
+                sprite.ShapeMode = GMXInt(properties[GMXEnumString(GMXSpriteProperty.ColKind)], sprite.ShapeMode);
+                sprite.AlphaTolerance = GMXInt(properties[GMXEnumString(GMXSpriteProperty.ColTolerance)], sprite.AlphaTolerance);
+                sprite.UseSeperateCollisionMasks = GMXBool(properties[GMXEnumString(GMXSpriteProperty.SepMasks)], sprite.UseSeperateCollisionMasks);
+                sprite.BoundingBoxMode = GMXInt(properties[GMXEnumString(GMXSpriteProperty.BBoxMode)], sprite.BoundingBoxMode);
+                sprite.BoundingBoxLeft = GMXInt(properties[GMXEnumString(GMXSpriteProperty.BBoxLeft)], sprite.BoundingBoxLeft);
+                sprite.BoundingBoxRight = GMXInt(properties[GMXEnumString(GMXSpriteProperty.BBoxRight)], sprite.BoundingBoxRight);
+                sprite.BoundingBoxTop = GMXInt(properties[GMXEnumString(GMXSpriteProperty.BBoxTop)], sprite.BoundingBoxTop);
+                sprite.BoundingBoxBottom = GMXInt(properties[GMXEnumString(GMXSpriteProperty.BBoxBottom)], sprite.BoundingBoxBottom);
+                sprite.TileHorizontally = GMXBool(properties[GMXEnumString(GMXSpriteProperty.HTile)], sprite.TileHorizontally);
+                sprite.TileVertically = GMXBool(properties[GMXEnumString(GMXSpriteProperty.VTile)], sprite.TileVertically);
+                sprite.UsedFor3D = GMXBool(properties[GMXEnumString(GMXSpriteProperty.For3D)], sprite.UsedFor3D);
+                sprite.Width = GMXInt(properties[GMXEnumString(GMXSpriteProperty.Width)], sprite.Width);
+                sprite.Height = GMXInt(properties[GMXEnumString(GMXSpriteProperty.Height)], sprite.Height);
+                properties[textureGroup] = properties[textureGroup] == "" ? "0" : properties[textureGroup];
+                properties[textureGroup0] = properties[textureGroup0] == "" ? "0" : properties[textureGroup0];
+                
+                // The texture group does not equal zero set texture group 0 to the texture group value
+                if (properties[textureGroup] != "0")
+                    properties[textureGroup0] = properties[textureGroup];
+                // The texture group zero does not equal zero set texture group to the texture group 0 value
+                else if (properties[textureGroup0] != "0")
+                    properties[textureGroup] = properties[textureGroup0];
+
+                // Create a list of texture groups
+                List<int> textureGroups = new List<int>();
+                for (int i = 0; properties.ContainsKey(textureGroup + i); i++)
+                    textureGroups.Add(Convert.ToInt32(properties[textureGroup + i]));
+
+                // Set the subimage size for all subimages
+                foreach (GMImage image in subImages)
+                {
+                    image.Width = sprite.Width;
+                    image.Height = sprite.Height;
+                }
+
+                sprite.TextureGroups = textureGroups.ToArray();
+                sprite.SubImages = subImages.ToArray();
+
+                // Add the sprite
+                sprites.Add(sprite);
+            }
+
+            // Return the list of sprites
+            return sprites;
+        }
 
         /// <summary>
         /// Reads sprites from Game Maker project file.
@@ -282,7 +404,7 @@ namespace GameMaker.Resource
                     }
 
                     // Read sprite data
-                    sprite.BoundingBoxMode = (BoundingBoxType)reader.ReadGMInt();
+                    sprite.BoundingBoxMode = reader.ReadGMInt();
                     sprite.Precise = reader.ReadGMBool();
 
                     // Check version
@@ -366,10 +488,10 @@ namespace GameMaker.Resource
                     }
 
                     // Read sprite data
-                    sprite.ShapeMode = (ShapeType)reader.ReadGMInt();
+                    sprite.ShapeMode = reader.ReadGMInt();
                     sprite.AlphaTolerance = reader.ReadGMInt();
                     sprite.UseSeperateCollisionMasks = reader.ReadGMBool();
-                    sprite.BoundingBoxMode = (BoundingBoxType)reader.ReadGMInt();
+                    sprite.BoundingBoxMode = reader.ReadGMInt();
                     sprite.BoundingBoxLeft = reader.ReadGMInt();
                     sprite.BoundingBoxRight = reader.ReadGMInt();
                     sprite.BoundingBoxBottom = reader.ReadGMInt();
@@ -384,111 +506,6 @@ namespace GameMaker.Resource
             }
 
             // Return sprites
-            return sprites;
-        }
-
-        /// <summary>
-        /// Reads sprites from Game Maker project file.
-        /// </summary>
-        public static GMList<GMSprite> ReadSpritesGMX(string directory, List<string> assets)
-        {
-            // A list of sprites
-            GMList<GMSprite> sprites = new GMList<GMSprite>();
-
-            // Iterate through .gmx files in the directory
-            foreach (string file in Directory.GetFiles(directory, "*.gmx"))
-            {
-                // Set name of the sprite
-                string name = GMFileReader.GetResourceName(file);
-
-                // If the file is not in the asset list, it has been orphaned, continue
-                if (!assets.Contains(name))
-                    continue;
-
-                // Create a dictionary of sprite properties
-                Dictionary<GMXSpriteProperty, string> properties = new Dictionary<GMXSpriteProperty, string>();
-
-                foreach (GMXSpriteProperty property in Enum.GetValues(typeof(GMXSpriteProperty)))
-                    properties.Add(property, "");
-
-                // Local variables
-                List<GMImage> subImages = new List<GMImage>();
-
-                // Create an xml reader
-                using (XmlReader xmlReader = XmlReader.Create(file))
-                {
-                    // Seek to content
-                    xmlReader.MoveToContent();
-
-                    // Read the GMX file
-                    while (xmlReader.Read())
-                    {
-                        // If the node is not an element, continue
-                        if (xmlReader.NodeType != XmlNodeType.Element)
-                            continue;
-
-                        // Get the element name
-                        string nodeName = xmlReader.Name;
-
-                        // Read element
-                        xmlReader.Read();
-
-                        // If the element value is null or empty, continue
-                        if (String.IsNullOrEmpty(xmlReader.Value))
-                            continue;
-
-                        // If the element is a frame element create subimage, else normal property
-                        if (nodeName.ToLower() == EnumString.GetEnumString(GMXSpriteProperty.Frame).ToLower())
-                        {
-                            // Create a sub image and set the image path
-                            GMImage subImage = new GMImage();
-                            subImage.Compressed = false;
-                            subImage.ImagePath = directory + "\\" + xmlReader.Value;
-                            subImage.Data = GMUtilities.LoadBytesFromBitmap(subImage.ImagePath);
-                            subImages.Add(subImage);
-                        }
-                        else
-                        {
-                            // Get the enumeration based on the node name
-                            GMXSpriteProperty? property = EnumString.GetEnumFromString<GMXSpriteProperty>(nodeName);
-
-                            // If no match was found, continue
-                            if (property == null)
-                                continue;
-
-                            // Set the property value
-                            properties[(GMXSpriteProperty)property] = xmlReader.Value;
-                        }
-                    }
-                }
-
-                // Create a new sprite, set properties
-                GMSprite sprite = new GMSprite();
-                sprite.Id = GMResource.GetIdFromName(name);
-                sprite.Name = name;
-                sprite.OriginX = GMFileReader.ReadGMXInt(properties[GMXSpriteProperty.XOrigin]);
-                sprite.OriginY = GMFileReader.ReadGMXInt(properties[GMXSpriteProperty.YOrigin]);
-                sprite.ShapeMode = (ShapeType)GMFileReader.ReadGMXInt(properties[GMXSpriteProperty.ColKind]);
-                sprite.AlphaTolerance = GMFileReader.ReadGMXInt(properties[GMXSpriteProperty.ColTolerance]);
-                sprite.UseSeperateCollisionMasks = GMFileReader.ReadGMXBool(properties[GMXSpriteProperty.SepMasks]);
-                sprite.BoundingBoxMode = (BoundingBoxType)GMFileReader.ReadGMXInt(properties[GMXSpriteProperty.BBoxMode]);
-                sprite.BoundingBoxLeft = GMFileReader.ReadGMXInt(properties[GMXSpriteProperty.BBoxLeft]);
-                sprite.BoundingBoxRight = GMFileReader.ReadGMXInt(properties[GMXSpriteProperty.BBoxRight]);
-                sprite.BoundingBoxTop = GMFileReader.ReadGMXInt(properties[GMXSpriteProperty.BBoxTop]);
-                sprite.BoundingBoxBottom = GMFileReader.ReadGMXInt(properties[GMXSpriteProperty.BBoxBottom]);
-                sprite.TileHorizontally = GMFileReader.ReadGMXBool(properties[GMXSpriteProperty.HTile]);
-                sprite.TileVertically = GMFileReader.ReadGMXBool(properties[GMXSpriteProperty.VTile]);
-                sprite.TextureGroup = GMFileReader.ReadGMXInt(properties[GMXSpriteProperty.TextureGroup0]);
-                sprite.UsedFor3D = GMFileReader.ReadGMXBool(properties[GMXSpriteProperty.For3D]);
-                sprite.Width = GMFileReader.ReadGMXInt(properties[GMXSpriteProperty.Width]);
-                sprite.Height = GMFileReader.ReadGMXInt(properties[GMXSpriteProperty.Height]);
-                sprite.SubImages = subImages.ToArray();
-
-                // Add the sprite
-                sprites.Add(sprite);
-            }
-
-            // Return the list of sprites
             return sprites;
         }
 

@@ -26,6 +26,7 @@
 #endregion
 
 using System;
+using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 using System.ComponentModel;
@@ -51,6 +52,7 @@ namespace GMare
         private UndoRedoHistory<IRoomOwner> _history;   // Room undo/redo history
         private GMareBackground _background = null;     // Selected background
         private GMareLayer _layer = null;               // Selected layer
+        private bool _loading = false;                  // If loading a project
 
         #endregion
 
@@ -61,25 +63,25 @@ namespace GMare
         /// </summary>
         public RoomData Data
         {
-            get { return new RoomData(ProjectManager.Room); }
+            get { return new RoomData(App.Room); }
             set
             {
                 // Make a copy of the current room persistent values
-                GMareRoom room = ProjectManager.Room.ClonePersistents();
+                GMareRoom room = App.Room.ClonePersistents();
 
                 // Set room from undo redo, use previous values for persistent data
-                ProjectManager.Room = value.Room;
-                ProjectManager.Room.Objects = room.Objects;
-                ProjectManager.Room.Brushes = room.Brushes;
-                ProjectManager.Room.ScaleWarning = room.ScaleWarning;
-                ProjectManager.Room.BlendWarning = room.BlendWarning;
+                App.Room = value.Room;
+                App.Room.Objects = room.Objects;
+                App.Room.Brushes = room.Brushes;
+                App.Room.ScaleWarning = room.ScaleWarning;
+                App.Room.BlendWarning = room.BlendWarning;
 
                 // Update UI
                 UpdateLayerList(lstLayers.SelectedIndex);
 
                 // If editing layers, delete the selection
-                if (pnlRoomEditor.EditMode == EditType.Layers)
-                    pnlRoomEditor.Delete();
+                //if (pnlRoomEditor.EditMode == EditType.Layers)
+                //    pnlRoomEditor.Delete();
 
                 // Clear selected instances, update room panel
                 pnlRoomEditor.SelectedInstances.Clear();
@@ -101,7 +103,7 @@ namespace GMare
 
         #endregion
 
-        #region Constructor
+        #region Constructors
 
         /// <summary>
         /// Constructs a new main form
@@ -195,6 +197,7 @@ namespace GMare
         /// </summary>
         private void mnuMain_Click(object sender, EventArgs e)
         {
+            // Update UI that displays the room caption and room name
             txtRoomText_Leave(txtRoomCaption, EventArgs.Empty);
             txtRoomText_Leave(txtRoomName, EventArgs.Empty);
         }
@@ -212,7 +215,7 @@ namespace GMare
             string name = (sender as ToolStripMenuItem).Name;
 
             // If saving and the room is empty, return
-            if ((mnuSave.Name == name || mnuSaveAs.Name == name || mnuExportImage.Name == name || mnuExportBinary.Name == name) && ProjectManager.Room == null)
+            if ((mnuSave.Name == name || mnuSaveAs.Name == name || mnuExportImage.Name == name || mnuExportBinary.Name == name) && App.Room == null)
                 return;
 
             // If creating a room, check the current room for save, if cancelled return
@@ -223,6 +226,8 @@ namespace GMare
             // Do action based on menu item click
             if (mnuNewProject.Name == name)
             {
+                // Reset automatic save to path, room editor states, and UI
+                App.SavePath = "";
                 pnlRoomEditor.Reset();
                 SetUI();
             }
@@ -237,16 +242,22 @@ namespace GMare
 
                     // Stop the room editor from processing mouse events from double click file selection
                     pnlRoomEditor.AvoidMouseEvents = true;
+                    pnlBackground.AvoidMouseEvents = true;
 
                     // If the dialog result is Ok
                     if (form.ShowDialog() == DialogResult.OK)
                     {
                         // Set project room
                         pnlRoomEditor.Reset();
-                        ProjectManager.SetProject(form.FileName);
+                        App.SetProject(form.FileName);
+
+                        // Set textures for loaded objects, update blocks and object names
+                        App.SetTextures();
+                        App.Room.UpdateBlockInstances();
+                        App.Room.UpdateInstanceObjectNames();
                         UpdateUI();
-                        nudRoomGridX.Value = ProjectManager.Room.Backgrounds[0].TileWidth;
-                        nudRoomGridY.Value = ProjectManager.Room.Backgrounds[0].TileHeight;
+                        nudRoomGridX.Value = App.Room.Backgrounds[0].TileWidth;
+                        nudRoomGridY.Value = App.Room.Backgrounds[0].TileHeight;
                     }
                 }
             }
@@ -277,27 +288,27 @@ namespace GMare
             }
             else if (mnuSave.Name == name)
             {
-                ProjectManager.SaveProject(ProjectManager.SavePath);
-                ProjectManager.Changed = false;
+                App.SaveProject(App.SavePath);
+                App.Changed = false;
             }
             else if (mnuSaveAs.Name == name)
             {
                 // Create a save file dialog
-                using (SaveFileDialog form = new SaveFileDialog())
+                using (SaveFileDialog sfd = new SaveFileDialog())
                 {
                     // Set filter
-                    form.Filter = "GMare Project File (.gmpx)|*.gmpx";
-                    form.Title = "Save Project As...";
+                    sfd.Filter = "GMare Project File (.gmpx)|*.gmpx";
+                    sfd.Title = "Save Project As...";
 
                     // If the dialog result was Ok, save the project
-                    if (form.ShowDialog() == DialogResult.OK)
+                    if (sfd.ShowDialog() == DialogResult.OK)
                     {
                         // Save the project
-                        if (ProjectManager.SaveProject(form.FileName))
-                            ProjectManager.SavePath = form.FileName;
+                        if (App.SaveProject(sfd.FileName))
+                            App.SavePath = sfd.FileName;
 
                         // The project has not made any new changes
-                        ProjectManager.Changed = false;
+                        App.Changed = false;
                     }
                 }
             }
@@ -312,21 +323,52 @@ namespace GMare
 
                     // If the dialog result is ok, set the project room
                     if (ofd.ShowDialog() == DialogResult.OK)
-                        ProjectManager.SetProject(ofd.FileName);
+                        App.SetProject(ofd.FileName);
 
                     // If the room is still empty, create a default room
-                    if (ProjectManager.Room == null)
+                    if (App.Room == null)
                     {
                         // Create a new room with a new layer
-                        ProjectManager.Room = new GMareRoom();
-                        ProjectManager.Room.Layers.Add(new GMareLayer(ProjectManager.Room.Columns, ProjectManager.Room.Rows));
+                        App.Room = new GMareRoom();
+                        App.Room.Layers.Add(new GMareLayer(App.Room.Columns, App.Room.Rows));
                     }
 
                     // Project changed
-                    ProjectManager.Changed = true;
+                    App.Changed = true;
 
                     // Update UI
                     UpdateUI();
+                    nudRoomGridX.Value = App.Room.Backgrounds[0].TileWidth;
+                    nudRoomGridY.Value = App.Room.Backgrounds[0].TileHeight;
+                }
+            }
+            else if (mnuImportGMare.Name == name)
+            {
+                // Create an open file dialog to get the image path
+                using (OpenFileDialog ofd = new OpenFileDialog())
+                {
+                    // Set filter
+                    ofd.Filter = "GMare Project File (.gmpx)|*.gmpx";
+                    ofd.Title = "Import GMare Project";
+
+                    // If the dialog result is not ok, return
+                    if (ofd.ShowDialog() != DialogResult.OK)
+                        return;
+
+                    // Create a new import GMare project dialog
+                    using (ImportGMareForm form = new ImportGMareForm(App.GetProject(ofd.FileName)))
+                    {
+                        // If the dialog result is not ok, return
+                        if (form.ShowDialog() != DialogResult.OK)
+                            return;
+
+                        // Update UI
+                        App.SetTextures();
+                        App.Room.UpdateBlockInstances();
+                        UpdateUI();
+                        nudRoomGridX.Value = App.Room.Backgrounds[0].TileWidth;
+                        nudRoomGridY.Value = App.Room.Backgrounds[0].TileHeight;
+                    }
                 }
             }
             else if (mnuExportImage.Name == name)
@@ -336,7 +378,7 @@ namespace GMare
                     return;
 
                 // Create a new export image dialog
-                using (ExportImageForm form = new ExportImageForm(ProjectManager.Room.Layers, _background.GetCondensedTileset(), ProjectManager.Room.RoomSize, _background.TileSize))
+                using (ExportImageForm form = new ExportImageForm(App.Room.Layers, _background.GetCondensedTileset(), App.Room.RoomSize, _background.TileSize))
                 {
                     form.ShowDialog();
                 }
@@ -349,7 +391,7 @@ namespace GMare
                     form.ShowDialog();
 
                     // Set room name based on native project name change
-                    txtRoomName.Text = ProjectManager.Room.Name;
+                    txtRoomName.Text = App.Room.Name;
 
                     // Push history
                     if (form.Changed)
@@ -362,17 +404,41 @@ namespace GMare
                 using (OpenFileDialog ofd = new OpenFileDialog())
                 {
                     // Set file format filter
-                    ofd.Filter = "Game Maker Project Files (.gmk, .gm6, .gmd .gm81)|*.gmk;*.gm6;*.gmd;*.gm81;";
-                    ofd.Title = "Open Game Maker Project For Export";
+                    ofd.Filter = "Game Maker Project Files (.gmk, .gm6, .gmd .gm81 .gmx)|*.gmk;*.gm6;*.gmd;*.gm81;*.gmx;";
+                    ofd.Title = "Open A Game Maker Project For Export";
 
                     // If the dialog result is Ok
                     if (ofd.ShowDialog() == DialogResult.OK)
                     {
                         // Create a new GM export dialog
-                        using (ExportGMProjectForm gmform = new ExportGMProjectForm(ProjectManager.GetGMProject(ofd.FileName), ofd.FileName))
+                        using (ExportGMProjectForm gmform = new ExportGMProjectForm(App.GetGMProject(ofd.FileName), ofd.FileName))
                         {
                             gmform.ShowDialog();
                         }
+                    }
+                }
+            }
+            else if (mnuPreferences.Name == name)
+            {
+                // Create a new preferences dialog
+                using (PreferencesForm form = new PreferencesForm())
+                {
+                    // If the dialog result is not Ok, return
+                    if (form.ShowDialog() != DialogResult.OK)
+                        return;
+
+                    // If unod/redo update is required, notify the user
+                    if (form.UpdateUnodRedo)
+                    {
+                        MessageBox.Show("Changes to the Undo/Redo maximum will take affect on restart.", "GMare", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                    }
+
+                    // If texture updates are required, reset textures
+                    if (_background != null && _background.Image != null && form.UpdateTextures)
+                    {
+                        App.SetTextures();
+                        pnlRoomEditor.Image = _background.GetCondensedTileset();
                     }
                 }
             }
@@ -412,7 +478,7 @@ namespace GMare
         private void butEdit_Click(object sender, EventArgs e)
         {
             // If the calling object is not a button or the room is empty, return
-            if (!(sender is PyxButton) || ProjectManager.Room == null)
+            if (!(sender is PyxButton) || App.Room == null)
                 return;
 
             // Get the calling button name
@@ -460,14 +526,14 @@ namespace GMare
         private void butRoomBackColor_Click(object sender, EventArgs e)
         {
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
                 return;
 
             // Create a new color dialog box
             using (ColorDialog form = new ColorDialog())
             {
                 // Set user custom colors
-                form.CustomColors = ProjectManager.Room.CustomColors;
+                form.CustomColors = App.Room.CustomColors;
 
                 // If the dialog result is Ok
                 if (form.ShowDialog() == DialogResult.OK)
@@ -476,8 +542,8 @@ namespace GMare
                     PushHistory();
 
                     // Change back color, and remember custom colors
-                    ProjectManager.Room.BackColor = form.Color;
-                    ProjectManager.Room.CustomColors = form.CustomColors;
+                    App.Room.BackColor = form.Color;
+                    App.Room.CustomColors = form.CustomColors;
 
                     // Update UI
                     pnlRoomEditor.Invalidate();
@@ -491,14 +557,14 @@ namespace GMare
         private void butRoomPersistent_CheckChanged(object sender)
         {
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
                 return;
 
             // Room changing
             PushHistory();
 
             // Set room persistence
-            ProjectManager.Room.Persistent = butRoomPersistent.Checked;
+            App.Room.Persistent = butRoomPersistent.Checked;
         }
 
         /// <summary>
@@ -507,11 +573,11 @@ namespace GMare
         private void butRoomScript_Click(object sender, EventArgs e)
         {
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
                 return;
 
             // Create a new shift form
-            using (ScriptForm form = new ScriptForm((string)ProjectManager.Room.CreationCode.Clone(), "Room Creation Code"))
+            using (ScriptForm form = new ScriptForm((string)App.Room.CreationCode.Clone(), "Room Creation Code"))
             {
                 // If the dialog result is Ok
                 if (form.ShowDialog() == DialogResult.OK)
@@ -520,7 +586,7 @@ namespace GMare
                     PushHistory();
 
                     // Set room creation code
-                    ProjectManager.Room.CreationCode = form.Code;
+                    App.Room.CreationCode = form.Code;
                 }
             }
         }
@@ -540,7 +606,7 @@ namespace GMare
         private void txtRoomText_KeyDown(object sender, KeyEventArgs e)
         {
             // If not the enter key or the room is empty, return
-            if (!(sender is PyxTextBox) || e.KeyCode != Keys.Enter || ProjectManager.Room == null)
+            if (!(sender is PyxTextBox) || e.KeyCode != Keys.Enter || App.Room == null)
                 return;
 
             // Get the calling textbox name
@@ -550,9 +616,9 @@ namespace GMare
             if (txtRoomName.Name == name)
             {
                 // If no text or no change in text, reset textbox to previous room name
-                if (txtRoomName.Text == "" || txtRoomName.Text == ProjectManager.Room.Name)
+                if (txtRoomName.Text == "" || txtRoomName.Text == App.Room.Name)
                 {
-                    txtRoomName.Text = ProjectManager.Room.Name;
+                    txtRoomName.Text = App.Room.Name;
                     return;
                 }
 
@@ -560,14 +626,14 @@ namespace GMare
                 PushHistory();
 
                 // Set room name
-                ProjectManager.Room.Name = txtRoomName.Text;
+                App.Room.Name = txtRoomName.Text;
             }
             else if (txtRoomCaption.Name == name)
             {
                 // If no change in text
-                if (txtRoomCaption.Text == ProjectManager.Room.Caption)
+                if (txtRoomCaption.Text == App.Room.Caption)
                 {
-                    txtRoomCaption.Text = ProjectManager.Room.Caption;
+                    txtRoomCaption.Text = App.Room.Caption;
                     return;
                 }
 
@@ -575,7 +641,7 @@ namespace GMare
                 PushHistory();
 
                 // Set room caption
-                ProjectManager.Room.Caption = txtRoomCaption.Text;
+                App.Room.Caption = txtRoomCaption.Text;
             }
 
             // Update UI
@@ -588,7 +654,7 @@ namespace GMare
         private void nudRoom_ValueChanged(object sender, EventArgs e)
         {
             // If the calling object is not a numeric up down or the room is empty, return
-            if (!(sender is PyxNumericUpDown) || ProjectManager.Room == null)
+            if (!(sender is PyxNumericUpDown) || App.Room == null)
                 return;
 
             // Get the calling numeric up down name
@@ -599,11 +665,11 @@ namespace GMare
 
             // Do action based on numeric change
             if (nudRoomColumns.Name == name)
-                ProjectManager.Room.Columns = (int)nudRoomColumns.Value;
+                App.Room.Columns = (int)nudRoomColumns.Value;
             else if (nudRoomRows.Name == name)
-                ProjectManager.Room.Rows = (int)nudRoomRows.Value;
+                App.Room.Rows = (int)nudRoomRows.Value;
             else if (nudRoomSpeed.Name == name)
-                ProjectManager.Room.Speed = (int)nudRoomSpeed.Value;
+                App.Room.Speed = (int)nudRoomSpeed.Value;
 
             // Update UI
             pnlRoomEditor.Invalidate();
@@ -620,7 +686,8 @@ namespace GMare
         /// </summary>
         private void tabMain_TabChanged(object sender, EventArgs e)
         {
-            // Set edit mode and update status
+            // Update the block instances, set edit mode, and update status
+            App.Room.UpdateBlockInstances();
             pnlRoomEditor.EditMode = tabMain.SelectedTab == tabTiles ? EditType.Layers : EditType.Objects;
             UpdateStatusStrip();
         }
@@ -635,7 +702,7 @@ namespace GMare
         private void butLayerAdd_Click(object sender, EventArgs e)
         {
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
                 return;
 
             // Create a new layer form
@@ -648,8 +715,8 @@ namespace GMare
                     PushHistory();
 
                     // Add the new layer and sort it from top to bottom
-                    ProjectManager.Room.Layers.Add(form.Layer);
-                    ProjectManager.Room.Layers.Sort(delegate(GMareLayer layer1, GMareLayer layer2) { return layer1.Depth.CompareTo(layer2.Depth); });
+                    App.Room.Layers.Add(form.Layer);
+                    App.Room.Layers.Sort(delegate(GMareLayer layer1, GMareLayer layer2) { return layer1.Depth.CompareTo(layer2.Depth); });
 
                     // Update the layer list and select the new layer
                     UpdateLayerList(form.Layer);
@@ -663,7 +730,7 @@ namespace GMare
         private void butLayerOption_Click(object sender, EventArgs e)
         {
             // If the calling object is not a button or no layer was selected or the room is empty, return
-            if (!(sender is PyxButton) || lstLayers.SelectedItem == null || ProjectManager.Room == null)
+            if (!(sender is PyxButton) || lstLayers.SelectedItem == null || App.Room == null)
                 return;
 
             // Get the calling button name
@@ -682,7 +749,7 @@ namespace GMare
                         PushHistory();
 
                         // Sort layers
-                        ProjectManager.Room.Layers.Sort(delegate(GMareLayer layer1, GMareLayer layer2) { return layer1.Depth.CompareTo(layer2.Depth); });
+                        App.Room.Layers.Sort(delegate(GMareLayer layer1, GMareLayer layer2) { return layer1.Depth.CompareTo(layer2.Depth); });
 
                         // Update layer list
                         UpdateLayerList((GMareLayer)lstLayers.SelectedItem);
@@ -692,7 +759,7 @@ namespace GMare
             else if (butLayerDelete.Name == name)
             {
                 // Warn the user
-                DialogResult result = MessageBox.Show("Are you sure you want to delete the selected layer?", "GMare", 
+                DialogResult result = MessageBox.Show("Are you sure you want to delete the selected layer?", "GMare",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
 
                 // If yes was clicked, remove the layer
@@ -705,7 +772,7 @@ namespace GMare
                     int index = lstLayers.SelectedIndex;
 
                     // Remove the layer from the room, update block instances
-                    ProjectManager.Room.Layers.Remove((GMareLayer)lstLayers.SelectedItem);
+                    App.Room.Layers.Remove((GMareLayer)lstLayers.SelectedItem);
 
                     // Update layer list, set index
                     UpdateLayerList(index);
@@ -739,7 +806,7 @@ namespace GMare
                         PushHistory();
 
                         // Shift layer(s)
-                        ProjectManager.Room.Shift(form.Layer, form.Direction, form.Amount);
+                        App.Room.Shift(form.Layer, form.Direction, form.Amount);
                     }
                 }
             }
@@ -755,7 +822,7 @@ namespace GMare
 
                 // Get selected layer and the layer to merge to 
                 GMareLayer topLayer = (GMareLayer)lstLayers.SelectedItem;
-                GMareLayer belowLayer = ProjectManager.Room.GetLayerBelow(topLayer);
+                GMareLayer belowLayer = App.Room.GetLayerBelow(topLayer);
 
                 // If no layer was found below the selected layer, return
                 if (belowLayer == null)
@@ -769,7 +836,7 @@ namespace GMare
                 PushHistory();
 
                 // Merge selected layer to the one right below it
-                ProjectManager.Room.MergeLayers(topLayer, belowLayer);
+                App.Room.MergeLayers(topLayer, belowLayer);
 
                 // Update layer list, select merged layer
                 UpdateLayerList(belowLayer);
@@ -777,7 +844,7 @@ namespace GMare
             else if (butLayerView.Name == name)
             {
                 // Create a new view form
-                using (ViewLayerForm form = new ViewLayerForm(ProjectManager.Room.Layers, false))
+                using (ViewLayerForm form = new ViewLayerForm(App.Room.Layers, false))
                 {
                     // Show the form
                     form.ShowDialog();
@@ -785,7 +852,7 @@ namespace GMare
             }
 
             // Update UI
-            ProjectManager.Room.UpdateBlockInstances();
+            App.Room.UpdateBlockInstances();
             pnlRoomEditor.Invalidate();
             lstLayers.Invalidate();
         }
@@ -808,7 +875,7 @@ namespace GMare
             pnlRoomEditor.DepthIndex = (lstLayers.SelectedItem as GMareLayer).Depth;
 
             // Set layer index
-            pnlRoomEditor.LayerIndex = ProjectManager.Room.Layers.IndexOf((lstLayers.SelectedItem as GMareLayer));
+            pnlRoomEditor.LayerIndex = App.Room.Layers.IndexOf((lstLayers.SelectedItem as GMareLayer));
 
             // Update status strip
             UpdateStatusStrip();
@@ -858,7 +925,7 @@ namespace GMare
         private void butBackgroundEdit_Click(object sender, EventArgs e)
         {
             // If the calling object is not a button or the room is empty, return
-            if (!(sender is PyxButton) || ProjectManager.Room == null)
+            if (!(sender is PyxButton) || App.Room == null)
                 return;
 
             // Get the calling button name
@@ -874,11 +941,11 @@ namespace GMare
                     if (form.ShowDialog() == DialogResult.OK)
                     {
                         // If the background has changed, trigger room changing
-                        if (!ProjectManager.Room.Backgrounds[0].Same(form.Background))
+                        if (!App.Room.Backgrounds[0].Same(form.Background))
                             PushHistory();
 
                         // Set background
-                        ProjectManager.Room.Backgrounds[0] = form.Background;
+                        App.Room.Backgrounds[0] = form.Background;
 
                         // Update
                         UpdateBackgrounds();
@@ -890,7 +957,7 @@ namespace GMare
                         nudRoomGridY.Value = _background.TileSize.Height;
 
                         // Update block instances, redraw room editor
-                        ProjectManager.Room.UpdateBlockInstances();
+                        App.Room.UpdateBlockInstances();
                         pnlRoomEditor.Invalidate();
                     }
                 }
@@ -916,21 +983,25 @@ namespace GMare
             else if (butReplace.Name == name)
             {
                 // Create a new tile replace form
-                using (TileReplacementForm form = new TileReplacementForm(_background.GetCondensedTileset(), ProjectManager.Room.Backgrounds[0].TileSize))
+                using (TileReplacementForm form = new TileReplacementForm(_background.GetCondensedTileset(), App.Room.Backgrounds[0].TileSize))
                 {
-                    // If dialog result was Ok
-                    if (form.ShowDialog() == DialogResult.OK)
-                    {
-                        // Room changing
-                        PushHistory();
+                    // If dialog result was not Ok, return
+                    if (form.ShowDialog() != DialogResult.OK)
+                        return;
 
-                        // If swaping tiles on all layers, else the selected layer
-                        if (form.Layer == null)
-                            foreach (GMareLayer temp in ProjectManager.Room.Layers)
-                                temp.Replace(form.Target.ToArray(), form.Swap.ToArray());
-                        else
-                            ProjectManager.Room.Layers[ProjectManager.Room.Layers.IndexOf(form.Layer)].Replace(form.Target.ToArray(), form.Swap.ToArray());
-                    }
+                    // If nothing selected, return
+                    if (form.Target == null || form.Swap == null)
+                        return;
+
+                    // Room changing
+                    PushHistory();
+
+                    // If swaping tiles on all layers, else the selected layer
+                    if (form.Layer == null)
+                        foreach (GMareLayer temp in App.Room.Layers)
+                            temp.Replace(form.Target.ToArray(), form.Swap.ToArray());
+                    else
+                        App.Room.Layers[App.Room.Layers.IndexOf(form.Layer)].Replace(form.Target.ToArray(), form.Swap.ToArray());
                 }
             }
 
@@ -958,7 +1029,7 @@ namespace GMare
         private void butObjectsImport_Click(object sender, EventArgs e)
         {
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
                 return;
 
             // Create an open file dialog
@@ -968,15 +1039,17 @@ namespace GMare
                 form.Filter = "Game Maker Project Files (.gmk, .gm6, .gmd .gm81 .gmx)|*.gmk;*.gm6;*gmd;*gm81;*.gmx;";
                 form.Title = "Import Objects From Game Maker Project";
 
-                // If the dialog result is Ok
+                // If the dialog result is not Ok, return
                 if (form.ShowDialog() != DialogResult.OK)
                     return;
 
-                // Get objects
-                ProjectManager.GetObjects(form.FileName);
+                // If retrieving objects was unsuccessful, notify the user
+                if (!App.GetObjects(form.FileName))
+                    MessageBox.Show("The selected project does not contain any objects. Nothing was loaded.", 
+                        "GMare", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
 
                 // If no nodes were loaded, return
-                if (ProjectManager.Room.Nodes == null)
+                if (App.Room.Nodes == null)
                 {
                     // Clear any drop down items
                     mnuObjects.Items.Clear();
@@ -1021,8 +1094,8 @@ namespace GMare
 
             // Get GMnode from tag
             GMNode node = (GMNode)(sender as ToolStripMenuItem).Tag;
-            pnlRoomEditor.SelectedObject = ProjectManager.Room.Objects.Find(o => o.Resource.Id == node.Id);
-            pnlBlockEditor.ObjectId = ProjectManager.Room.Objects.Find(o => o.Resource.Id == node.Id).Resource.Id;
+            pnlRoomEditor.SelectedObject = App.Room.Objects.Find(o => o.Resource.Id == node.Id);
+            pnlBlockEditor.ObjectId = App.Room.Objects.Find(o => o.Resource.Id == node.Id).Resource.Id;
         }
 
         /// <summary>
@@ -1079,8 +1152,8 @@ namespace GMare
             }
 
             // Remove the object if it already exists in recent object history and recreate it to the top of the list
-            ProjectManager.Room.RecentObjects.RemoveAll(o => o.Resource.Id == pnlRoomEditor.SelectedObject.Resource.Id);
-            ProjectManager.Room.RecentObjects.Insert(0, pnlRoomEditor.SelectedObject);
+            App.Room.RecentObjects.RemoveAll(o => o.Resource.Id == pnlRoomEditor.SelectedObject.Resource.Id);
+            App.Room.RecentObjects.Insert(0, pnlRoomEditor.SelectedObject);
 
             // Recreate recent object history menu items
             SetRecentObjectsMenu(mnuObjects);
@@ -1105,7 +1178,7 @@ namespace GMare
                 PushHistory();
 
                 // Clear all block instances and update
-                ProjectManager.Room.ClearBlockInstances();
+                App.Room.ClearBlockInstances();
                 pnlBlockEditor.UpdateBackBuffer();
                 pnlRoomEditor.Invalidate();
 
@@ -1218,7 +1291,7 @@ namespace GMare
         private void mnuInstances_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
                 return;
 
             // Close menu, as impending dialogs may be covered by it
@@ -1226,7 +1299,7 @@ namespace GMare
 
             // Get the calling menu item name
             string name = e.ClickedItem.Name;
-       
+
             // Do action based on menu item
             if (mnuSortStandard.Name == name)
                 SetSortingChecked(0);
@@ -1277,7 +1350,7 @@ namespace GMare
         private void butRoomOptions_CheckChanged(object sender)
         {
             // If the calling object is not a button or the room is empty, return
-            if (!(sender is PyxButton) || ProjectManager.Room == null)
+            if (!(sender is PyxButton) || App.Room == null)
                 return;
 
             // Get the calling button name
@@ -1288,6 +1361,8 @@ namespace GMare
                 pnlRoomEditor.ShowGrid = butGrid.Checked;
             else if (butGridIso.Name == name)
                 pnlRoomEditor.GridMode = butGridIso.Checked ? GridType.Isometric : GridType.Normal;
+            else if (butInvertGridColor.Name == name)
+                pnlRoomEditor.InvertGridColor = butInvertGridColor.Checked;
             else if (butGridSnap.Name == name)
                 pnlRoomEditor.Snap = butGridSnap.Checked;
             else if (butShowInstances.Name == name)
@@ -1310,7 +1385,7 @@ namespace GMare
         private void nudRoomGrid_ValueChanged(object sender, EventArgs e)
         {
             // If the calling object is not a numeric up down or the room is empty, return
-            if (!(sender is PyxNumericUpDown) || ProjectManager.Room == null)
+            if (!(sender is PyxNumericUpDown) || App.Room == null)
                 return;
 
             // Get the calling numeric up down name
@@ -1337,6 +1412,7 @@ namespace GMare
         /// </summary>
         private void pnlRoomEditor_EditModeChanged()
         {
+            // Update instances listbox
             UpdateStatusStrip();
         }
 
@@ -1346,26 +1422,25 @@ namespace GMare
         private void pnlRoomEditor_MouseUp(object sender, MouseEventArgs e)
         {
             // If a room has been loaded
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
                 return;
 
             // Do action based on edit mode of room editor
             switch (pnlRoomEditor.EditMode)
             {
                 case EditType.Layers: break;
-                
                 case EditType.Objects:
 
                     // Update instances listbox
-                    SetSelectedInstances(true);
+                    lstInstances.Invalidate();
 
                     // If the selected object is empty, break
                     if (pnlRoomEditor.SelectedObject == null)
                         break;
 
                     // Remove the object if it already exists in recent object history and recreate it to the top of the list
-                    ProjectManager.Room.RecentObjects.RemoveAll(o => o.Resource.Id == pnlRoomEditor.SelectedObject.Resource.Id);
-                    ProjectManager.Room.RecentObjects.Insert(0, pnlRoomEditor.SelectedObject);
+                    App.Room.RecentObjects.RemoveAll(o => o.Resource.Id == pnlRoomEditor.SelectedObject.Resource.Id);
+                    App.Room.RecentObjects.Insert(0, pnlRoomEditor.SelectedObject);
 
                     // Recreate recent object history menu items
                     SetRecentObjectsMenu(mnuObjects);
@@ -1382,10 +1457,19 @@ namespace GMare
         /// <summary>
         /// Rooom editor mouse position changed
         /// </summary>
-        private void pnlRoomEditor_PositionChanged()
+        private void pnlRoomEditor_MousePositionChanged()
         {
             // Update status strip
             UpdateStatusStrip();
+        }
+
+        /// <summary>
+        /// Instance position changeg event
+        /// </summary>
+        private void pnlRoomEditor_InstancesPositionChanged()
+        {
+            // Refresh changes
+            lstInstances.Invalidate();
         }
 
         /// <summary>
@@ -1397,16 +1481,13 @@ namespace GMare
             SetSelectedInstances(true);
 
             // Set the selected instances
-            if (pnlRoomEditor.SelectedInstances.Count != 0)
+            foreach (GMareInstance instance in pnlRoomEditor.SelectedInstances)
             {
-                foreach (GMareInstance instance in pnlRoomEditor.SelectedInstances)
-                {
-                    // If not showing blocks, and the instance is a block, continue
-                    if (!pnlRoomEditor.ShowBlocks && instance.TileId != -1)
-                        continue;
+                // If not showing blocks, and the instance is a block, continue
+                if (!pnlRoomEditor.ShowBlocks && instance.TileId != -1)
+                    continue;
 
-                    lstInstances.SelectedItems.Add(instance);
-                }
+                lstInstances.SelectedItems.Add(instance);
             }
 
             // Force redraw
@@ -1435,7 +1516,7 @@ namespace GMare
         private void trkMagnify_ValueChanged(object sender, EventArgs e)
         {
             // If the calling object is not a trackbar or the room is empty, return
-            if (!(sender is PyxTrackBar) || ProjectManager.Room == null)
+            if (!(sender is PyxTrackBar) || App.Room == null)
                 return;
 
             // Get the calling trackbar name
@@ -1486,11 +1567,11 @@ namespace GMare
         private DialogResult CheckSave()
         {
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
                 return DialogResult.Abort;
 
             // If the project has not changed, return
-            if (ProjectManager.Changed == false)
+            if (App.Changed == false)
                 return DialogResult.Abort;
 
             // If the room has changed, ask if they want to save before closing
@@ -1512,8 +1593,8 @@ namespace GMare
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             // Save the project, and dispose as the current project
-                            ProjectManager.SaveProject(form.FileName);
-                            ProjectManager.Room = null;
+                            App.SaveProject(form.FileName);
+                            App.Room = null;
                         }
                         else  // Did not save project, treat like "Cancel"
                             return DialogResult.Cancel;
@@ -1521,7 +1602,7 @@ namespace GMare
 
                     break;
 
-                case DialogResult.No: ProjectManager.Room = null; break;
+                case DialogResult.No: App.Room = null; break;
                 case DialogResult.Cancel: return DialogResult.Cancel;
             }
 
@@ -1535,16 +1616,16 @@ namespace GMare
         private void PushHistory()
         {
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null || _loading)
                 return;
 
             // Push room data
             if (_history.InUndoRedo == false)
-                _history.Do(new RoomMemento(new RoomData(ProjectManager.Room.Clone())));
+                _history.Do(new RoomMemento(new RoomData(App.Room.Clone())));
 
             // Set state as changed
-            if (ProjectManager.Changed == false)
-                ProjectManager.Changed = true;
+            if (App.Changed == false)
+                App.Changed = true;
 
             // Set undo/redo buttons
             SetUndoRedo();
@@ -1561,7 +1642,7 @@ namespace GMare
         private void SetTileTools(PyxButton button)
         {
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
                 return;
 
             // Set tool mode for room editor
@@ -1571,12 +1652,16 @@ namespace GMare
                 pnlRoomEditor.ToolMode = ToolType.Bucket;
             else if (button.Name == butSelectionTool.Name)
                 pnlRoomEditor.ToolMode = ToolType.Selection;
-                
+
             // Create radio button behavior for tools
             butBrushTool.Checked = false;
             butBucketFillTool.Checked = false;
             butSelectionTool.Checked = false;
             button.Checked = true;
+
+            // Update any block changes
+            App.Room.UpdateBlockInstances();
+            pnlRoomEditor.Invalidate();
         }
 
         /// <summary>
@@ -1634,7 +1719,7 @@ namespace GMare
             menu.Items.Clear();
 
             // Get menu items
-            ToolStripMenuItem[] items = ProjectManager.Room.GetMenu();
+            ToolStripMenuItem[] items = App.Room.GetMenu();
 
             // If items loaded, set undefined
             if (items.Length > 0)
@@ -1664,12 +1749,12 @@ namespace GMare
         private void SetRecentObjectsMenu(ContextMenuStrip menu)
         {
             // If no objects have been loaded, return
-            if (ProjectManager.Room.Objects.Count == 0)
+            if (App.Room.Objects.Count == 0)
                 return;
 
             // A list of new recent objects
             List<GMareObject> recentObjects = new List<GMareObject>();
-            
+
             // Remove Recent Objects menu items
             menu.Items.RemoveByKey("mnuRecentObjects");
             menu.Items.RemoveByKey("sepRecentObjects");
@@ -1681,10 +1766,10 @@ namespace GMare
             recent.Image = GMare.Properties.Resources.clock_history;
 
             // Iterate through existing items and see if they are still valid
-            foreach (GMareObject gObject in ProjectManager.Room.RecentObjects)
+            foreach (GMareObject gObject in App.Room.RecentObjects)
             {
                 // See if the object still exists
-                GMareObject gObject2 = ProjectManager.Room.Objects.Find(o => o.Resource.Id == gObject.Resource.Id);
+                GMareObject gObject2 = App.Room.Objects.Find(o => o.Resource.Id == gObject.Resource.Id);
 
                 // If the object is empty or at recent list count maximum, continue
                 if (gObject2 == null || recent.DropDownItems.Count >= 20)
@@ -1700,11 +1785,13 @@ namespace GMare
                 Size size = new Size(Math.Min(gObject2.Image.Width, 22), Math.Min(gObject2.Image.Height, 22));
 
                 // Create a menu item for the object
+                Bitmap image = gObject2.Image.ToBitmap();
                 ToolStripMenuItem item = new ToolStripMenuItem();
                 item.Text = gObject2.Resource.Name;
-                item.Image = GMare.Graphics.PixelMap.BitmapResize(gObject2.Image, size);
+                item.Image = GMare.Graphics.PixelMap.BitmapResize(image, size);
                 item.Tag = node;
                 item.Click += new EventHandler(mnuObjectMenuItem_Click);
+                image.Dispose();
 
                 // Add item to recent drop down
                 recent.DropDownItems.Add(item);
@@ -1720,7 +1807,7 @@ namespace GMare
             menu.Items.Insert(1, sep);
 
             // Set recent objects
-            ProjectManager.Room.RecentObjects = recentObjects;
+            App.Room.RecentObjects = recentObjects;
         }
 
         /// <summary>
@@ -1802,20 +1889,21 @@ namespace GMare
             PyxVisualStyle.ApplyVisualStyle();
 
             // Create a new room with a new layer
-            ProjectManager.Room = new GMareRoom();
-            ProjectManager.Room.Layers.Add(new GMareLayer(ProjectManager.Room.Columns, ProjectManager.Room.Rows));
+            _loading = true;
+            App.Room = new GMareRoom();
+            App.Room.Layers.Add(new GMareLayer(App.Room.Columns, App.Room.Rows));
 
             // Set form level variables
-            _history = new UndoRedoHistory<IRoomOwner>(this, 5);
-            _layer = ProjectManager.Room.Layers[0];
+            _history = new UndoRedoHistory<IRoomOwner>(this, App.GetUndoRedoMax());
+            _layer = App.Room.Layers[0];
 
             // Set UI based on room properties
-            butRoomPersistent.Checked = ProjectManager.Room.Persistent;
-            txtRoomName.Text = ProjectManager.Room.Name;
-            txtRoomCaption.Text = ProjectManager.Room.Caption;
-            nudRoomColumns.Value = ProjectManager.Room.Columns;
-            nudRoomRows.Value = ProjectManager.Room.Rows;
-            nudRoomSpeed.Value = ProjectManager.Room.Speed;
+            butRoomPersistent.Checked = App.Room.Persistent;
+            txtRoomName.Text = App.Room.Name;
+            txtRoomCaption.Text = App.Room.Caption;
+            nudRoomColumns.Value = App.Room.Columns;
+            nudRoomRows.Value = App.Room.Rows;
+            nudRoomSpeed.Value = App.Room.Speed;
             pnlBlockEditor.SelectedBackground = _background;
             pnlRoomEditor.EditMode = tabMain.SelectedTab == tabTiles ? EditType.Layers : EditType.Objects;
             txtObject.Text = "<undefined>";
@@ -1830,7 +1918,8 @@ namespace GMare
             UpdateInstanceList();
 
             // Loading the room has triggered history changes, reset the history
-            ProjectManager.Changed = false;
+            _loading = false;
+            App.Changed = false;
             _history.Clear();
 
             // SET UI
@@ -1848,7 +1937,7 @@ namespace GMare
         private void UpdateTitle()
         {
             // Set window title
-            this.Text = "GMare" + " [" + ProjectManager.Room.Name + "] " + "Size: " + ProjectManager.Room.Width + " X " + ProjectManager.Room.Height;
+            this.Text = "GMare" + " [" + App.Room.Name + "] " + "Size: " + App.Room.Width + " X " + App.Room.Height;
         }
 
         /// <summary>
@@ -1861,14 +1950,14 @@ namespace GMare
             lstLayers.Items.Clear();
 
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
             {
                 lstLayers.SelectedIndex = -1;
                 return;
             }
 
             // Iterate through room layers, add layer, and set visible check mark
-            foreach (GMareLayer layer in ProjectManager.Room.Layers)
+            foreach (GMareLayer layer in App.Room.Layers)
             {
                 int i = lstLayers.Items.Add(layer);
                 lstLayers.SetItemChecked(i, layer.Visible);
@@ -1891,14 +1980,14 @@ namespace GMare
             lstLayers.Items.Clear();
 
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
             {
                 lstLayers.SelectedIndex = -1;
                 return;
             }
 
             // Iterate through room layers, add layer, and set visible check mark
-            foreach (GMareLayer layer in ProjectManager.Room.Layers)
+            foreach (GMareLayer layer in App.Room.Layers)
             {
                 int i = lstLayers.Items.Add(layer);
                 lstLayers.SetItemChecked(i, layer.Visible);
@@ -1917,8 +2006,8 @@ namespace GMare
             lstInstances.Items.Clear();
 
             // Add instance items, don't add blocks if not showing blocks
-            lstInstances.Items.AddRange(butShowBlocks.Checked ? ProjectManager.Room.Instances.ToArray() : 
-                ProjectManager.Room.Instances.FindAll(i => i.TileId == -1).ToArray());
+            lstInstances.Items.AddRange(butShowBlocks.Checked ? App.Room.Instances.ToArray() :
+                App.Room.Instances.FindAll(i => i.TileId == -1).ToArray());
 
             // Get a cloned copy of the selected instance in the room editor
             GMareInstance[] selected = (GMareInstance[])pnlRoomEditor.SelectedInstances.ToArray().Clone();
@@ -1927,7 +2016,7 @@ namespace GMare
             foreach (GMareInstance instance in selected)
             {
                 // If the selected instance exists in the instance list, add it to selected on instance list, else remove it from the room editor
-                if (ProjectManager.Room.Instances.Contains(instance))
+                if (App.Room.Instances.Contains(instance))
                     lstInstances.SelectedItems.Add(instance);
                 else
                     pnlRoomEditor.SelectedInstances.Remove(instance);
@@ -1943,12 +2032,21 @@ namespace GMare
         /// <param name="roomData">Undo/Redo room data, if null, use the current room</param>
         private void UpdateImages(RoomData roomData)
         {
-            pnlBackground.SnapSize = roomData == null ? ProjectManager.Room.Backgrounds[0].TileSize : roomData.Room.Backgrounds[0].TileSize;
-            pnlBackground.Image = roomData == null ? ProjectManager.Room.Backgrounds[0].GetCondensedTileset() : roomData.Room.Backgrounds[0].GetCondensedTileset();
-            pnlRoomEditor.SelectedBackground = roomData == null ? ProjectManager.Room.Backgrounds[0] : roomData.Room.Backgrounds[0];
-            pnlRoomEditor.Image = roomData == null ? ProjectManager.Room.Backgrounds[0].GetCondensedTileset() : roomData.Room.Backgrounds[0].GetCondensedTileset();
-            pnlBlockEditor.Image = roomData == null ? ProjectManager.Room.Backgrounds[0].GetSegmentedTileset(1) : roomData.Room.Backgrounds[0].GetSegmentedTileset(1);
-            
+            // If there is no change in background, then there's no need to update the UI
+            if (App.Room != null && roomData != null &&
+                App.Room.Backgrounds.Count > 0 && roomData.Room.Backgrounds.Count > 0 &&
+                App.Room.Backgrounds[0] != null && roomData.Room.Backgrounds[0] != null &&
+                App.Room.Backgrounds[0].Same(roomData.Room.Backgrounds[0]))
+                return;
+
+            // Update all background UI
+            pnlBackground.SnapSize = roomData == null ? App.Room.Backgrounds[0].TileSize : roomData.Room.Backgrounds[0].TileSize;
+            pnlBackground.Image = roomData == null ? App.Room.Backgrounds[0].GetCondensedTileset() : roomData.Room.Backgrounds[0].GetCondensedTileset();
+            pnlRoomEditor.SelectedBackground = roomData == null ? App.Room.Backgrounds[0] : roomData.Room.Backgrounds[0];
+            pnlRoomEditor.Image = roomData == null ? App.Room.Backgrounds[0].GetCondensedTileset() : roomData.Room.Backgrounds[0].GetCondensedTileset();
+            pnlBlockEditor.SelectedBackground = roomData == null ? App.Room.Backgrounds[0] : roomData.Room.Backgrounds[0];
+            pnlBlockEditor.Image = roomData == null ? App.Room.Backgrounds[0].GetSegmentedTileset(1) : roomData.Room.Backgrounds[0].GetSegmentedTileset(1);
+
             // Set room editor tile selection
             pnlRoomEditor.Tiles = pnlBackground.TileBrush;
         }
@@ -1958,7 +2056,7 @@ namespace GMare
         /// </summary>
         private void UpdateBackgrounds()
         {
-            _background = ProjectManager.Room.Backgrounds[0];
+            _background = App.Room.Backgrounds[0];
             pnlRoomEditor.SelectedBackground = _background;
             pnlBlockEditor.SelectedBackground = _background;
             pnlBackground.SnapSize = _background.TileSize;
@@ -1977,7 +2075,7 @@ namespace GMare
             mnuObjects.Items.Clear();
 
             // If no nodes were loaded, return
-            if (ProjectManager.Room.Nodes == null)
+            if (App.Room.Nodes == null)
             {
                 UpdateObjectUI(false);
                 return;
@@ -2023,8 +2121,8 @@ namespace GMare
                     break;
 
                 case EditType.Objects:
-                    sslInfo.Text = "Instances: " + ProjectManager.Room.Instances.Count + " | " + pnlRoomEditor.MouseInstance;
-                    sslTool.Text = "Shift + Left Mouse Button to multi-select.";
+                    sslInfo.Text = "Instances: " + App.Room.Instances.Count + " | " + pnlRoomEditor.MouseInstance;
+                    sslTool.Text = "Shift + Left Button to multi-select. Alt + Left Button to paint.";
                     sslTool.Image = GMare.Properties.Resources.tool_selection;
                     break;
             }
@@ -2036,17 +2134,18 @@ namespace GMare
         private void UpdateUI()
         {
             // If the room is empty, return
-            if (ProjectManager.Room == null)
+            if (App.Room == null)
                 return;
 
             // Set UI based on room properties
-            butRoomPersistent.Checked = ProjectManager.Room.Persistent;
-            txtRoomName.Text = ProjectManager.Room.Name;
-            txtRoomCaption.Text = ProjectManager.Room.Caption;
-            nudRoomColumns.Value = ProjectManager.Room.Columns;
-            nudRoomRows.Value = ProjectManager.Room.Rows;
-            nudRoomSpeed.Value = ProjectManager.Room.Speed;
-            txtObject.Enabled = ProjectManager.Room.Nodes == null ? false : true;
+            _loading = true;
+            butRoomPersistent.Checked = App.Room.Persistent;
+            txtRoomName.Text = App.Room.Name;
+            txtRoomCaption.Text = App.Room.Caption;
+            nudRoomColumns.Value = App.Room.Columns;
+            nudRoomRows.Value = App.Room.Rows;
+            nudRoomSpeed.Value = App.Room.Speed;
+            txtObject.Enabled = App.Room.Nodes == null ? false : true;
 
             // Update UI
             UpdateLayerList(0);
@@ -2060,8 +2159,9 @@ namespace GMare
             // Invalidate the room editor
             pnlRoomEditor.Invalidate();
 
-            // Loading the room has triggered history changes, reset the history
-            ProjectManager.Changed = false;
+            // Reset the history
+            _loading = false;
+            App.Changed = false;
             _history.Clear();
 
             SetUndoRedo();

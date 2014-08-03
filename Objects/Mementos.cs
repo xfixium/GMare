@@ -26,6 +26,7 @@
 #endregion
 
 using System;
+using System.IO;
 using System.Drawing;
 using System.Collections.Generic;
 using GenericUndoRedo;
@@ -40,7 +41,7 @@ namespace GMare.Objects
         #region Members
 
         /// <summary>
-        /// Room data property memeber.
+        /// Room data property member
         /// </summary>
         RoomData Data
         {
@@ -59,7 +60,7 @@ namespace GMare.Objects
         #region Members
 
         /// <summary>
-        /// Tile data property member.
+        /// Tile data property member
         /// </summary>
         TileData Data
         {
@@ -77,16 +78,16 @@ namespace GMare.Objects
     {
         #region Fields
 
-        private RoomData _data;  // Room data.
+        private RoomData _data;  // Room data
 
         #endregion
 
-        #region Constructor
+        #region Constructors
 
         /// <summary>
-        /// Constructs a new room memento.
+        /// Constructs a new room memento
         /// </summary>
-        /// <param name="data">The room to serialize.</param>
+        /// <param name="data">The room to serialize</param>
         public RoomMemento(RoomData data)
         {
             // Set room data.
@@ -95,13 +96,13 @@ namespace GMare.Objects
 
         #endregion
 
-        #region IMemento<IRoomOwner> Members
+        #region Methods
 
         /// <summary>
-        /// Restore member.
+        /// Restore member
         /// </summary>
-        /// <param name="target">The room owner.</param>
-        /// <returns>A restored momento.</returns>
+        /// <param name="target">The room owner</param>
+        /// <returns>A restored momento</returns>
         public IMemento<IRoomOwner> Restore(IRoomOwner target)
         {
             IMemento<IRoomOwner> inverse = new RoomMemento(target.Data);
@@ -119,16 +120,16 @@ namespace GMare.Objects
     {
         #region Fields
 
-        private TileData _data;  // Tiles data.
+        private TileData _data;  // Tiles data
 
         #endregion
 
         #region Constructor
 
         /// <summary>
-        /// Constructs a new tiles momento.
+        /// Constructs a new tiles momento
         /// </summary>
-        /// <param name="room">The tile data to store.</param>
+        /// <param name="room">The tile data to store</param>
         public TilesMemento(TileData data)
         {
             // Set tile data.
@@ -137,13 +138,13 @@ namespace GMare.Objects
 
         #endregion
 
-        #region IMemento<ITilesOwner> Members
+        #region Methods
 
         /// <summary>
-        /// Restore memento.
+        /// Restore memento
         /// </summary>
-        /// <param name="target">Tiles owner, the target.</param>
-        /// <returns>A restored memento.</returns>
+        /// <param name="target">Tiles owner, the target</param>
+        /// <returns>A restored memento</returns>
         public IMemento<ITilesOwner> Restore(ITilesOwner target)
         {
             IMemento<ITilesOwner> inverse = new TilesMemento(target.Data);
@@ -189,11 +190,11 @@ namespace GMare.Objects
         #region Constructor
 
         /// <summary>
-        /// Constructs a new tile data object.
+        /// Constructs a new tile data object
         /// </summary>
-        /// <param name="tiles">The tile bitmap collection.</param>
-        /// <param name="layer">The layer data.</param>
-        /// <param name="cols">The number of columns.</param>
+        /// <param name="tiles">The tile bitmap collection</param>
+        /// <param name="layer">The layer data</param>
+        /// <param name="cols">The number of columns</param>
         public TileData(List<Bitmap> tiles, int cols)
         {
             _tiles = tiles;
@@ -204,13 +205,13 @@ namespace GMare.Objects
     }
 
     /// <summary>
-    /// 
+    /// Room data for a room owner
     /// </summary>
     public class RoomData
     {
         #region Fields
 
-        private GMareRoom _room = null;       // The room object.
+        private GMareRoom _room = null;  // The room object
 
         #endregion
 
@@ -229,15 +230,15 @@ namespace GMare.Objects
         #region Constructor
 
         /// <summary>
-        /// Constructs a new room data object.
+        /// Constructs a new room data object
         /// </summary>
-        /// <param name="room">The room object.</param>
-        /// <param name="layer">The selected edit item.</param>
-        /// <param name="instance">The selected instance.</param>
-        /// <param name="shape">The selected shape.</param>
+        /// <param name="room">The room object</param>
+        /// <param name="layer">The selected edit item</param>
+        /// <param name="instance">The selected instance</param>
+        /// <param name="shape">The selected shape</param>
         public RoomData(GMareRoom room)
         {
-            // Set data.
+            // Set data
             _room = room;
         }
 

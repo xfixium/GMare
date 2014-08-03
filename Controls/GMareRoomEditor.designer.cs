@@ -69,9 +69,11 @@
             // 
             // pnlRoom
             // 
+            this.pnlRoom.AltKey = false;
+            this.pnlRoom.AvoidMouseEvents = false;
             this.pnlRoom.BackColor = System.Drawing.Color.White;
             this.pnlRoom.Brush = null;
-            this.pnlRoom.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.pnlRoom.ControlKey = false;
             this.pnlRoom.DepthIndex = 0;
             this.pnlRoom.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlRoom.EditMode = GMare.Objects.EditType.Layers;
@@ -79,6 +81,7 @@
             this.pnlRoom.GridX = 16;
             this.pnlRoom.GridY = 16;
             this.pnlRoom.HandKey = false;
+            this.pnlRoom.InvertGridColor = false;
             this.pnlRoom.LayerIndex = -1;
             this.pnlRoom.Level = 0;
             this.pnlRoom.Location = new System.Drawing.Point(0, 0);
@@ -96,8 +99,9 @@
             this.pnlRoom.TabIndex = 6;
             this.pnlRoom.ToolMode = GMare.Objects.ToolType.Brush;
             this.pnlRoom.Zoom = 1F;
-            this.pnlRoom.PositionChanged += new GMare.Controls.GMareRoomPanel.PositionHandler(this.pnlRoom_PositionChanged);
-            this.pnlRoom.SelectedInstanceChanged += new GMare.Controls.GMareRoomPanel.InstanceChangedHandler(this.pnlRoom_InstanceChanged);
+            this.pnlRoom.MousePositionChanged += new GMare.Controls.GMareRoomPanel.MousePositionHandler(this.pnlRoom_MousePositionChanged);
+            this.pnlRoom.SelectedInstancesPositionChanged += new GMare.Controls.GMareRoomPanel.InstancePositionHandler(this.pnlRoom_InstancesPositionChanged);
+            this.pnlRoom.SelectedInstanceChanged += new GMare.Controls.GMareRoomPanel.InstanceChangedHandler(this.pnlRoom_InstancesChanged);
             this.pnlRoom.RoomChanging += new GMare.Controls.GMareRoomPanel.RoomChangingHandler(this.pnlRoom_RoomChanged);
             this.pnlRoom.ClipboardChanged += new GMare.Controls.GMareRoomPanel.ClipboardChangedHandler(this.pnlRoom_ClipboardChanged);
             this.pnlRoom.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlRoom_MouseDown);

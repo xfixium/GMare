@@ -35,6 +35,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using GameMaker.Resource;
 using GMare.Objects;
+using Pyxosoft.Windows.Tools.PyxTools.Controls;
 
 namespace GMare.Forms
 {
@@ -45,8 +46,9 @@ namespace GMare.Forms
     {
         #region Fields
 
-        private bool _changed = false;      // If project export data has changed
-        private bool _allowChange;  // Change flag on start up
+        private string _backgroundHeader = "";  // Base text for background group box header
+        private bool _changed = false;          // If project export data has changed
+        private bool _allowChange;              // Change flag on start up
 
         #endregion
 
@@ -68,26 +70,30 @@ namespace GMare.Forms
         {
             InitializeComponent();
 
+            // Set base header
+            _backgroundHeader = grpBackgrounds.Text;
+
             // If no native project was found, create one
-            if (ProjectManager.Room.Projects.Find(p => p.Native == true) == null)
+            if (App.Room.Projects.Find(p => p.Native == true) == null)
             {
                 ExportProject project = new ExportProject();
                 project.Native = true;
-                ProjectManager.Room.Projects.Add(project);
+                project.Background = App.Room.Backgrounds[0].Clone();
+                App.Room.Projects.Add(project);
 
                 // Project changed
                 _changed = true;
             }
 
             // Update the native project
-            ExportProject native = ProjectManager.Room.Projects.Find(p => p.Native == true);
+            ExportProject native = App.Room.Projects.Find(p => p.Native == true);
 
             // If project changed
-            if (native.Name != ProjectManager.Room.Name || native.RoomPath != ProjectManager.SavePath)
+            if (native.Name != App.Room.Name || native.RoomPath != App.SavePath)
                 _changed = true;
 
-            native.Name = ProjectManager.Room.Name;
-            native.RoomPath = ProjectManager.SavePath;
+            native.Name = App.Room.Name;
+            native.RoomPath = App.SavePath;
 
             // Select first script option
             cboScripts.SelectedIndex = 0;
@@ -183,11 +189,11 @@ namespace GMare.Forms
                 foreach (string path in form.FileNames)
                 {
                     // If the path is the same as this project's path, continue
-                    if (path == ProjectManager.SavePath)
+                    if (path == App.SavePath)
                         continue;
 
                     // Get the room data
-                    GMareRoom room = ProjectManager.GetGMareProject(path);
+                    GMareRoom room = App.GetProject(path);
 
                     // If the room is empty, continue
                     if (room == null)
@@ -202,15 +208,17 @@ namespace GMare.Forms
                         project = new ExportProject();
                         project.Name = room.Name;
                         project.RoomPath = path;
+                        project.Background = App.Room.Backgrounds[0].Clone();
                     }
                     else
                         project = room.Projects.Find(p => p.Native).Clone();
 
                     // The project is not native to this project
                     project.Native = false;
+                    project.Background = room.Backgrounds[0];
 
                     // Add the room to the project list
-                    ProjectManager.Room.Projects.Add(project);
+                    App.Room.Projects.Add(project);
                 }
 
                 // Update project list
@@ -242,7 +250,7 @@ namespace GMare.Forms
             }
 
             // Remove project and update project list
-            ProjectManager.Room.Projects.Remove(project);
+            App.Room.Projects.Remove(project);
             UpdateProjectList(lstRooms.Items.Count == 1 ? -1 : lstRooms.SelectedIndex >= lstRooms.Items.Count - 1 ? lstRooms.Items.Count - 2 : lstRooms.SelectedIndex);
 
             // Export projects have changed
@@ -266,8 +274,8 @@ namespace GMare.Forms
             if (index - 1 > -1)
             {
                 // Remove, insert, and select the swap item
-                ProjectManager.Room.Projects.RemoveAt(index);
-                ProjectManager.Room.Projects.Insert(index - 1, swap);
+                App.Room.Projects.RemoveAt(index);
+                App.Room.Projects.Insert(index - 1, swap);
                 UpdateProjectList(index - 1);
 
                 // Export projects have changed
@@ -292,8 +300,8 @@ namespace GMare.Forms
             if (index + 1 < lstRooms.Items.Count)
             {
                 // Remove, insert, and select the swap item
-                ProjectManager.Room.Projects.RemoveAt(index);
-                ProjectManager.Room.Projects.Insert(index + 1, swap);
+                App.Room.Projects.RemoveAt(index);
+                App.Room.Projects.Insert(index + 1, swap);
                 UpdateProjectList(index + 1);
 
                 // Export projects have changed
@@ -307,7 +315,7 @@ namespace GMare.Forms
         private void butCheckAll_CheckChanged(object sender)
         {
             // Iterate through projects, set exporting flag
-            foreach (ExportProject project in ProjectManager.Room.Projects)
+            foreach (ExportProject project in App.Room.Projects)
                 project.Exporting = butCheckAll.Checked;
 
             // Update project list
@@ -350,13 +358,13 @@ namespace GMare.Forms
                 txtProjectPath.Text = string.Empty;
                 txtProjectPath.ToolTipText = "";
                 txtBackgroundName.Text = "None";
-                txtBackgroundId.Text = "None";
-                txtTileWidth.Text = "0";
-                txtTileHeight.Text = "0";
-                txtTileOffsetX.Text = "0";
-                txtTileOffsetY.Text = "0";
-                txtTileSeparationX.Text = "0";
-                txtTileSeparationY.Text = "0";
+                grpBackgrounds.Text = _backgroundHeader;
+                nudTileWidth.Text = "0";
+                nudTileHeight.Text = "0";
+                nudTileOffsetX.Text = "0";
+                nudTileOffsetY.Text = "0";
+                nudTileSeparationX.Text = "0";
+                nudTileSeparationY.Text = "0";
                 grpRoomProperties.Enabled = false;
                 grpBackgrounds.Enabled = false;
                 return;
@@ -365,17 +373,17 @@ namespace GMare.Forms
             // Set properties UI
             ExportProject project = (ExportProject)lstRooms.SelectedItem;
             txtRoomName.Text = project.Name;
-            txtProjectPath.Text = project.Native ? ProjectManager.SavePath : project.RoomPath;
+            txtProjectPath.Text = project.Native ? App.SavePath : project.RoomPath;
             txtProjectPath.Enabled = project.Native ? false : true;
             txtProjectPath.ToolTipText = project.RoomPath;
             txtBackgroundName.Text = (project.Background.Name == "" ? "None" : project.Background.Name);
-            txtBackgroundId.Text = (project.Background.GameMakerId == -1 ? "None" : project.Background.GameMakerId.ToString());
-            txtTileWidth.Text = project.Background.TileWidth.ToString();
-            txtTileHeight.Text = project.Background.TileHeight.ToString();
-            txtTileOffsetX.Text = project.Background.OffsetX.ToString();
-            txtTileOffsetY.Text = project.Background.OffsetY.ToString();
-            txtTileSeparationX.Text = project.Background.SeparationX.ToString();
-            txtTileSeparationY.Text = project.Background.SeparationY.ToString();
+            grpBackgrounds.Text = _backgroundHeader + " (ID: " + project.Background.GameMakerId.ToString() + ")";
+            nudTileWidth.Value = project.Background.TileWidth;
+            nudTileHeight.Value = project.Background.TileHeight;
+            nudTileOffsetX.Value = project.Background.OffsetX;
+            nudTileOffsetY.Value = project.Background.OffsetY;
+            nudTileSeparationX.Value = project.Background.SeparationX;
+            nudTileSeparationY.Value = project.Background.SeparationY;
             chkWriteTiles.Checked = project.WriteTiles;
             chkUseFlipped.Checked = project.UseFlipValues;
             chkUseColor.Checked = project.UseBlendColor;
@@ -390,7 +398,7 @@ namespace GMare.Forms
         private void lstRooms_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             // Set project as exporting
-            ProjectManager.Room.Projects[e.Index].Exporting = e.NewValue == CheckState.Checked ? true : false;
+            App.Room.Projects[e.Index].Exporting = e.NewValue == CheckState.Checked ? true : false;
 
             // Export projects have changed
             _changed = _allowChange;
@@ -410,7 +418,7 @@ namespace GMare.Forms
             
             // If the native room, change the name of the room name
             if ((lstRooms.SelectedItem as ExportProject).Native)
-                ProjectManager.Room.Name = (string)txtRoomName.Text.Clone();
+                App.Room.Name = (string)txtRoomName.Text.Clone();
             
             // Refresh the project list
             UpdateProjectList(lstRooms.SelectedIndex);
@@ -471,8 +479,6 @@ namespace GMare.Forms
                 // Set UI flags
                 chkUseFlipped.Checked = chkWriteTiles.Checked ? chkUseFlipped.Checked : false;
                 chkUseColor.Checked = chkWriteTiles.Checked ? chkUseFlipped.Checked : false;
-                //chkUseFlipped.Enabled = chkWriteTiles.Checked;
-                //chkUseColor.Enabled = chkWriteTiles.Checked;
 
                 // Set project flags
                 project.WriteTiles = chkWriteTiles.Checked;
@@ -498,40 +504,112 @@ namespace GMare.Forms
                 return;
 
             // Create an open file dialog box
-            using (OpenFileDialog form = new OpenFileDialog())
+            using (OpenFileDialog ofd = new OpenFileDialog())
             {
                 // Set file filter
-                form.Filter = "Supported Files (.gmk, .gm6, .gmd .gm81)|*.gmk;*.gm6;*.gmd;*.gm81;*.gmx;";
+                ofd.Filter = "Supported Files (.bmp, .png, .gif, .gmk, .gm6, .gmd .gm81 .gmx)|*.bmp;*.png;*.gif;*.gmk;*.gm6;*.gmd;*.gm81;*.gmx;";
 
                 // If the dialog result was not Ok, return
-                if (form.ShowDialog() != DialogResult.OK)
+                if (ofd.ShowDialog() != DialogResult.OK)
                     return;
 
-                // Create a Game Maker project form
-                using (GMProjectLoadForm iof = new GMProjectLoadForm(form.FileName))
+                
+                // If getting a background object from a Game Maker project file
+                if (ofd.FileName.Substring(ofd.FileName.LastIndexOf(".")).ToLower().Contains("gm") == true)
                 {
-                    // Show the form
-                    iof.ShowDialog();
-
-                    // Create a new import background form
-                    using (ImportBackgroundForm backgroundForm = new ImportBackgroundForm(iof.Project.Backgrounds.FindAll(b => b.UseAsTileSet == true).ToArray()))
+                    // Create a Game Maker project form
+                    using (ProjectIOForm iof = new ProjectIOForm(ofd.FileName, true))
                     {
-                        // If dialog result is Ok
-                        if (backgroundForm.ShowDialog() == DialogResult.OK)
-                        {
-                            // Set background and update list
-                            if (backgroundForm.Background != null)
-                            {
-                                (lstRooms.SelectedItem as ExportProject).Background = backgroundForm.Background;
-                                UpdateProjectList(lstRooms.SelectedIndex);
+                        // Show the form
+                        iof.ShowDialog();
 
-                                // Export projects have changed
-                                _changed = _allowChange;
-                            }
+                        // Create a new import background form
+                        using (ImportBackgroundForm backgroundForm = new ImportBackgroundForm(iof.GMProject.Backgrounds.FindAll(b => b.UseAsTileSet == true).ToArray()))
+                        {
+                            // If dialog result is not Ok, or the background is empty, return
+                            if (backgroundForm.ShowDialog() != DialogResult.OK || backgroundForm.Background == null)
+                                return;
+
+                            (lstRooms.SelectedItem as ExportProject).Background = backgroundForm.Background;
+                            UpdateProjectList(lstRooms.SelectedIndex);
+
+                            // Export projects have changed
+                            _changed = _allowChange;
                         }
                     }
                 }
+                else
+                {
+                    // Create a new file stream
+                    using (FileStream fs = new FileStream(ofd.FileName, FileMode.Open, FileAccess.Read))
+                    {
+                        // Get a bitmap from disk
+                        Bitmap image = (Bitmap)Image.FromStream(fs);
+                        GMareBackground background = new GMareBackground();
+                        background.Name = Path.GetFileNameWithoutExtension(ofd.FileName);
+                        background.Image = new Graphics.PixelMap(image);
+
+                        (lstRooms.SelectedItem as ExportProject).Background = background;
+                        UpdateProjectList(lstRooms.SelectedIndex);
+
+                        // Export projects have changed
+                        _changed = _allowChange;
+                    }
+                }
             }
+        }
+
+        /// <summary>
+        /// Background name changed
+        /// </summary>
+        private void txtBackgroundName_TextChanged(object sender, EventArgs e)
+        {
+            // If a project was not selected, return
+            if (lstRooms.SelectedItem == null)
+                return;
+
+            // Change the name of the room's background
+            (lstRooms.SelectedItem as ExportProject).Background.Name = txtBackgroundName.Text;
+
+            // Refresh the project list
+            UpdateProjectList(lstRooms.SelectedIndex);
+
+            // Export projects have changed
+            _changed = _allowChange;
+        }
+
+        /// <summary>
+        /// Background numeric property has changed
+        /// </summary>
+        private void background_ValueChanged(object sender, EventArgs e)
+        {
+            // If a project was not selected or the name text box has no focus, return
+            if (lstRooms.SelectedItem == null || !(sender is PyxNumericUpDown))
+                return;
+
+            // Get the control name
+            ExportProject project = (lstRooms.SelectedItem as ExportProject);
+            string name = (sender as PyxNumericUpDown).Name;
+
+            // Change background property
+            if (name == nudTileWidth.Name)
+                project.Background.TileWidth = (int)nudTileWidth.Value;
+            else if (name == nudTileHeight.Name)
+                project.Background.TileHeight = (int)nudTileHeight.Value;
+            else if (name == nudTileOffsetX.Name)
+                project.Background.OffsetX = (int)nudTileOffsetX.Value;
+            else if (name == nudTileOffsetY.Name)
+                project.Background.OffsetY = (int)nudTileOffsetY.Value;
+            else if (name == nudTileSeparationX.Name)
+                project.Background.SeparationX = (int)nudTileSeparationX.Value;
+            else if (name == nudTileSeparationY.Name)
+                project.Background.SeparationY = (int)nudTileSeparationY.Value;
+
+            // Refresh the project list
+            UpdateProjectList(lstRooms.SelectedIndex);
+
+            // Export projects have changed
+            _changed = _allowChange;
         }
 
         #endregion
@@ -548,10 +626,14 @@ namespace GMare.Forms
             lstRooms.Items.Clear();
 
             // Add projects to export to the project list
-            for (int i = 0; i < ProjectManager.Room.Projects.Count; i++)
+            for (int i = 0; i < App.Room.Projects.Count; i++)
             {
-                lstRooms.Items.Add(ProjectManager.Room.Projects[i]);
-                lstRooms.SetItemChecked(i, ProjectManager.Room.Projects[i].Exporting);
+                // Refresh the native project if needed
+                if (App.Room.Projects[i].Native && App.Room.Projects[i].Background.Image == null)
+                    App.Room.Projects[i].Background = App.Room.Backgrounds[0];
+
+                lstRooms.Items.Add(App.Room.Projects[i]);
+                lstRooms.SetItemChecked(i, App.Room.Projects[i].Exporting);
             }
 
             // Set selected index
@@ -581,7 +663,7 @@ namespace GMare.Forms
                         continue;
 
                     // Get the room
-                    GMareRoom room = project.Native ? ProjectManager.Room : ProjectManager.OpenProject(project.RoomPath);
+                    GMareRoom room = project.Native ? App.Room : App.GetProject(project.RoomPath);
 
                     // Write room name and size of room data
                     writer.Write((byte)project.Name.Length);
@@ -607,7 +689,7 @@ namespace GMare.Forms
                         int offsetX = project.Background.OffsetX;
                         int tileWidth = project.Background.TileWidth;
                         int separationX = project.Background.SeparationX;
-                        int backgroundCols = (width - (((width - offsetX) / tileWidth) * separationX)) / tileWidth;
+                        int backgroundCols = project.Background.GetGridSize().Width;
 
                         // Write room data
                         writer.Write((int)room.Layers.Count);

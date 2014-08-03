@@ -35,6 +35,7 @@ namespace GMare.Forms
             this.lblVersion = new System.Windows.Forms.Label();
             this.grpCredits = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxGroupBox();
             this.txtInformation = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxRichTextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.grpCredits.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -83,6 +84,7 @@ namespace GMare.Forms
             // grpCredits
             // 
             this.grpCredits.BackColor = System.Drawing.Color.Transparent;
+            this.grpCredits.Controls.Add(this.label1);
             this.grpCredits.Controls.Add(this.txtInformation);
             this.grpCredits.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.grpCredits.Location = new System.Drawing.Point(4, 4);
@@ -106,6 +108,17 @@ namespace GMare.Forms
             this.txtInformation.Text = resources.GetString("txtInformation.Text");
             this.txtInformation.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.rtxtInformation_LinkClicked);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.Crimson;
+            this.label1.Location = new System.Drawing.Point(268, 8);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(33, 13);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "Beta";
+            // 
             // AboutForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -126,6 +139,7 @@ namespace GMare.Forms
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "About GMare";
             this.grpCredits.ResumeLayout(false);
+            this.grpCredits.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -139,5 +153,6 @@ namespace GMare.Forms
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxRichTextBox txtInformation;
         private System.Windows.Forms.Label lblVersion;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxGroupBox grpCredits;
+        private System.Windows.Forms.Label label1;
     }
 }

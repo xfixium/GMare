@@ -34,15 +34,27 @@ namespace GameMaker.Resource
     {
         #region Fields
 
+        private byte[] _data = null;
+        private string _filePath = "";
         private int _width = 32;
         private int _height = 32;
-        private byte[] _data = null;
         private bool _compressed = true;
-        private string _imagePath = string.Empty;
 
         #endregion
 
         #region Properties
+
+        public byte[] Data
+        {
+            get { return _data; }
+            set { _data = value; }
+        }
+
+        public string FilePath
+        {
+            get { return _filePath; }
+            set { _filePath = value; }
+        }
 
         public int Width
         {
@@ -56,22 +68,10 @@ namespace GameMaker.Resource
             set { _height = value; }
         }
 
-        public byte[] Data
-        {
-            get { return _data; }
-            set { _data = value; }
-        }
-
         public bool Compressed
         {
             get { return _compressed; }
             set { _compressed = value; }
-        }
-
-        public string ImagePath
-        {
-            get { return _imagePath; }
-            set { _imagePath = value; }
         }
 
         #endregion

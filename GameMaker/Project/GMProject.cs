@@ -27,6 +27,7 @@
 
 using System;
 using System.IO;
+using System.Xml;
 using System.Collections.Generic;
 using GameMaker.Common;
 using GameMaker.Resource;
@@ -62,6 +63,7 @@ namespace GameMaker.Project
         public GMList<GMRoom> Rooms = new GMList<GMRoom>();
         public GMList<GMPackage> Packages = new GMList<GMPackage>();
         public GMList<GMLibrary> Libraries = new GMList<GMLibrary>();
+        public GMList<GMShader> Shaders = new GMList<GMShader>();
 
         #endregion
 
@@ -140,6 +142,102 @@ namespace GameMaker.Project
         #endregion
 
         #region Read
+
+        /// <summary>
+        /// Reads a Game Maker Studio project file
+        /// </summary>
+        private void ReadProjectGMS(string file)
+        {
+            // Set version
+            GameMakerVersion = GMVersionType.GameMakerStudio;
+
+            // Path with project file removed
+            string folder = file.Remove(file.LastIndexOf("\\"));
+
+            // Set up resource directory strings
+            Dictionary<GMResourceType, string> directories = new Dictionary<GMResourceType, string>();
+            directories.Add(GMResourceType.Assets, file);
+            directories.Add(GMResourceType.DataFiles, file);
+            directories.Add(GMResourceType.Configs, file);
+            directories.Add(GMResourceType.Constants, file);
+            directories.Add(GMResourceType.Hash, file);
+            directories.Add(GMResourceType.Backgrounds, folder + "\\" + "background");
+            directories.Add(GMResourceType.Objects, folder + "\\" + "objects");
+            directories.Add(GMResourceType.Rooms, folder + "\\" + "rooms");
+            directories.Add(GMResourceType.Sprites, folder + "\\" + "sprites");
+            directories.Add(GMResourceType.Sounds, folder + "\\" + "sound");
+            directories.Add(GMResourceType.TimeLines, folder + "\\" + "timelines");
+            directories.Add(GMResourceType.Shaders, folder + "\\" + "shaders");
+            directories.Add(GMResourceType.Scripts, folder + "\\" + "scripts");
+            directories.Add(GMResourceType.Paths, folder + "\\" + "paths");
+
+            // Resource load index
+            int index = 0;
+
+            // Iterate through directories
+            foreach (KeyValuePair<GMResourceType, string> item in directories)
+            {
+                // Increment directory index
+                index++;
+
+                // If the directory does not exist, continue
+                if (Path.GetExtension(item.Value) != ".gmx" && !Directory.Exists(item.Value))
+                    continue;
+
+                // Progress changed
+                ProgressChanged("Reading " + item.Key.ToString() + "...", index, directories.Count);
+
+                // Load data based on resource type
+                switch (item.Key)
+                {
+                    case GMResourceType.Hash: Settings.Hash = ReadHashGMX(item.Value); break;
+                    case GMResourceType.Assets: ProjectTree = GMNode.ReadTreeGMX(item.Value); Assets = (List<string>)ProjectTree.Tag; break;
+                    case GMResourceType.DataFiles: DataFiles = GMDataFile.ReadDataFilesGMX(item.Value); break;
+                    //case GMResourceType.Configs: Settings.Configs = GMSettings.GetConfigsGMX(item.Value); break;
+                    //case GMResourceType.Constants: Settings.Constants = GMSettings.ReadConstantsGMX(item.Value); break;
+                    case GMResourceType.Backgrounds: Backgrounds = GMBackground.ReadBackgroundGMX(item.Value, ref Assets); break;
+                    case GMResourceType.Objects: Objects = GMObject.ReadObjectsGMX(item.Value, ref Assets); break;
+                    case GMResourceType.Rooms: Rooms = GMRoom.ReadRoomsGMX(item.Value, ref Assets, out LastTileId); break;
+                    //case GMResourceType.TimeLines: Timelines = GMTimeline.ReadTimelinesGMX(item.Value, Assets); break;
+                    //case GMResourceType.Sounds: Sounds = GMSound.ReadSoundsGMX(item.Value, ref Assets); break;
+                    //case GMResourceType.Shaders: Shaders = GMShader.ReadShadersGMX(item.Value, ref Assets); break;
+                    //case GMResourceType.Scripts: Scripts = GMScript.ReadScriptsGMX(item.Value, ref Assets); break;
+                    //case GMResourceType.Paths: Paths = GMPath.ReadPathsGMX(item.Value, ref Assets); break;
+                    //case GMResourceType.TimeLines: Timelines = GMTimeline.ReadTimelinesGMX(item.Value, Assets); break;
+                }
+            }
+
+            // Retrieve tutorial data
+            foreach (GMNode node in ProjectTree.Nodes)
+            {
+                // If the node is the tutorial state node and it has the nodes we're looking for
+                if (node.ResourceType == GMResourceType.TutorialState && node.Nodes != null && node.Nodes.Length == 3)
+                {
+                    Settings.IsTutorial = node.Nodes[0].Nodes == null ? Settings.IsTutorial : GMResource.GMXBool(node.Nodes[0].Nodes[0].Name, true);
+                    Settings.TutorialName = node.Nodes[1].Nodes == null ? Settings.TutorialName : GMResource.GMXString(node.Nodes[1].Nodes[0].FilePath, "");
+                    Settings.TutorialPage = node.Nodes[2].Nodes == null ? Settings.TutorialPage : GMResource.GMXInt(node.Nodes[2].Nodes[0].Name, 0);
+                }
+            }
+
+            // Progress event
+            ProgressChanged("Finished Reading Project.", index, directories.Count);
+        }
+
+        /// <summary>
+        /// Gets hash from project file
+        /// </summary>
+        /// <param name="path">File path to project file</param>
+        private static string ReadHashGMX(string path)
+        {
+            using (FileStream fs = new FileStream(path, FileMode.Open))
+            {
+                using (XmlTextReader reader = new XmlTextReader(new StreamReader(fs)))
+                {
+                    reader.MoveToContent();
+                    return reader.HasAttributes ? reader.GetAttribute(0) : "";
+                }
+            }
+        }
 
         /// <summary>
         /// Reads a Game Maker project file
@@ -337,59 +435,6 @@ namespace GameMaker.Project
                 // Progress event
                 ProgressChanged("Finished Reading Project.", reader.BaseStream.Position, length);
             }
-        }
-
-        /// <summary>
-        /// Reads a Game Maker Studio project file
-        /// </summary>
-        private void ReadProjectGMS(string file)
-        {
-            // Set version
-            GameMakerVersion = GMVersionType.GameMakerStudio;
-
-            // Path with project file removed
-            string folder = file.Remove(file.LastIndexOf("\\"));
-
-            // Set up resource directory strings
-            Dictionary<GMResourceType, string> directories = new Dictionary<GMResourceType, string>();
-            directories.Add(GMResourceType.Assets, file);
-            directories.Add(GMResourceType.Backgrounds, folder + "\\" + "background");
-            directories.Add(GMResourceType.Objects, folder + "\\" + "objects");
-            directories.Add(GMResourceType.Rooms, folder + "\\" + "rooms");
-            directories.Add(GMResourceType.Sprites, folder + "\\" + "sprites");
-
-            // Resource load index
-            int index = 0;
-
-            // A list of assets from the project. these are needed first
-            List<string> assets = new List<string>();
-
-            // Iterate through directories
-            foreach (KeyValuePair<GMResourceType, string> item in directories)
-            {
-                // Increment directory index
-                index++;
-
-                // If the directory does not exist, continue
-                if (item.Key != GMResourceType.Assets && !Directory.Exists(item.Value))
-                    continue;
-
-                // Progress changed
-                ProgressChanged("Reading " + item.Key.ToString(), index, directories.Count);
-
-                // Load data based on resource type
-                switch (item.Key)
-                {
-                    case GMResourceType.Assets: this.ProjectTree = GMNode.ReadTreeGMX(item.Value, out Assets); break;
-                    case GMResourceType.Backgrounds: this.Backgrounds = GMBackground.ReadBackgroundGMX(item.Value, Assets); break;
-                    case GMResourceType.Objects: this.Objects = GMObject.ReadObjectsGMX(item.Value, Assets); break;
-                    case GMResourceType.Rooms: this.Rooms = GMRoom.ReadRoomsGMX(item.Value, Assets, out LastTileId); break;
-                    case GMResourceType.Sprites: this.Sprites = GMSprite.ReadSpritesGMX(item.Value, Assets); break;
-                }
-            }
-
-            // Progress event
-            ProgressChanged("Finished Reading Project.", index, directories.Count);
         }
 
         /// <summary>

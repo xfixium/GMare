@@ -35,21 +35,15 @@ namespace GameMaker.Resource
     {
         #region Fields
 
-        private EventType _mainType = EventType.None;
         private GMAction[] _actions = null;
         private string _otherName = "";
+        private int _mainType = -1;
         private int _subType = 0;
         private int _otherId = -1;
 
         #endregion
 
         #region Properties
-
-        public EventType MainType
-        {
-            get { return _mainType; }
-            set { _mainType = value; }
-        }
 
         public GMAction[] Actions
         {
@@ -61,6 +55,12 @@ namespace GameMaker.Resource
         {
             get { return _otherName; }
             set { _otherName = value; }
+        }
+
+        public int MainType
+        {
+            get { return _mainType; }
+            set { _mainType = value; }
         }
 
         public int SubType

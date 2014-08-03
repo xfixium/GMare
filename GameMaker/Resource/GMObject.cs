@@ -219,6 +219,217 @@ namespace GameMaker.Resource
         #region Methods
 
         /// <summary>
+        /// Reads all GMX objects from a directory
+        /// </summary>
+        /// <param name="file">The XML (.GMX) file path</param>
+        /// <returns>A list of objects</returns>
+        public static GMList<GMObject> ReadObjectsGMX(string directory, ref List<string> assets)
+        {
+            // A list of objects
+            GMList<GMObject> objects = new GMList<GMObject>();
+            objects.AutoIncrementIds = false;
+
+            // Iterate through .gmx files in the directory
+            foreach (string file in Directory.GetFiles(directory, "*.gmx"))
+            {
+                // Set name of the object
+                string name = GetResourceName(file);
+
+                // If the file is not in the asset list, it has been orphaned, continue
+                if (!assets.Contains(name))
+                    continue;
+
+                // Create a dictionary of object properties
+                Dictionary<string, string> objectProperties = new Dictionary<string, string>();
+                foreach (GMXObjectProperty property in Enum.GetValues(typeof(GMXObjectProperty)))
+                    objectProperties.Add(GMXEnumString(property), "");
+
+                // Create a dictionary of action properties
+                Dictionary<string, string> actionProperties = new Dictionary<string, string>();
+                foreach (GMXActionProperty property in Enum.GetValues(typeof(GMXActionProperty)))
+                    actionProperties.Add(GMXEnumString(property), "");
+
+                // Create a dictionary of argument properties
+                Dictionary<string, string> argumentProperties = new Dictionary<string, string>();
+                foreach (GMXArgumentProperty property in Enum.GetValues(typeof(GMXArgumentProperty)))
+                    argumentProperties.Add(GMXEnumString(property), "");
+
+                // Local variables
+                List<GMEvent>[] events = new List<GMEvent>[12];
+                List<GMPoint> physicsPoints = new List<GMPoint>();
+
+                // Create an xml reader
+                using (XmlReader reader = XmlReader.Create(file))
+                {
+                    // Seek to content
+                    reader.MoveToContent();
+
+                    // Read the GMX file
+                    while (reader.Read())
+                    {
+                        // If the node is not an element, continue
+                        if (reader.NodeType != XmlNodeType.Element)
+                            continue;
+
+                        // Get the element name
+                        string nodeName = reader.Name;
+
+                        // If the element is an event
+                        if (nodeName.ToLower() == GMXEnumString(GMXObjectProperty.Event).ToLower())
+                        {
+                            // Create a new event and get it's properties
+                            GMEvent gmEvent = new GMEvent();
+                            int type = GMXInt(reader.GetAttribute(GMXEnumString(GMXEventProperty.Eventtype)), gmEvent.MainType);
+                            gmEvent.MainType = type;
+
+                            // If the event is a collision event, set the other name, else use subtype value
+                            if (gmEvent.MainType == (int)EventType.Collision)
+                                gmEvent.OtherName = GMXString(reader.GetAttribute(GMXEnumString(GMXEventProperty.EName)), gmEvent.OtherName);
+                            else
+                                gmEvent.SubType = GMXInt(reader.GetAttribute(GMXEnumString(GMXEventProperty.ENumb)), gmEvent.SubType);
+
+                            // Action list
+                            List<GMAction> actions = new List<GMAction>();
+
+                            // Seek to content
+                            reader.MoveToContent();
+
+                            // Create a reader for the actions
+                            using (XmlReader xmlReader2 = reader.ReadSubtree())
+                            {
+                                // Argument list
+                                List<GMArgument> arguments = new List<GMArgument>();
+
+                                // Read in action properties
+                                while (xmlReader2.Read())
+                                {
+                                    // If the node is not an element, continue
+                                    if (reader.NodeType != XmlNodeType.Element)
+                                        continue;
+
+                                    // Get the element name
+                                    string nodeName2 = xmlReader2.Name;
+
+                                    // If the node is an argument
+                                    if (nodeName2.ToLower() == EnumString.GetEnumString(GMXObjectProperty.Argument).ToLower())
+                                    {
+                                        // Seek to content
+                                        xmlReader2.MoveToContent();
+
+                                        // Create a reader for the arguments
+                                        using (XmlReader xmlReader3 = xmlReader2.ReadSubtree())
+                                        {
+                                            // Read in argument properties
+                                            while (xmlReader3.Read())
+                                            {
+                                                // If the node is not an element, continue
+                                                if (reader.NodeType != XmlNodeType.Element)
+                                                    continue;
+
+                                                // Get the element name
+                                                string nodeName3 = xmlReader3.Name;
+
+                                                // Read element
+                                                xmlReader3.Read();
+
+                                                // If the element value is null or empty, continue
+                                                if (String.IsNullOrEmpty(xmlReader3.Value))
+                                                    continue;
+
+                                                // Set the property value
+                                                argumentProperties[nodeName3] = xmlReader3.Value;
+                                            }
+
+                                            // Create a new argument
+                                            GMArgument argument = new GMArgument();
+                                            argument.Type = GMXInt(argumentProperties[GMXEnumString(GMXArgumentProperty.Kind)], argument.Type);
+                                            argument.Value = GMXString(argumentProperties[GMXEnumString(GMXArgumentProperty.String)], argument.Value);
+
+                                            // Add argument to the list
+                                            arguments.Add(argument);
+                                        }
+                                    }
+
+                                    // Read element
+                                    xmlReader2.Read();
+
+                                    // If the element value is null or empty, continue
+                                    if (String.IsNullOrEmpty(xmlReader2.Value))
+                                        continue;
+
+                                    // Set the property value
+                                    actionProperties[nodeName2] = xmlReader2.Value;
+                                }
+
+                                // Create a new action
+                                GMAction action = new GMAction();
+                                action.LibraryId = GMXInt(actionProperties[GMXEnumString(GMXActionProperty.LibId)], action.LibraryId);
+                                action.ActionId = GMXInt(actionProperties[GMXEnumString(GMXActionProperty.Id)], action.ActionId);
+                                action.ActionKind = GMXInt(actionProperties[GMXEnumString(GMXActionProperty.Kind)], action.ActionKind);
+                                action.AllowRelative = GMXBool(actionProperties[GMXEnumString(GMXActionProperty.UseRelative)], action.AllowRelative);
+                                action.Question = GMXBool(actionProperties[GMXEnumString(GMXActionProperty.IsQuestion)], action.Question);
+                                action.CanApplyTo = GMXBool(actionProperties[GMXEnumString(GMXActionProperty.UseApplyTo)], action.CanApplyTo);
+                                action.ExecuteMode = GMXInt(actionProperties[GMXEnumString(GMXActionProperty.ExeType)], action.ExecuteMode);
+                                action.FunctionName = GMXString(actionProperties[GMXEnumString(GMXActionProperty.FunctionName)], action.FunctionName);
+                                action.ExecuteCode = GMXString(actionProperties[GMXEnumString(GMXActionProperty.CodeString)], action.ExecuteCode);
+                                action.AppliesToName = GMXString(actionProperties[GMXEnumString(GMXActionProperty.WhoName)], action.AppliesToName);
+                                action.AppliesTo = action.AppliesToName == "" ? -1 : GetIdFromName(action.AppliesToName);
+                                action.Relative = GMXBool(actionProperties[GMXEnumString(GMXActionProperty.Relative)], action.Relative);
+                                action.Not = GMXBool(actionProperties[GMXEnumString(GMXActionProperty.IsNot)], action.Not);
+                                action.Arguments = arguments.ToArray();
+
+                                // Add action to the list
+                                actions.Add(action);
+                            }
+
+                            // Set the events actions
+                            gmEvent.Actions = actions.ToArray();
+
+                            // If the event type list has not been generated, create it
+                            if (events[type] == null)
+                                events[type] = new List<GMEvent>();
+
+                            // Add the event of the event type
+                            events[type].Add(gmEvent);
+                        }
+
+                        // Read element
+                        reader.Read();
+
+                        // If the element value is null or empty, continue
+                        if (String.IsNullOrEmpty(reader.Value))
+                            continue;
+
+                        // Set the property value
+                        objectProperties[nodeName] = reader.Value;
+                    }
+                }
+
+                // Create a new object and set its properties
+                GMObject obj = new GMObject();
+                obj.Id = GetIdFromName(name);
+                obj.Name = name;
+                obj.SpriteName = GMXString(objectProperties[GMXEnumString(GMXObjectProperty.SpriteName)], obj.SpriteName);
+                obj.SpriteId = obj.SpriteName == "" ? -1 : GetIdFromName(obj.SpriteName);
+                obj.Solid = GMXBool(objectProperties[GMXEnumString(GMXObjectProperty.Solid)], obj.Solid);
+                obj.Visible = GMXBool(objectProperties[GMXEnumString(GMXObjectProperty.Visible)], obj.Visible);
+                obj.Depth = GMXInt(objectProperties[GMXEnumString(GMXObjectProperty.Depth)], obj.Depth);
+                obj.Persistent = GMXBool(objectProperties[GMXEnumString(GMXObjectProperty.Persistent)], obj.Persistent);
+                obj.ParentName = GMXString(objectProperties[GMXEnumString(GMXObjectProperty.ParentName)], obj.ParentName);
+                obj.Parent = obj.ParentName == "" ? -1 : GetIdFromName(obj.ParentName);
+                obj.MaskName = GMXString(objectProperties[GMXEnumString(GMXObjectProperty.MaskName)], obj.MaskName);
+                obj.Mask = obj.MaskName == "" ? -1 : GetIdFromName(obj.MaskName);
+                obj.Events = events;
+
+                // Add the object
+                objects.Add(obj);
+            }
+
+            // Return the list of objects
+            return objects;
+        }
+
+        /// <summary>
         /// Reads objects from GM file
         /// </summary>
         public static GMList<GMObject> ReadObjects(GMFileReader reader)
@@ -309,10 +520,10 @@ namespace GameMaker.Resource
                             GMEvent ev = new GMEvent();
 
                             // Set type of event
-                            ev.MainType = (EventType)(j);
+                            ev.MainType = j;
 
                             // If a collision type of event set other object id
-                            if (ev.MainType == EventType.Collision)
+                            if (ev.MainType == (int)EventType.Collision)
                                 ev.OtherId = eventNum;
                             else
                                 ev.SubType = eventNum;
@@ -336,236 +547,6 @@ namespace GameMaker.Resource
             }
 
             // Return objects
-            return objects;
-        }
-
-        /// <summary>
-        /// Reads all GMX objects from a directory
-        /// </summary>
-        /// <param name="file">The XML (.GMX) file path</param>
-        /// <returns>A list of objects</returns>
-        public static GMList<GMObject> ReadObjectsGMX(string directory, List<string> assets)
-        {
-            // A list of objects
-            GMList<GMObject> objects = new GMList<GMObject>();
-
-            // Iterate through .gmx files in the directory
-            foreach (string file in Directory.GetFiles(directory, "*.gmx"))
-            {
-                // Set name of the object
-                string name = GMFileReader.GetResourceName(file);
-
-                // If the file is not in the asset list, it has been orphaned, continue
-                if (!assets.Contains(name))
-                    continue;
-
-                // Create a dictionary of object properties
-                Dictionary<GMXObjectProperty, string> objectProperties = new Dictionary<GMXObjectProperty, string>();
-
-                foreach (GMXObjectProperty property in Enum.GetValues(typeof(GMXObjectProperty)))
-                    objectProperties.Add(property, "");
-
-                // Create a dictionary of action properties
-                Dictionary<GMXActionProperty, string> actionProperties = new Dictionary<GMXActionProperty, string>();
-
-                foreach (GMXActionProperty property in Enum.GetValues(typeof(GMXActionProperty)))
-                    actionProperties.Add(property, "");
-
-                // Create a dictionary of action properties
-                Dictionary<GMXArgumentProperty, string> argumentProperties = new Dictionary<GMXArgumentProperty, string>();
-
-                foreach (GMXArgumentProperty property in Enum.GetValues(typeof(GMXArgumentProperty)))
-                    argumentProperties.Add(property, "");
-
-                // Local variables
-                List<GMEvent>[] events = new List<GMEvent>[12];
-                List<GMPoint> physicsPoints = new List<GMPoint>();
-
-                // Create an xml reader
-                using (XmlReader xmlReader = XmlReader.Create(file))
-                {
-                    // Seek to content
-                    xmlReader.MoveToContent();
-
-                    // Read the GMX file
-                    while (xmlReader.Read())
-                    {
-                        // If the node is not an element, continue
-                        if (xmlReader.NodeType != XmlNodeType.Element)
-                            continue;
-
-                        // Get the element name
-                        string nodeName = xmlReader.Name;
-
-                        // If the element is a event
-                        if (nodeName.ToLower() == EnumString.GetEnumString(GMXObjectProperty.Event).ToLower())
-                        {
-                            // Create a new event and get it's properties
-                            GMEvent gmEvent = new GMEvent();
-                            int type = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXEventProperty.Eventtype)));
-                            gmEvent.MainType = (EventType)type;
-
-                            // If the event is a collision event, set the other name, else use subtype value
-                            if (gmEvent.MainType == EventType.Collision)
-                                gmEvent.OtherName = xmlReader.GetAttribute(EnumString.GetEnumString(GMXEventProperty.EName));
-                            else
-                                gmEvent.SubType = GMFileReader.ReadGMXInt(xmlReader.GetAttribute(EnumString.GetEnumString(GMXEventProperty.ENumb)));
-
-                            // Action list
-                            List<GMAction> actions = new List<GMAction>();
-
-                            // Seek to content
-                            xmlReader.MoveToContent();
-
-                            // Create a reader for the actions
-                            using (XmlReader xmlReader2 = xmlReader.ReadSubtree())
-                            {
-                                // Argument list
-                                List<GMArgument> arguments = new List<GMArgument>();
-
-                                // Read in action properties
-                                while (xmlReader2.Read())
-                                {
-                                    // If the node is not an element, continue
-                                    if (xmlReader.NodeType != XmlNodeType.Element)
-                                        continue;
-
-                                    // Get the element name
-                                    string nodeName2 = xmlReader2.Name;
-
-                                    // If the node is an argument
-                                    if (nodeName2.ToLower() == EnumString.GetEnumString(GMXObjectProperty.Argument).ToLower())
-                                    {
-                                        // Seek to content
-                                        xmlReader2.MoveToContent();
-
-                                        // Create a reader for the arguments
-                                        using (XmlReader xmlReader3 = xmlReader2.ReadSubtree())
-                                        {
-                                            // Read in argument properties
-                                            while (xmlReader3.Read())
-                                            {
-                                                // If the node is not an element, continue
-                                                if (xmlReader.NodeType != XmlNodeType.Element)
-                                                    continue;
-
-                                                // Get the element name
-                                                string nodeName3 = xmlReader3.Name;
-
-                                                // Read element
-                                                xmlReader3.Read();
-
-                                                // If the element value is null or empty, continue
-                                                if (String.IsNullOrEmpty(xmlReader3.Value))
-                                                    continue;
-
-                                                // Get the enumeration based on the node name
-                                                GMXArgumentProperty? property3 = EnumString.GetEnumFromString<GMXArgumentProperty>(nodeName3);
-
-                                                // If no match was found, continue
-                                                if (property3 == null)
-                                                    continue;
-
-                                                // Set the property value
-                                                argumentProperties[(GMXArgumentProperty)property3] = xmlReader3.Value;
-                                            }
-
-                                            // Create a new argument
-                                            GMArgument argument = new GMArgument();
-                                            argument.Type = (ArgumentType)GMFileReader.ReadGMXInt(argumentProperties[GMXArgumentProperty.Kind]);
-                                            argument.Value = argumentProperties[GMXArgumentProperty.String];
-                                            
-                                            // Add argument to the list
-                                            arguments.Add(argument);
-                                        }
-                                    }
-
-                                    // Read element
-                                    xmlReader2.Read();
-
-                                    // If the element value is null or empty, continue
-                                    if (String.IsNullOrEmpty(xmlReader2.Value))
-                                        continue;
-
-                                    // Get the enumeration based on the node name
-                                    GMXActionProperty? property2 = EnumString.GetEnumFromString<GMXActionProperty>(nodeName2);
-
-                                    // If no match was found, continue
-                                    if (property2 == null)
-                                        continue;
-
-                                    // Set the property value
-                                    actionProperties[(GMXActionProperty)property2] = xmlReader2.Value;
-                                }
-
-                                // Create a new action
-                                GMAction action = new GMAction();
-                                action.LibraryId = GMFileReader.ReadGMXInt(actionProperties[GMXActionProperty.LibId]);
-                                action.ActionId = GMFileReader.ReadGMXInt(actionProperties[GMXActionProperty.Id]);
-                                action.ActionKind = (ActionType)GMFileReader.ReadGMXInt(actionProperties[GMXActionProperty.Kind]);
-                                action.AllowRelative = GMFileReader.ReadGMXBool(actionProperties[GMXActionProperty.UseRelative]);
-                                action.Question = GMFileReader.ReadGMXBool(actionProperties[GMXActionProperty.IsQuestion]);
-                                action.CanApplyTo = GMFileReader.ReadGMXBool(actionProperties[GMXActionProperty.UseApplyTo]);
-                                action.ExecuteMode = (ExecutionType)GMFileReader.ReadGMXInt(actionProperties[GMXActionProperty.ExeType]);
-                                action.FunctionName = actionProperties[GMXActionProperty.FunctionName];
-                                action.ExecuteCode = actionProperties[GMXActionProperty.CodeString];
-                                action.AppliesToName = actionProperties[GMXActionProperty.WhoName];
-                                action.Relative = GMFileReader.ReadGMXBool(actionProperties[GMXActionProperty.Relative]);
-                                action.Not = GMFileReader.ReadGMXBool(actionProperties[GMXActionProperty.IsNot]);
-                                action.Arguments = arguments.ToArray();
-
-                                // Add action to the list
-                                actions.Add(action);
-                            }
-
-                            // Set the events actions
-                            gmEvent.Actions = actions.ToArray();
-
-                            // If the event type list has not been generated, create it
-                            if (events[type] == null)
-                                events[type] = new List<GMEvent>();
-
-                            // Add the event of the event type
-                            events[type].Add(gmEvent);
-                        }
-
-                        // Read element
-                        xmlReader.Read();
-
-                        // If the element value is null or empty, continue
-                        if (String.IsNullOrEmpty(xmlReader.Value))
-                            continue;
-
-                        // Get the enumeration based on the node name
-                        GMXObjectProperty? property = EnumString.GetEnumFromString<GMXObjectProperty>(nodeName);
-
-                        // If no match was found, continue
-                        if (property == null)
-                            continue;
-
-                        // Set the property value
-                        objectProperties[(GMXObjectProperty)property] = xmlReader.Value;
-                    }
-                }
-
-                // Create a new object and set its properties
-                GMObject obj = new GMObject();
-                obj.Id = GMResource.GetIdFromName(name);
-                obj.Name = name;
-                obj.SpriteName = objectProperties[GMXObjectProperty.SpriteName];
-                obj.Solid = GMFileReader.ReadGMXBool(objectProperties[GMXObjectProperty.Solid]);
-                obj.Visible = GMFileReader.ReadGMXBool(objectProperties[GMXObjectProperty.Visible]);
-                obj.Depth = GMFileReader.ReadGMXInt(objectProperties[GMXObjectProperty.Depth]);
-                obj.Persistent = GMFileReader.ReadGMXBool(objectProperties[GMXObjectProperty.Persistent]);
-                obj.ParentName = objectProperties[GMXObjectProperty.ParentName];
-                obj.MaskName = objectProperties[GMXObjectProperty.MaskName];
-                obj.Events = events;
-
-                // Add the object
-                objects.Add(obj);
-            }
-            
-            // Return the list of objects
             return objects;
         }
 

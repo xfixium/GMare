@@ -94,24 +94,20 @@ namespace GMare.Forms
                 lstBackgrounds.SelectedIndex = 0;
 
             // The object node index
-            int roomIndex = -1;
-
-            // Get the object node
-            for (int i = 0; i < _project.ProjectTree.Nodes.Length; i++)
-                if (_project.ProjectTree.Nodes[i].ResourceType == GMResourceType.Rooms)
-                    roomIndex = i;
+            int roomIndex = GetResourceIndex(GMResourceType.Rooms);
 
             // If no object node was found, return
             if (roomIndex == -1)
                 return;
 
             // Add room nodes to treeview
+            //tvRooms.Nodes.Add(GMUtilities.GetTreeNodeFromGMNode(_project, _project.ProjectTree, null));
             tvRooms.Nodes.Add(GMUtilities.GetTreeNodeFromGMNode(_project, _project.ProjectTree.Nodes[roomIndex], null));
             tvRooms.SelectedNode = tvRooms.Nodes[0];
             tvRooms.Nodes[0].Expand();
 
             // Set name of room in text box
-            txtName.Text = ProjectManager.Room.Name;
+            txtName.Text = App.Room.Name;
 
             // Verify requistes
             Verify();
@@ -137,6 +133,9 @@ namespace GMare.Forms
 
                 // Get the currently selected node
                 GMNode node = tvRooms.SelectedNode.Tag as GMNode;
+                
+                // Create a new room
+                GMRoom room;
 
                 // If the node is a child node
                 if (node.NodeType == GMNodeType.Child)
@@ -154,7 +153,7 @@ namespace GMare.Forms
                 if (node.NodeType == GMNodeType.Child)
                 {
                     // Find the room to overwrite
-                    GMRoom room = _project.Rooms.Find(r => r.Id == node.Id);
+                    room = _project.Rooms.Find(r => r.Id == node.Id);
 
                     // Set room properties
                     if (!SetRoomProperties(room, -1))
@@ -167,8 +166,20 @@ namespace GMare.Forms
                 }
                 else
                 {
+                    // Check for any resource doubles
+                    foreach (string asset in _project.Assets)
+                    {
+                        // If the asset already exists, return
+                        if (asset == txtName.Text)
+                        {
+                            MessageBox.Show("The game resource name already exists. Please use a unique name for this room. Export aborted.", "GMare",
+                                MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                            return;
+                        }
+                    }
+
                     // Create a new room
-                    GMRoom room = new GMRoom();
+                    room = new GMRoom();
 
                     // Set room properties
                     if (!SetRoomProperties(room, _project.Rooms.LastId++))
@@ -193,7 +204,9 @@ namespace GMare.Forms
                     newNode.Name = room.Name;
                     newNode.NodeType = GMNodeType.Child;
                     newNode.ResourceType = GMResourceType.Rooms;
+                    newNode.ResourceSubType = GMResourceSubType.Room;
                     newNode.Id = room.Id;
+                    newNode.FilePath = "rooms\\" + room.Name;
 
                     // Set the tree node tag to Game Maker node
                     treeNode.Tag = newNode;
@@ -204,7 +217,7 @@ namespace GMare.Forms
                 }
 
                 // Set room nodes
-                _project.ProjectTree.Nodes[8] = GMUtilities.GetGMNodeFromTreeNode(tvRooms.Nodes[0]);
+                _project.ProjectTree.Nodes[GetResourceIndex(GMResourceType.Rooms)] = GMUtilities.GetGMNodeFromTreeNode(tvRooms.Nodes[0]);
 
                 // If refactor tiles, refactor
                 if (chkRefactorTiles.Checked == true)
@@ -214,9 +227,29 @@ namespace GMare.Forms
                 if (chkRefactorInstances.Checked == true)
                     _project.RefactorInstanceIds();
 
-                // Write the project
-                _writer.WriteGMProject(_projectPath, _project, _project.GameMakerVersion);
+                // If a game maker studio project and there is room data, wirte project
+                if (_project.GameMakerVersion == GMVersionType.GameMakerStudio)
+                {
+                    // If the room was never created, notify user
+                    if (room == null)
+                        MessageBox.Show("There was an error creating the room to export. Export failed.", "GMare", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+                    else
+                    {
+                        // NOTE: Normally I would not do things this way. It should be the data that drives
+                        // the project file creation. However, we're only changing the room portion of the 
+                        // project and it's just safer, as of now, to write only the project file and the 
+                        // room vs. writing the entire project out. Luckily GM:S is modular and allows that
+                        // to happen
+                        GameMaker.Resource.GMNode.WriteNodesGMX(_projectPath, ref _project);
+                        GameMaker.Resource.GMRoom.WriteRoomGMX(room, Path.GetDirectoryName(_projectPath) + "\\" + "rooms");
+                    }
+                }
+                // Legacy Game Maker project write
+                else
+                    _writer.WriteGMProject(_projectPath, _project, _project.GameMakerVersion);
 
+                // Display success message
                 if (MessageBox.Show("Export complete. A backup of the original project was made. Do you want to open the directory it was copied to?", "GMare",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                     Process.Start(filePath);
@@ -224,7 +257,7 @@ namespace GMare.Forms
                 // Close the form
                 Close();
             }
-            catch
+            catch (Exception ex)
             {
                 // Notify the user that the export failed
                 MessageBox.Show("An error occurred while exporting the room, export aborted.", "GMare",
@@ -256,7 +289,7 @@ namespace GMare.Forms
         private void butViewOptimization_Click(object sender, EventArgs e)
         {
             // Create a new view form
-            using (ViewLayerForm form = new ViewLayerForm(ProjectManager.Room.Layers, true))
+            using (ViewLayerForm form = new ViewLayerForm(App.Room.Layers, true))
             {
                 // Show the form
                 form.ShowDialog();
@@ -282,6 +315,7 @@ namespace GMare.Forms
             GMNode node = tvRooms.SelectedNode.Tag as GMNode;
 
             // If the node is a child node, disable room name (it will inherit the overwritten room's name), else enable it
+            txtName.Text = node.NodeType == GMNodeType.Child ? node.Name : App.Room.Name;
             txtName.Enabled = node.NodeType == GMNodeType.Child ? false : true;
 
             Verify();
@@ -300,6 +334,21 @@ namespace GMare.Forms
         #region Methods
 
         /// <summary>
+        /// Gets the index to the Game Maker resource type
+        /// </summary>
+        /// <returns>An index to the given Game Maker resource type's parent node</returns>
+        private int GetResourceIndex(GMResourceType type)
+        {
+            // Get the room parent node
+            for (int i = 0; i < _project.ProjectTree.Nodes.Length; i++)
+                if (_project.ProjectTree.Nodes[i].ResourceType == type)
+                    return i;
+
+            // Return room node
+            return -1;
+        }
+
+        /// <summary>
         /// Check if requirements have been met before export
         /// </summary>
         private void Verify()
@@ -308,7 +357,7 @@ namespace GMare.Forms
             butExport.Enabled = tvRooms.SelectedNode != null && lstBackgrounds.SelectedItem != null ? true : false;
 
             // If no background, disable tile export
-            if (ProjectManager.Room.Backgrounds[0].Image == null)
+            if (App.Room.Backgrounds[0].Image == null)
             {
                 chkWriteTiles.Checked = false;
                 chkWriteTiles.Enabled = false;
@@ -326,7 +375,7 @@ namespace GMare.Forms
         {
             // Get regular and block instances
             List<GMareInstance> gmareInstances = new List<GMareInstance>();
-            gmareInstances.AddRange(ProjectManager.Room.Instances.ToArray());
+            gmareInstances.AddRange(App.Room.Instances.ToArray());
 
             // Create a game maker instance array
             GMInstance[] instances = new GMInstance[gmareInstances.Count];
@@ -334,12 +383,26 @@ namespace GMare.Forms
             // Set room instances
             for (int i = 0; i < gmareInstances.Count; i++)
             {
-                // If the object id does not exist in the export project, abort
-                if (_project.Objects.Find(o => o.Id == gmareInstances[i].ObjectId) == null)
+                // If game maker studio, else Game Maker legacy
+                if (_project.GameMakerVersion == GMVersionType.GameMakerStudio)
                 {
-                    MessageBox.Show("Could not find the object: " + gmareInstances[i].Name + "(Id: " + gmareInstances[i].ObjectId + ") within the target export project.", 
-                        "GMare", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
-                    return null;
+                    // If the object id does not exist in the export project, abort
+                    if (_project.Objects.Find(o => o.Name == gmareInstances[i].ObjectName) == null)
+                    {
+                        MessageBox.Show("Could not find the object: " + gmareInstances[i].ObjectName + " within the target export project.",
+                            "GMare", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                        return null;
+                    }
+                }
+                else
+                {
+                    // If the object id does not exist in the export project, abort
+                    if (_project.Objects.Find(o => o.Id == gmareInstances[i].ObjectId) == null)
+                    {
+                        MessageBox.Show("Could not find the object: " + gmareInstances[i].Name + "(Id: " + gmareInstances[i].ObjectId + ") within the target export project.",
+                            "GMare", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                        return null;
+                    }
                 }
 
                 // Increment project last instance id
@@ -350,9 +413,12 @@ namespace GMare.Forms
                 instances[i].Name = GetUniqueName(false);
                 instances[i].CreationCode = (string)gmareInstances[i].CreationCode.Clone();
                 instances[i].Id = _project.LastInstanceId;
+                instances[i].ObjectName = gmareInstances[i].ObjectName;
                 instances[i].ObjectId = gmareInstances[i].ObjectId;
                 instances[i].X = gmareInstances[i].X;
                 instances[i].Y = gmareInstances[i].Y;
+                instances[i].ScaleX = gmareInstances[i].ScaleX == 0 ? 1 : gmareInstances[i].ScaleX;
+                instances[i].ScaleY = gmareInstances[i].ScaleY == 0 ? 1 : gmareInstances[i].ScaleY;
             }
 
             // Return an array of instances
@@ -371,7 +437,7 @@ namespace GMare.Forms
             GMBackground background = (GMBackground)lstBackgrounds.SelectedItem;
 
             // If the selected background dimensions do not match the GMare project's background
-            if (chkWriteTiles.Checked && (ProjectManager.Room.Backgrounds[0].Image.Width != background.Width || ProjectManager.Room.Backgrounds[0].Image.Height != background.Height))
+            if (chkWriteTiles.Checked && (App.Room.Backgrounds[0].Image.Width != background.Width || App.Room.Backgrounds[0].Image.Height != background.Height))
             {
                 // Give warning, and cancel export
                 DialogResult result = MessageBox.Show("The selected background's size does not match the background used for this room. Please select a background that is the same size as the used background.", 
@@ -383,25 +449,26 @@ namespace GMare.Forms
             // Set room properties
             room.Id = id == -1 ? room.Id : id;
             room.Name = txtName.Text;
-            room.BackgroundColor = GMUtilities.ColorToGMColor(ProjectManager.Room.BackColor);
-            room.Width = ProjectManager.Room.Width;
-            room.Height = ProjectManager.Room.Height;
-            room.TileWidth = ProjectManager.Room.Backgrounds[0].TileWidth;
-            room.TileHeight = ProjectManager.Room.Backgrounds[0].TileHeight;
-            room.Caption = ProjectManager.Room.Caption;
-            room.CreationCode = ProjectManager.Room.CreationCode;
-            room.Speed = ProjectManager.Room.Speed;
-            room.Persistent = ProjectManager.Room.Persistent;
+            room.BackgroundColor = GMUtilities.ColorToGMColor(App.Room.BackColor);
+            room.Width = App.Room.Width;
+            room.Height = App.Room.Height;
+            room.TileWidth = App.Room.Backgrounds[0].TileWidth;
+            room.TileHeight = App.Room.Backgrounds[0].TileHeight;
+            room.Caption = App.Room.Caption;
+            room.CreationCode = App.Room.CreationCode;
+            room.Speed = App.Room.Speed;
+            room.Persistent = App.Room.Persistent;
 
             // If exporting tiles, set tiles
             if (chkWriteTiles.Checked)
             {
                 // Copy the room's background, set the game maker background id
-                GMareBackground gmareBackground = ProjectManager.Room.Backgrounds[0].Clone();
+                GMareBackground gmareBackground = App.Room.Backgrounds[0].Clone();
                 gmareBackground.GameMakerId = background.Id;
+                gmareBackground.Name = background.Name;
 
                 // Get tile array
-                GMTile[] tiles = ProjectManager.Room.GMareTilesToGMTiles(_project.LastTileId, gmareBackground, chkOptimizeTiles.Checked);
+                GMTile[] tiles = App.Room.GMareTilesToGMTiles(_project.LastTileId, gmareBackground, chkOptimizeTiles.Checked);
 
                 // Set unique names
                 foreach (GMTile tile in tiles)
@@ -444,7 +511,7 @@ namespace GMare.Forms
                 match = false;
 
                 // Create a random name
-                name = "inst_" + String.Format("#{0:X6}", random.Next(0x1000000));
+                name =  (tileName ? "tile_" : "inst_") + String.Format("{0:X8}", GMUtilities.StaticRandom.Instance.Next(0x10000000));
 
                 // Iterate through rooms
                 foreach (GMRoom room in _project.Rooms)
@@ -486,35 +553,50 @@ namespace GMare.Forms
                 // If the source file no longer exists, abort export
                 if (!File.Exists(_projectPath))
                 {
-                    MessageBox.Show("Can not find the source Game Make project to export to. It may have been moved or deleted. Export aborted.", "GMare",
+                    MessageBox.Show("Could not find the source Game Make project to export to. It may have been moved or deleted. Export aborted.", "GMare",
                         MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
                     return "";
                 }
 
                 // Get application save path
                 string source = Path.GetDirectoryName(_projectPath);
-                string target = Path.GetDirectoryName(ProjectManager.SavePath);
+                string target = Path.GetDirectoryName(App.SavePath == "" ? Application.ExecutablePath : App.SavePath);
                 string fileName = Path.GetFileNameWithoutExtension(_projectPath);
                 string fileNameExt = Path.GetFileName(_projectPath);
+                string temp = Path.GetTempPath();
 
                 // If the save directory does not exist, save backup to application directory
                 if (!Directory.Exists(target))
                     target = Path.GetDirectoryName(Application.ExecutablePath);
 
+                // Get date string to attach to file
+                string date = "_" + DateTime.Now.Year.ToString() + "_" + DateTime.Now.Month.ToString() + "_" + DateTime.Now.Day.ToString() + "_" + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString();
+
                 // If a game maker studio project, create a backup .zip
                 if (_project.GameMakerVersion == GMVersionType.GameMakerStudio)
                 {
-                    // Create a unique directory
-                    target += "\\" + fileName + "_" + DateTime.Now.ToString().Replace("/", "_").Replace(" ", "_").Replace(":", "_") + ".zip";
+                    // Create set target path and temp path to write to
+                    target += "\\" + fileName + date + ".zip";
+                    temp += "\\" + fileName + date + ".zip";
 
                     // Zip the source to the target .zip
                     FastZip fz = new FastZip();
-                    fz.CreateZip(target, source, true, "");
+                    fz.CreateZip(temp, source, true, "");
+                    File.Copy(temp, target);
+                    File.Delete(temp);
+                    
+                    // If the backup was not made successfully
+                    if (!File.Exists(target))
+                    {
+                        ShowFileErrorMessage();
+                        return "";
+                    }
+
                     return target.Remove(target.LastIndexOf("\\"));
                 }
 
                 // Reset target and source paths with filename included
-                target = Path.Combine(target, fileName + "_" + DateTime.Now.ToString().Replace("/", "_").Replace(" ", "_").Replace(":", "_") + ".bak");
+                target = Path.Combine(target, fileName + date + ".bak");
                 source = Path.Combine(source, fileNameExt);
 
                 // Copy project from source to target
@@ -540,8 +622,9 @@ namespace GMare.Forms
                 // Return successful target path
                 return Path.GetDirectoryName(target);
             }
-            catch
+            catch (Exception e)
             {
+                MessageBox.Show(e.Message);
                 // If an error occurs, abort export
                 ShowFileErrorMessage();
                 return "";

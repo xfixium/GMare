@@ -158,7 +158,7 @@ namespace GMare.Controls
                 case ListboxType.Instances:
                     // Get the instance from the list, also get the parent object of the instance
                     GMareInstance instance = Items[e.Index] as GMareInstance;
-                    GMareObject gmObject = ProjectManager.Room.Objects.Find(o => instance.ObjectId == o.Resource.Id);
+                    GMareObject gmObject = App.Room.Objects.Find(o => instance.ObjectId == o.Resource.Id);
 
                     // If the instance or object or object image is empty, return default glyph
                     if (instance == null || gmObject == null || gmObject.Image == null)
@@ -166,7 +166,7 @@ namespace GMare.Controls
 
                     // Create a new glyph
                     GDI.Bitmap glyph = new GDI.Bitmap(CellSize.Width * 2 + 2, CellSize.Height);
-                    GDI.Bitmap icon = ScaleImage((GDI.Bitmap)gmObject.Image.Clone(), CellSize.Width, CellSize.Height);
+                    GDI.Bitmap icon = ScaleImage((GDI.Bitmap)gmObject.Image.ToBitmap(), CellSize.Width, CellSize.Height);
                     GDI.Graphics gfx = GDI.Graphics.FromImage(glyph);
                     gfx.DrawImageUnscaled(icon, GDI.Point.Empty);
 
@@ -315,14 +315,14 @@ namespace GMare.Controls
                 case ListboxType.Instances:
 
                     // If no room was loaded, return
-                    if (ProjectManager.Room == null)
+                    if (App.Room == null)
                         return;
 
                     // Create a new list of instances
                     List<GMareInstance> list = new List<GMareInstance>();
 
                     // Add all the current room instances
-                    foreach (GMareInstance instance in ProjectManager.Room.Instances)
+                    foreach (GMareInstance instance in App.Room.Instances)
                     {
                         // If the listbox is not dislpaying block instances, skip the instance
                         if (!_showBlocks && instance.TileId != -1)

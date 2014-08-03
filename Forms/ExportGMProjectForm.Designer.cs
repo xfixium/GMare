@@ -231,9 +231,9 @@ namespace GMare. Forms
             // 
             // lstBackgrounds
             // 
-            this.lstBackgrounds.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstBackgrounds.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.lstBackgrounds.CellSize = new System.Drawing.Size(64, 64);
             this.lstBackgrounds.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.lstBackgrounds.EmptyListText = "Background Selection Disabled";
@@ -273,9 +273,9 @@ namespace GMare. Forms
             // 
             // tvRooms
             // 
-            this.tvRooms.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tvRooms.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tvRooms.HideSelection = false;
             this.tvRooms.ImageIndex = 0;
             this.tvRooms.ImageList = this.imgProjectTree;

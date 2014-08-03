@@ -38,21 +38,16 @@ namespace GenericUndoRedo
     [Serializable]
     public class RoundStack<T>
     {
-        private readonly T[] items; // items.Length is Capacity + 1
-
-        // top == bottom ==> full
-        private int top = 1;
-        private int bottom = 0;
+        private T[] _items; // items.Length is Capacity + 1
+        private int _top = 1;
+        private int _bottom = 0;
 
         /// <summary>
         /// Gets if the <see cref="RoundStack&lt;T&gt;"/> is full.
         /// </summary>
         public bool IsFull
         {
-            get
-            {
-                return top == bottom;
-            }
+            get { return _top == _bottom; }
         }
 
         /// <summary>
@@ -62,9 +57,9 @@ namespace GenericUndoRedo
         {
             get
             {
-                int count = top - bottom - 1;
+                int count = _top - _bottom - 1;
                 if (count < 0)
-                    count += items.Length;
+                    count += _items.Length;
                 return count;
             }
         }
@@ -74,21 +69,19 @@ namespace GenericUndoRedo
         /// </summary>
         public int Capacity
         {
-            get
-            {
-                return items.Length - 1;
-            }
+            get { return _items.Length - 1; }
         }
 
         /// <summary>
         /// Creates <see cref="RoundStack&lt;T&gt;"/> with given capacity
         /// </summary>
-        /// <param name="capacity"></param>
+        /// <param name="capacity">The maximum amount of items</param>
         public RoundStack(int capacity)
         {
             if (capacity < 1)
-                throw new ArgumentOutOfRangeException("Capacity need to be at least 1");
-            items = new T[capacity + 1];
+                throw new ArgumentOutOfRangeException("Capacity needs to be at least 1");
+
+            _items = new T[capacity + 1];
         }
 
         /// <summary>
@@ -99,10 +92,10 @@ namespace GenericUndoRedo
         {
             if (Count > 0)
             {
-                T removed = items[top];
-                items[top--] = default(T);
-                if (top < 0)
-                    top += items.Length;
+                T removed = _items[_top];
+                _items[_top--] = default(T);
+                if (_top < 0)
+                    _top += _items.Length;
                 return removed;
             }
             else
@@ -117,13 +110,13 @@ namespace GenericUndoRedo
         {
             if (IsFull)
             {
-                bottom++;
-                if (bottom >= items.Length)
-                    bottom -= items.Length;
+                _bottom++;
+                if (_bottom >= _items.Length)
+                    _bottom -= _items.Length;
             }
-            if (++top >= items.Length)
-                top -= items.Length;
-            items[top] = item;
+            if (++_top >= _items.Length)
+                _top -= _items.Length;
+            _items[_top] = item;
         }
 
         /// <summary>
@@ -131,7 +124,7 @@ namespace GenericUndoRedo
         /// </summary>
         public T Peek()
         {
-            return items[top];
+            return _items[_top];
         }
 
         /// <summary>
@@ -141,13 +134,13 @@ namespace GenericUndoRedo
         {
             if (Count > 0)
             {
-                for (int i = 0; i < items.Length; i++)
+                for (int i = 0; i < _items.Length; i++)
                 {
-                    items[i] = default(T);
+                    _items[i] = default(T);
                 }
 
-                top = 1;
-                bottom = 0;
+                _top = 1;
+                _bottom = 0;
             }
         }
     }

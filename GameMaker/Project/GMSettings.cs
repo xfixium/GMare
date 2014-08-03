@@ -1,7 +1,7 @@
 #region MIT
 
 // 
-// GMLib.
+// GMare.
 // Copyright (C) 2011, 2012, 2013, 2014 Michael Mercado
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,7 +26,11 @@
 #endregion
 
 using System;
+using System.IO;
+using System.Xml;
+using System.Collections.Generic;
 using GameMaker.Common;
+using GameMaker.Resource;
 
 namespace GameMaker.Project
 {
@@ -44,8 +48,12 @@ namespace GameMaker.Project
         private PriorityType _gamePriority = PriorityType.Normal;
         private GMConstant[] _constants = null;
         private GMInclude[] _includes = null;
-        private double _projectLastChanged = 0;
-        private double _settingsLastChanged = 0;
+        public string[] _configs = null;
+        public string[] _textureGroups = null;
+        private byte[] _loadingImage = null;
+        private byte[] _frontLoadBarImage = null;
+        private byte[] _backLoadBarImage = null;
+        private byte[] _gameIcon = null;
         private string _company = "";
         private string _product = "";
         private string _copyright = "";
@@ -53,6 +61,10 @@ namespace GameMaker.Project
         private string _author = "";
         private string _version = "";
         private string _information = "";
+        private string _tutorialName = "";
+        private string _hash = "";
+        private double _projectLastChanged = 0;
+        private double _settingsLastChanged = 0;
         private int _gameIdentifier = 0;
         private int _major = 0;
         private int _minor = 0;
@@ -64,6 +76,7 @@ namespace GameMaker.Project
         private int _scaleInWindowedMode = 100;
         private int _scaleInFullScreenMode = 100;
         private int _includeFolder = 0;
+        private int _tutorialPage = 0;
         private bool _startFullscreen = false;
         private bool _scaleOnHardwareSupport = true;
         private bool _useExclusiveGraphicsMode = false;
@@ -93,10 +106,7 @@ namespace GameMaker.Project
         private bool _freezeOnLoseFocus = false;
         private bool _overwriteExisting = false;
         private bool _removeAtGameEnd = false;
-        private byte[] _loadingImage = null;
-        private byte[] _frontLoadBarImage = null;
-        private byte[] _backLoadBarImage = null;
-        private byte[] _gameIcon = null;
+        private bool _isTutorial = true;
 
         #endregion
 
@@ -162,6 +172,42 @@ namespace GameMaker.Project
             set { _includes = value; }
         }
 
+        public string[] Configs
+        {
+            get { return _configs; }
+            set { _configs = value; }
+        }
+
+        public string[] TextureGroups
+        {
+            get { return _textureGroups; }
+            set { _textureGroups = value; }
+        }
+
+        public byte[] LoadingImage
+        {
+            get { return _loadingImage; }
+            set { _loadingImage = value; }
+        }
+
+        public byte[] FrontLoadBarImage
+        {
+            get { return _frontLoadBarImage; }
+            set { _frontLoadBarImage = value; }
+        }
+
+        public byte[] BackLoadBarImage
+        {
+            get { return _backLoadBarImage; }
+            set { _backLoadBarImage = value; }
+        }
+
+        public byte[] GameIcon
+        {
+            get { return _gameIcon; }
+            set { _gameIcon = value; }
+        }
+
         public double ProjectLastChanged
         {
             get { return _projectLastChanged; }
@@ -214,6 +260,18 @@ namespace GameMaker.Project
         {
             get { return _information; }
             set { _information = value; }
+        }
+
+        public string TutorialName
+        {
+            get { return _tutorialName; }
+            set { _tutorialName = value; }
+        }
+
+        public string Hash
+        {
+            get { return _hash; }
+            set { _hash = value; }
         }
 
         public int GameIdentifier
@@ -280,6 +338,12 @@ namespace GameMaker.Project
         {
             get { return _includeFolder; }
             set { _includeFolder = value; }
+        }
+
+        public int TutorialPage
+        {
+            get { return _tutorialPage; }
+            set { _tutorialPage = value; }
         }
 
         public bool StartFullscreen
@@ -456,28 +520,10 @@ namespace GameMaker.Project
             set { _removeAtGameEnd = value; }
         }
 
-        public byte[] LoadingImage
+        public bool IsTutorial
         {
-            get { return _loadingImage; }
-            set { _loadingImage = value; }
-        }
-
-        public byte[] FrontLoadBarImage
-        {
-            get { return _frontLoadBarImage; }
-            set { _frontLoadBarImage = value; }
-        }
-
-        public byte[] BackLoadBarImage
-        {
-            get { return _backLoadBarImage; }
-            set { _backLoadBarImage = value; }
-        }
-
-        public byte[] GameIcon
-        {
-            get { return _gameIcon; }
-            set { _gameIcon = value; }
+            get { return _isTutorial; }
+            set { _isTutorial = value; }
         }
 
         #endregion
@@ -485,34 +531,92 @@ namespace GameMaker.Project
         #region Methods
 
         /// <summary>
-        /// 
+        /// Gets configs from project file
         /// </summary>
-        /// <returns></returns>
-        public int GetSize(GMVersionType version)
+        /// <param name="path">File path to project file</param>
+        public static string[] GetConfigsGMX(string path)
         {
-            int size = 126 + _company.Length + _product.Length + _copyright.Length + _description.Length + _author.Length + _version.Length + _information.Length;
+            // Get configs from project file
+            using (FileStream fs = new FileStream(path, FileMode.Open))
+            {
+                // List of configs
+                List<string> configs = new List<string>();
 
-            if (_constants != null)
-                foreach (GMConstant constant in _constants)
-                    size += constant.GetSize(version);
+                using (XmlTextReader reader = new XmlTextReader(new StreamReader(fs)))
+                {
+                    reader.MoveToContent();
 
-            if (_includes != null)
-                foreach (GMInclude include in _includes)
-                    size += include.GetSize(version);
+                    // Read project GMX
+                    while (reader.Read())
+                    {
+                        // If not a start element or not a config element
+                        if (!reader.IsStartElement() || reader.Name != GMResource.GMXEnumString(GMXConfigProperty.Config))
+                            continue;
 
-            if (_loadingImage != null)
-                size += _loadingImage.Length;
+                        // Get element string
+                        string element = reader.ReadInnerXml();
 
-            if (_frontLoadBarImage != null)
-                size += _frontLoadBarImage.Length;
+                        // If not a config element, continue
+                        if (!element.StartsWith(GMResource.GMXEnumString(GMXConfigProperty.Config)))
+                            continue;
 
-            if (_backLoadBarImage != null)
-                size += _backLoadBarImage.Length;
+                        // Add configuration
+                        configs.Add(element.Remove(0, 8));
+                    }
+                }
 
-            if (_gameIcon != null)
-                size += _gameIcon.Length;
+                // Return config list
+                return configs.ToArray();
+            }
+        }
 
-            return size;
+        /// <summary>
+        /// Gets constants from project file
+        /// </summary>
+        /// <param name="path">File path to project file</param>
+        public static GMConstant[] ReadConstantsGMX(string path)
+        {
+            // Get constants from project file
+            using (FileStream fs = new FileStream(path, FileMode.Open))
+            {
+                // A list of constants
+                List<GMConstant> constants = new List<GMConstant>();
+
+                using (XmlTextReader reader = new XmlTextReader(new StreamReader(fs)))
+                {
+                    reader.MoveToContent();
+
+                    // Read project GMX
+                    while (reader.Read())
+                    {
+                        // If not a start element
+                        if (!reader.IsStartElement())
+                            continue;
+
+                        // If not a constant element
+                        if (reader.Name != GMResource.GMXEnumString(GMXConstantProperty.Constant))
+                        {
+                            // If not the last element, continue
+                            if (reader.Name != GMResource.GMXEnumString(GMXConfigProperty.Help))
+                                continue;
+
+                            // End read
+                            reader.Close();
+                        }
+                        else
+                        {
+                            // Create new constant
+                            GMConstant constant = new GMConstant();
+                            constant.Name = reader.GetAttribute(GMResource.GMXEnumString(GMXConstantProperty.Name));
+                            constant.Value = reader.ReadInnerXml();
+                            constants.Add(constant);
+                        }
+                    }
+                }
+
+                // Return constants
+                return constants.ToArray();
+            }
         }
 
         /// <summary>

@@ -35,12 +35,12 @@ namespace GameMaker.Resource
     {
         #region Fields
 
-        private ActionType _actionKind = ActionType.Normal;
-        private ExecutionType _executeMode = ExecutionType.Function;
         private GMArgument[] _arguments = null;
         private string _executeCode = "";
         private string _functionName = "";
         private string _appliesToName = "self";
+        private int _actionKind = 0;
+        private int _executeMode = 1;
         private int _libraryId = 1;
         private int _actionId = 101;
         private int _appliesTo = -1;
@@ -53,18 +53,6 @@ namespace GameMaker.Resource
         #endregion
 
         #region Properties
-
-        public ActionType ActionKind
-        {
-            get { return _actionKind; }
-            set { _actionKind = value; }
-        }
-
-        public ExecutionType ExecuteMode
-        {
-            get { return _executeMode; }
-            set { _executeMode = value; }
-        }
 
         public GMArgument[] Arguments
         {
@@ -88,6 +76,18 @@ namespace GameMaker.Resource
         {
             get { return _appliesToName; }
             set { _appliesToName = value; }
+        }
+
+        public int ActionKind
+        {
+            get { return _actionKind; }
+            set { _actionKind = value; }
+        }
+
+        public int ExecuteMode
+        {
+            get { return _executeMode; }
+            set { _executeMode = value; }
         }
 
         public int LibraryId
@@ -189,20 +189,20 @@ namespace GameMaker.Resource
                 // Get action properties.
                 actions[i].LibraryId = reader.ReadGMInt();
                 actions[i].ActionId = reader.ReadGMInt();
-                actions[i].ActionKind = (ActionType)(reader.ReadGMInt());
+                actions[i].ActionKind = reader.ReadGMInt();
                 actions[i].AllowRelative = reader.ReadGMBool();
                 actions[i].Question = reader.ReadGMBool();
                 actions[i].CanApplyTo = reader.ReadGMBool();
-                actions[i].ExecuteMode = (ExecutionType)(reader.ReadGMInt());
+                actions[i].ExecuteMode = reader.ReadGMInt();
 
                 // If the execute mode is a prefabbed function.
-                if (actions[i].ExecuteMode == ExecutionType.Function)
+                if (actions[i].ExecuteMode == (int)ExecutionType.Function)
                     actions[i].ExecuteCode = reader.ReadGMString();
                 else
                     reader.ReadGMBytes(reader.ReadGMInt());
 
                 // If the execute mode is a script.
-                if (actions[i].ExecuteMode == ExecutionType.Code)
+                if (actions[i].ExecuteMode == (int)ExecutionType.Code)
                     actions[i].ExecuteCode = reader.ReadGMString();
                 else
                     reader.ReadGMBytes(reader.ReadGMInt());
@@ -241,7 +241,7 @@ namespace GameMaker.Resource
                     actions[i].Arguments[k] = new GMArgument();
 
                     // Set what kind of argument.
-                    actions[i].Arguments[k].Type = (ArgumentType)(argTypes[k]);
+                    actions[i].Arguments[k].Type = argTypes[k];
 
                     // Resource value.
                     actions[i].Arguments[k].Value = reader.ReadGMString();
@@ -263,19 +263,13 @@ namespace GameMaker.Resource
     {
         #region Fields
 
-        private int _resource = -1;
         private string _value = "";
-        private ArgumentType _type = ArgumentType.Expression;
+        private int _resource = -1;
+        private int _type = 0;
 
         #endregion
 
         #region Properties
-
-        public int Resource
-        {
-            get { return _resource; }
-            set { _resource = value; }
-        }
 
         public string Value
         {
@@ -283,7 +277,13 @@ namespace GameMaker.Resource
             set { _value = value; }
         }
 
-        public ArgumentType Type
+        public int Resource
+        {
+            get { return _resource; }
+            set { _resource = value; }
+        }
+
+        public int Type
         {
             get { return _type; }
             set { _type = value; }

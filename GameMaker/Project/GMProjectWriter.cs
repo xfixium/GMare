@@ -27,6 +27,7 @@
 
 using System;
 using System.IO;
+using System.Xml;
 using System.Collections.Generic;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using GameMaker.Common;
@@ -35,7 +36,7 @@ using GameMaker.Resource;
 namespace GameMaker.Project
 {
     /// <summary>
-    /// A class that writes a Game Maker project to disk.
+    /// A class that writes a Game Maker project to disk
     /// </summary>
     public class GMProjectWriter
     {
@@ -66,8 +67,6 @@ namespace GameMaker.Project
             // If the file does not exist, return.
             if (File.Exists(filePath) == false)
                 return;
-
-            // TODO: Get file size.
 
             // Create a new stream encoder.
             using (_writer = new FileStream(filePath, FileMode.Create, FileAccess.Write))
@@ -279,6 +278,10 @@ namespace GameMaker.Project
                 ProgressChanged("Finished Writing Project.");
             }
         }
+
+        #endregion
+
+        #region WriteGMSProject
 
         #endregion
 
@@ -748,7 +751,7 @@ namespace GameMaker.Project
                 if (version < GMVersionType.GameMaker60)
                 {
                     // If sound data exists, read it.
-                    if (sound.Kind != SoundKind.None)
+                    if (sound.Kind != (int)SoundKind.None)
                     {
                         // Write sound data.
                         WriteInt(sound.Data.Length);
@@ -1538,7 +1541,7 @@ namespace GameMaker.Project
                         if (ev.Actions != null)
                         {
                             // Check if the event's type is a collision event, set other's id.
-                            if (ev.MainType == EventType.Collision)
+                            if (ev.MainType == (int)EventType.Collision)
                                 WriteInt(ev.OtherId);
                             else
                                 WriteInt(ev.SubType);
@@ -1817,13 +1820,13 @@ namespace GameMaker.Project
                 WriteInt((int)actions[i].ExecuteMode);
 
                 // If the execute mode is a prefabbed function.
-                if (actions[i].ExecuteMode == ExecutionType.Function)
+                if (actions[i].ExecuteMode == (int)ExecutionType.Function)
                     WriteString(actions[i].ExecuteCode);
                 else
                     WriteInt(0);
 
                 // If the execute mode is a script.
-                if (actions[i].ExecuteMode == ExecutionType.Code)
+                if (actions[i].ExecuteMode == (int)ExecutionType.Code)
                     WriteString(actions[i].ExecuteCode);
                 else
                     WriteInt(0);
@@ -2149,6 +2152,26 @@ namespace GameMaker.Project
                 // Write character.
                 WriteByte((byte)s[i]);
             }
+        }
+
+        /// <summary>
+        /// Gets the GMX property string for the given string enum
+        /// </summary>
+        /// <param name="e">The numeration to extract the property srting from</param>
+        /// <returns>A string representation of an enumeration elelment</returns>
+        public static string GMXProperty(Enum e)
+        {
+            return EnumString.GetEnumString(e);
+        }
+
+        /// <summary>
+        /// Gets a string value of a boolean from the given boolean
+        /// </summary>
+        /// <param name="b">The boolean to convert to a string</param>
+        /// <returns>Either -1 for true or 0 for false</returns>
+        public static string GetBool(bool b)
+        {
+            return b ? "-1" : "0";
         }
 
         #endregion

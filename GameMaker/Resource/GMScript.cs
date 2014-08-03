@@ -26,6 +26,9 @@
 #endregion
 
 using System;
+using System.IO;
+using System.Xml;
+using System.Collections.Generic;
 using GameMaker.Common;
 
 namespace GameMaker.Resource
@@ -52,12 +55,42 @@ namespace GameMaker.Resource
         #region Methods
 
         /// <summary>
-        /// 
+        /// Reads scripts from Game Maker Studio project file
         /// </summary>
-        /// <returns></returns>
-        public int GetSize()
+        /// <param name="directory">The directory the shaders are placed</param>
+        /// <param name="assets">Collection of project assets</param>
+        public static GMList<GMScript> ReadScriptsGMX(string directory, ref List<string> assets)
         {
-            return 12 + _code.Length + Name.Length;
+            // A list of scripts
+            GMList<GMScript> scripts = new GMList<GMScript>();
+            scripts.AutoIncrementIds = false;
+
+            // Iterate through .gmx files in the directory
+            foreach (string file in Directory.GetFiles(directory, "*.gml"))
+            {
+                // Set name of the script
+                string name = GetResourceName(file);
+
+                // If the file is not in the asset list, it has been orphaned, continue
+                if (!assets.Contains(name))
+                    continue;
+
+                // Create a stream to the script file
+                using (StreamReader streamReader = new StreamReader(file))
+                {
+                    // Create a new script
+                    GMScript script = new GMScript();
+                    script.Name = name;
+                    script.Id = GetIdFromName(name);
+                    script.Code = streamReader.ReadToEnd();
+
+                    // Add the script
+                    scripts.Add(script);
+                }
+            }
+
+            // Return the list of scripts
+            return scripts;
         }
 
         /// <summary>

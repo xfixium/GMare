@@ -135,15 +135,6 @@ namespace GameMaker.Project
         #region Methods
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public int GetSize()
-        {
-            return 38 + _formCaption.Length + _information.Length;
-        }
-
-        /// <summary>
         /// Reads game information from GM file.
         /// </summary>
         public static GMGameInformation ReadGameInformation(GMFileReader reader)

@@ -43,6 +43,7 @@ namespace GameMaker.Common
         private readonly List<T> _items = new List<T>();
         private int _lastId = -1;
         private readonly bool _isReadOnly = false;
+        private bool _autoIncrementIds = true;
 
         #endregion
 
@@ -71,6 +72,12 @@ namespace GameMaker.Common
         public bool IsReadOnly
         {
             get { return _isReadOnly; }
+        }
+
+        public bool AutoIncrementIds
+        {
+            get { return _autoIncrementIds; }
+            set { _autoIncrementIds = value; }
         }
 
         #endregion
@@ -113,8 +120,8 @@ namespace GameMaker.Common
 
         public void Add(T item)
         {
-            // If the item is a resource, increment last resource id.
-            if (item is GMResource)
+            // If the item is a resource and allowing auto id increments, increment last resource id and set the resource id
+            if (item is GMResource && _autoIncrementIds)
             {
                 _lastId++;
                 (item as GMResource).Id = _lastId;

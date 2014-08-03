@@ -112,62 +112,65 @@ namespace GMare.Forms
         private void butImage_Click(object sender, EventArgs e)
         {
             // Create an open file dialog box
-            using (OpenFileDialog form = new OpenFileDialog())
+            using (OpenFileDialog ofd = new OpenFileDialog())
             {
                 // Set file filter
-                form.Filter = "Supported Files (.bmp, .png, .gif, .gmk, .gm6, .gmd .gm81 .gmx)|*.bmp;*.png;*.gif;*.gmk;*.gm6;*.gmd;*.gm81;*.gmx;";
+                ofd.Filter = "Supported Files (.bmp, .png, .gif, .gmk, .gm6, .gmd .gm81 .gmx)|*.bmp;*.png;*.gif;*.gmk;*.gm6;*.gmd;*.gm81;*.gmx;";
 
-                // If the dialog result was Ok
-                if (form.ShowDialog() == DialogResult.OK)
+                // If the dialog result was not Ok, return
+                if (ofd.ShowDialog() != DialogResult.OK)
+                    return;
+
+                // If getting a background object from a Game Maker project file
+                if (ofd.FileName.Substring(ofd.FileName.LastIndexOf(".")).ToLower().Contains("gm") == true)
                 {
-                    // If getting a background object from a Game Maker project file
-                    if (form.FileName.Substring(form.FileName.LastIndexOf(".")).ToLower().Contains("gm") == true)
+                    // Create a Game Maker project form
+                    using (ProjectIOForm iof = new ProjectIOForm(ofd.FileName, true))
                     {
-                        // Create a Game Maker project form
-                        using (GMProjectLoadForm iof = new GMProjectLoadForm(form.FileName))
-                        {
-                            // Show the form
-                            iof.ShowDialog();
+                        // Show the form
+                        iof.ShowDialog();
 
-                            // Create a new import background form
-                            using (ImportBackgroundForm backgroundForm = new ImportBackgroundForm(iof.Project.Backgrounds.ToArray()))
+                        // Create a new import background form
+                        using (ImportBackgroundForm backgroundForm = new ImportBackgroundForm(iof.GMProject.Backgrounds.ToArray()))
+                        {
+                            // If dialog result is Ok
+                            if (backgroundForm.ShowDialog() == DialogResult.OK)
                             {
-                                // If dialog result is Ok
-                                if (backgroundForm.ShowDialog() == DialogResult.OK)
+                                // Set background and update views
+                                if (backgroundForm.Background != null)
                                 {
-                                    // Set background and update views
-                                    if (backgroundForm.Background != null)
-                                    {
-                                        _background = backgroundForm.Background;
-                                        SetUI();
-                                    }
+                                    _background = backgroundForm.Background;
+                                    SetUI();
                                 }
                             }
                         }
                     }
-                    else  // Normal image file
+                }
+                else  // Normal image file
+                {
+                    // Create a new file stream
+                    using (FileStream fs = new FileStream(ofd.FileName, FileMode.Open, FileAccess.Read))
                     {
-                        // Create a new file stream
-                        using (FileStream fs = new FileStream(form.FileName, FileMode.Open, FileAccess.Read))
+                        // Get a bitmap from disk
+                        Bitmap image = (Bitmap)Image.FromStream(fs);
+
+                        // If the image is a valid size
+                        if (CheckSize(image.Size, pnlImage.CellSize))
                         {
-                            // Get a bitmap from disk
-                            Bitmap image = (Bitmap)Image.FromStream(fs);
+                            // Set GUI and set background name to the file name
+                            pnlImage.Image = image;
+                            _background.GameMakerId = -1;
+                            _background.Name = Path.GetFileNameWithoutExtension(ofd.FileName);
+                            txtName.Text = _background.Name;
 
-                            // If the image is a valid size
-                            if (CheckSize(image.Size, pnlImage.CellSize))
-                            {
-                                // Set GUI
-                                pnlImage.Image = image;
-
-                                // Set transparency color
-                                butSetColorKey_CheckedChanged(this);
-                            }
-                            else  // Not a valid size
-                                image.Dispose();
-
-                            // Update the status strip
-                            UpdateStatusStrip();
+                            // Set transparency color
+                            butSetColorKey_CheckedChanged(this);
                         }
+                        else  // Not a valid size
+                            image.Dispose();
+
+                        // Update the status strip
+                        UpdateStatusStrip();
                     }
                 }
             }
@@ -210,10 +213,19 @@ namespace GMare.Forms
         /// </summary>
         private void butOk_Click(object sender, EventArgs e)
         {
+            // If the name of the background is empty, inform the user and return
+            if (pnlImage.Image != null && txtName.Text == "")
+            {
+                MessageBox.Show("Please fill out the name of the background.", "GMare", MessageBoxButtons.OK, 
+                    MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                return;
+            }
+
             // Set dialog result and close
             DialogResult = DialogResult.OK;
 
             // Set room data
+            _background.Name = txtName.Text;
             _background.TileWidth = (int)nudTileX.Value;
             _background.TileHeight = (int)nudTileY.Value;
             _background.OffsetX = (int)nudOffsetX.Value;
@@ -252,6 +264,7 @@ namespace GMare.Forms
         private void SetUI()
         {
             // Set the nud values
+            txtName.Text = _background.Name;
             nudTileX.Value = _background.TileWidth;
             nudTileY.Value = _background.TileHeight;
             nudOffsetX.Value = _background.OffsetX;

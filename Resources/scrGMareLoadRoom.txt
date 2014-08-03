@@ -96,6 +96,11 @@ if (tileData == true)
     backgroundId = scrGMareReadBytes(stream, 4, true);       // The background id
     backgroundName = scrGMareReadString(stream, 4);          // The background name
 
+	// If the background id is empty (The background was create from an image file),
+	// try to get the background id based on the background name
+	if (backgroundId == -1)
+	    backgroundId = execute_string("return " + backgroundName);
+
     // Iterate through layers
     repeat (layerCount)
     {
