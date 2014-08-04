@@ -193,6 +193,7 @@ namespace GameMaker.Project
                     case GMResourceType.Hash: Settings.Hash = ReadHashGMX(item.Value); break;
                     case GMResourceType.Assets: ProjectTree = GMNode.ReadTreeGMX(item.Value); Assets = (List<string>)ProjectTree.Tag; break;
                     case GMResourceType.DataFiles: DataFiles = GMDataFile.ReadDataFilesGMX(item.Value); break;
+                    case GMResourceType.Sprites: Sprites = GMSprite.ReadSpritesGMX(item.Value, ref Assets); break;
                     //case GMResourceType.Configs: Settings.Configs = GMSettings.GetConfigsGMX(item.Value); break;
                     //case GMResourceType.Constants: Settings.Constants = GMSettings.ReadConstantsGMX(item.Value); break;
                     case GMResourceType.Backgrounds: Backgrounds = GMBackground.ReadBackgroundGMX(item.Value, ref Assets); break;
