@@ -53,6 +53,7 @@ namespace GMare
         private GMareBackground _background = null;     // Selected background
         private GMareLayer _layer = null;               // Selected layer
         private bool _loading = false;                  // If loading a project
+        private bool _ignoreCheck = false;              // If ignoring visibility check state
 
         #endregion
 
@@ -160,26 +161,30 @@ namespace GMare
             // Do action based on key
             switch (keyData)
             {
-                case Keys.C: butRoomBackColor_Click(this, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
-                case Keys.W: butRoomPersistent.Checked = butRoomPersistent.Checked == true ? false : true; break;
-                case Keys.T: butRoomScript_Click(this, EventArgs.Empty); break;
-                case Keys.L: butLayerAdd_Click(butLayerAdd, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
-                case Keys.E: butLayerOption_Click(butLayerEdit, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
-                case Keys.M: butLayerOption_Click(butLayerMove, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
-                case Keys.V: butLayerOption_Click(butLayerView, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
-                case Keys.B: butBackgroundEdit_Click(butBackgroundEdit, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
-                case Keys.P: SetTileTools(butBrushTool); pnlRoomEditor.Invalidate(); break;
-                case Keys.F: SetTileTools(butBucketFillTool); pnlRoomEditor.Invalidate(); break;
-                case Keys.S: SetTileTools(butSelectionTool); pnlRoomEditor.Invalidate(); break;
-                case Keys.R: butBackgroundEdit_Click(butReplace, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
                 case Keys.A: butShowInstances.Checked = butShowInstances.Checked == true ? false : true; break;
-                case Keys.Q: butShowBlocks.Checked = butShowBlocks.Checked == true ? false : true; break;
+                case Keys.B: butBackgroundEdit_Click(butBackgroundEdit, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
+                case Keys.C: butRoomBackColor_Click(this, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
+                case Keys.E: butLayerOption_Click(butLayerEdit, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
+                case Keys.F: SetTileTools(butBucketFillTool); pnlRoomEditor.Invalidate(); break;
                 case Keys.G: butGrid.Checked = butGrid.Checked ? false : true; pnlRoomEditor.Invalidate(); break;
                 case Keys.I: butGridIso.Checked = butGridIso.Checked ? false : true; pnlRoomEditor.Invalidate(); break;
+                case Keys.L: butLayerAdd_Click(butLayerAdd, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
+                case Keys.M: butLayerOption_Click(butLayerMove, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
                 case Keys.N: butGridSnap.Checked = butGridSnap.Checked ? false : true; break;
                 case Keys.O: butObjectsImport_Click(butObjectsImport, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
-                case Keys.Right: pnlRoomEditor.Focus(); pnlRoomEditor.Flip(FlipDirectionType.Horizontal); return true;
-                case Keys.Down: pnlRoomEditor.Focus(); pnlRoomEditor.Flip(FlipDirectionType.Vertical); return true;
+                case Keys.P: SetTileTools(butBrushTool); pnlRoomEditor.Invalidate(); break;
+                case Keys.Q: butShowBlocks.Checked = butShowBlocks.Checked == true ? false : true; break;
+                case Keys.R: butBackgroundEdit_Click(butReplace, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
+                case Keys.S: SetTileTools(butSelectionTool); pnlRoomEditor.Invalidate(); break;
+                case Keys.T: butRoomScript_Click(this, EventArgs.Empty); break;
+                case Keys.U: SetLayerVisibility(); break;
+                case Keys.V: butLayerOption_Click(butLayerView, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
+                case Keys.W: butRoomPersistent.Checked = butRoomPersistent.Checked == true ? false : true; break;
+                case Keys.Z: mnuSearchObjects_Click(this, EventArgs.Empty); break;
+                case Keys.Up: SelectLayer(true); return true;
+                case Keys.Down: SelectLayer(false); return true;
+                case Keys.Left: pnlRoomEditor.Focus(); pnlRoomEditor.Flip(FlipDirectionType.Horizontal); return true;
+                case Keys.Right: pnlRoomEditor.Focus(); pnlRoomEditor.Flip(FlipDirectionType.Vertical); return true;
             }
 
             // Process
@@ -440,6 +445,16 @@ namespace GMare
                         App.SetTextures();
                         pnlRoomEditor.Image = _background.GetCondensedTileset();
                     }
+
+                    // Set the status bar visibility
+                    bool showTips = App.GetConfigFlag(App.ShowTipsAppKey, true);
+
+                    // If there is no change, return
+                    if (grpRoomEditor.ShowStatusBar == showTips)
+                        return;
+
+                    grpRoomEditor.ShowStatusBar = showTips;
+                    SetRoomEditorHeight();
                 }
             }
             else if (mnuExit.Name == name)
@@ -882,6 +897,7 @@ namespace GMare
 
             // Set clipboard UI
             SetClipboard();
+            lstLayers.Invalidate();
         }
 
         /// <summary>
@@ -890,7 +906,7 @@ namespace GMare
         private void lstLayers_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             // If the selected item is empty, return
-            if (lstLayers.SelectedItem == null)
+            if (lstLayers.SelectedItem == null || _ignoreCheck)
                 return;
 
             // If the click is not near the checkbox hit area, keep the previous value
@@ -899,6 +915,8 @@ namespace GMare
 
             // Set layer visibility, invalidate the room editor
             (lstLayers.SelectedItem as GMareLayer).Visible = e.NewValue == CheckState.Checked ? true : false;
+
+            // Invalidate room editor
             pnlRoomEditor.Invalidate();
         }
 
@@ -1080,6 +1098,31 @@ namespace GMare
         }
 
         /// <summary>
+        /// Search objects menu item click
+        /// </summary>
+        private void mnuSearchObjects_Click(object sender, EventArgs e)
+        {
+            // Create an object list form
+            using (ObjectListForm form = new ObjectListForm())
+            {
+                // If the user did not click Ok or the selected object is null
+                if (form.ShowDialog() != DialogResult.OK || form.SelectedObject == null || form.SelectedObject.Image == null)
+                    return;
+
+                // Set selected item
+                txtObject.Text = form.SelectedObject.Resource.Name;
+                Size size = new Size(Math.Min(form.SelectedObject.Image.Width, 22), Math.Min(form.SelectedObject.Image.Height, 22));
+                Bitmap image = form.SelectedObject.Image.ToBitmap();
+                pnlObject.BackgroundImage = Graphics.PixelMap.BitmapResize(image, size);
+                image.Dispose();
+
+                // Set the selected object
+                pnlRoomEditor.SelectedObject = form.SelectedObject;
+                pnlBlockEditor.ObjectId = form.SelectedObject.Resource.Id;
+            }
+        }
+
+        /// <summary>
         /// Object menu item click
         /// </summary>
         private void mnuObjectMenuItem_Click(object sender, EventArgs e)
@@ -1209,9 +1252,27 @@ namespace GMare
                 // Make the delete all option not visible
                 mnuInstanceDeleteAll.Visible = false;
 
-                // If a single instance has been selected, enable replacement options
+                // If a single instance has been selected, enable object selection and replacement options
                 if (pnlRoomEditor.SelectedInstances.Count == 1)
                 {
+                    // Allow setting the object selection based on the instance
+                    mnuSetAsObject.Enabled = true;
+
+                    // Set selected item
+                    GMareObject obj = App.Room.Objects.Find(o => o.Resource.Id == pnlRoomEditor.SelectedInstances[0].ObjectId);
+
+                    // If the object was found and has an image
+                    if (obj != null && obj.Image != null)
+                    {
+                        // Set menu image to object sprite image
+                        Size size = new Size(Math.Min(obj.Image.Width, 22), Math.Min(obj.Image.Height, 22));
+                        Bitmap image = obj.Image.ToBitmap();
+                        mnuSetAsObject.Image = Graphics.PixelMap.BitmapResize(image, size);
+                        image.Dispose();
+                    }
+                    else
+                        mnuSetAsObject.Image = GMare.Properties.Resources.instance;
+
                     // If an object has been selected
                     if (pnlRoomEditor.SelectedObject != null)
                     {
@@ -1271,6 +1332,10 @@ namespace GMare
             // If there is something on the clipboard, enable pasting
             mnuInstancePaste.Enabled = pnlRoomEditor.InstanceClipboard.Count > 0 ? true : false;
 
+            // Always allow object search
+            mnuSearchObjects.Visible = true;
+            mnuSearchObjects.Enabled = true;
+
             // Always allow sorting
             mnuSortStandard.Visible = true;
             mnuSortStandard.Enabled = true;
@@ -1301,7 +1366,11 @@ namespace GMare
             string name = e.ClickedItem.Name;
 
             // Do action based on menu item
-            if (mnuSortStandard.Name == name)
+            if (mnuSearchObjects.Name == name)
+                mnuSearchObjects_Click(this, EventArgs.Empty);
+            else if (mnuSetAsObject.Name == name)
+                pnlRoomEditor.SetObjectFromInstance();
+            else if (mnuSortStandard.Name == name)
                 SetSortingChecked(0);
             else if (mnuSortAscending.Name == name)
                 SetSortingChecked(1);
@@ -1352,7 +1421,7 @@ namespace GMare
             // If the calling object is not a button or the room is empty, return
             if (!(sender is PyxButton) || App.Room == null)
                 return;
-
+            
             // Get the calling button name
             string name = (sender as PyxButton).Name;
 
@@ -1452,6 +1521,26 @@ namespace GMare
 
             // Invalidate room editor
             pnlRoomEditor.Invalidate();
+        }
+
+        /// <summary>
+        /// Selected object changed
+        /// </summary>
+        private void pnlRoomEditor_SelectedObjectChanged()
+        {
+            // If a room is not loaded or there is no object selected or the object selected has no image data
+            if (App.Room == null || pnlRoomEditor.SelectedObject == null || pnlRoomEditor.SelectedObject.Image == null)
+                return;
+
+            // Set selected item
+            txtObject.Text = pnlRoomEditor.SelectedObject.Resource.Name;
+            Size size = new Size(Math.Min(pnlRoomEditor.SelectedObject.Image.Width, 22), Math.Min(pnlRoomEditor.SelectedObject.Image.Height, 22));
+            Bitmap image = pnlRoomEditor.SelectedObject.Image.ToBitmap();
+            pnlObject.BackgroundImage = Graphics.PixelMap.BitmapResize(image, size);
+            image.Dispose();
+            
+            // Set the selected object
+            pnlBlockEditor.ObjectId = pnlRoomEditor.SelectedObject.Resource.Id;
         }
 
         /// <summary>
@@ -1756,8 +1845,16 @@ namespace GMare
             List<GMareObject> recentObjects = new List<GMareObject>();
 
             // Remove Recent Objects menu items
+            menu.Items.RemoveByKey("mnuSearchObjects");
             menu.Items.RemoveByKey("mnuRecentObjects");
             menu.Items.RemoveByKey("sepRecentObjects");
+
+            // Create a menu item for the object search
+            ToolStripMenuItem search = new ToolStripMenuItem();
+            search.Name = "mnuSearchObjects";
+            search.Text = "Search Objects";
+            search.Image = GMare.Properties.Resources.magnifier;
+            search.Click += new EventHandler(mnuSearchObjects_Click);
 
             // Create a menu item for recent objects
             ToolStripMenuItem recent = new ToolStripMenuItem();
@@ -1803,8 +1900,9 @@ namespace GMare
             sep.Name = "sepRecentObjects";
 
             // Insert the recent object menu item and a separator
-            menu.Items.Insert(0, recent);
-            menu.Items.Insert(1, sep);
+            menu.Items.Insert(0, search);
+            menu.Items.Insert(1, recent);
+            menu.Items.Insert(2, sep);
 
             // Set recent objects
             App.Room.RecentObjects = recentObjects;
@@ -1881,6 +1979,14 @@ namespace GMare
         }
 
         /// <summary>
+        /// Sets the room editor height based on if showing the tips status bar
+        /// </summary>
+        private void SetRoomEditorHeight()
+        {
+            pnlRoomEditor.Height += grpRoomEditor.ShowStatusBar ? -18 : 18;
+        }
+
+        /// <summary>
         /// Sets the initial GUI on project loads
         /// </summary>
         private void SetUI()
@@ -1894,7 +2000,7 @@ namespace GMare
             App.Room.Layers.Add(new GMareLayer(App.Room.Columns, App.Room.Rows));
 
             // Set form level variables
-            _history = new UndoRedoHistory<IRoomOwner>(this, App.GetUndoRedoMax());
+            _history = new UndoRedoHistory<IRoomOwner>(this, App.GetUndoRedoMax(true));
             _layer = App.Room.Layers[0];
 
             // Set UI based on room properties
@@ -1908,8 +2014,12 @@ namespace GMare
             pnlRoomEditor.EditMode = tabMain.SelectedTab == tabTiles ? EditType.Layers : EditType.Objects;
             txtObject.Text = "<undefined>";
             txtObject.Enabled = false;
-
+            grpRoomEditor.ShowStatusBar = App.GetConfigFlag(App.ShowTipsAppKey, true);
+            
             // Update UI
+            if (!grpRoomEditor.ShowStatusBar)
+                SetRoomEditorHeight();
+
             UpdateLayerList(0);
             UpdateBackgrounds();
             UpdateStatusStrip();
@@ -1925,6 +2035,49 @@ namespace GMare
             // SET UI
             SetUndoRedo();
             SetClipboard();
+        }
+
+        /// <summary>
+        /// Selects the next layer
+        /// </summary>
+        private void SelectLayer(bool up)
+        {
+            // If the room or selected layer is empty, return
+            if (App.Room == null || lstLayers.Items.Count == 0)
+                return;
+
+            // If no layer selected, select the first layer
+            if (lstLayers.SelectedItem == null)
+            {
+                lstLayers.SelectedIndex = 0;
+                return;
+            }
+
+            // Set index
+            int newIndex = up ? lstLayers.SelectedIndex - 1 : lstLayers.SelectedIndex + 1;
+            lstLayers.SelectedIndex = up ? newIndex < 0 ? lstLayers.Items.Count - 1 : newIndex :
+                                           newIndex >= lstLayers.Items.Count ? 0 : newIndex;
+            lstLayers.Invalidate();
+        }
+
+        /// <summary>
+        /// Set the layer visibility
+        /// </summary>
+        private void SetLayerVisibility()
+        {
+            // If no layer is selected, return
+            if (lstLayers.SelectedItem == null)
+                return;
+
+            // Set visibility
+            _ignoreCheck = true;
+            bool visible = (lstLayers.SelectedItem as GMareLayer).Visible;
+            (lstLayers.SelectedItem as GMareLayer).Visible = !visible;
+            lstLayers.SetItemChecked(lstLayers.SelectedIndex, !visible);
+            _ignoreCheck = false;
+
+            // Update rendering
+            lstLayers.Invalidate();
         }
 
         #endregion
@@ -2116,14 +2269,18 @@ namespace GMare
             {
                 case EditType.Layers:
                     sslInfo.Text = pnlRoomEditor.MouseSector;
-                    sslTool.Text = "Shift + Left Mouse Button to erase.";
-                    sslTool.Image = GMare.Properties.Resources.eraser;
+
+                    if (grpRoomEditor.StatusBarText != GMare.Properties.Resources.TileToolTips)
+                        grpRoomEditor.StatusBarText = GMare.Properties.Resources.TileToolTips;
+
                     break;
 
                 case EditType.Objects:
                     sslInfo.Text = "Instances: " + App.Room.Instances.Count + " | " + pnlRoomEditor.MouseInstance;
-                    sslTool.Text = "Shift + Left Button to multi-select. Alt + Left Button to paint.";
-                    sslTool.Image = GMare.Properties.Resources.tool_selection;
+
+                    if (grpRoomEditor.StatusBarText != GMare.Properties.Resources.ObjectToolTips)
+                        grpRoomEditor.StatusBarText = GMare.Properties.Resources.ObjectToolTips;
+
                     break;
             }
         }

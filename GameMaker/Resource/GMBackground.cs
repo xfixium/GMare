@@ -190,7 +190,7 @@ namespace GameMaker.Resource
         /// <param name="directory">The XML (.GMX) file path</param>
         /// <param name="assets">A list of assets listed in the project GMX</param>
         /// <returns>A GM background</returns>
-        public static GMList<GMBackground> ReadBackgroundGMX(string directory, ref List<string> assets)
+        public static GMList<GMBackground> ReadBackgroundsGMX(string directory, ref List<string> assets)
         {
             // A list of backgrounds
             GMList<GMBackground> backgrounds = new GMList<GMBackground>();

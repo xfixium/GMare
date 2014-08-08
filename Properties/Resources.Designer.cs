@@ -710,6 +710,22 @@ namespace GMare.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hold down the shift key and press the left mouse button to create a selection rectangle
+        ///Use the mouse wheel to zoom in and out of the room
+        ///Press the O key to import objects from a Game Maker project
+        ///Hold down the Alt key and press the left button to paint instances of a selected object
+        ///Right click the room editor or an instance to open the options menu
+        ///Press the H key to hand drag the room
+        ///Press the Z key to open a list of objects to choose from
+        ///Right click a tile on the block editor to unassign the  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ObjectToolTips {
+            get {
+                return ResourceManager.GetString("ObjectToolTips", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap persistent {
@@ -985,6 +1001,23 @@ namespace GMare.Properties {
             get {
                 object obj = ResourceManager.GetObject("tileset_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When painting, hold down the shift key and press the left mouse button to erase tiles
+        ///Use the mouse wheel to zoom in and out of the room
+        ///Right click the room editor or a tile selection to open the options menu
+        ///Press the H key to hand drag the room
+        ///Press the up arrow key to select the layer above
+        ///Press the down arrow key to select the layer below
+        ///Press the left arrow key to flip the brush tiles horizontally
+        ///Press the right arrow key to flip the brush tiles vertically
+        ///Press the B key to import a backg [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TileToolTips {
+            get {
+                return ResourceManager.GetString("TileToolTips", resourceCulture);
             }
         }
         

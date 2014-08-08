@@ -42,22 +42,24 @@ namespace GMare.Controls
     {
         #region Fields
 
-        public event MousePositionHandler MousePositionChanged;         // Mouse position changed event
-        public delegate void MousePositionHandler();                    // Mouse position changed event handler
-        public event InstancePositionHandler InstancesPositionChanged;  // Selected instances position changed event
-        public delegate void InstancePositionHandler();                 // Selected instances position changed event handler
-        public event InstanceChangedHandler InstancesChanged;           // Selected instances changed event
-        public delegate void InstanceChangedHandler();                  // Selected instances changed event handler
-        public event RoomChangedHandler RoomChanged;                    // Room changed event
-        public delegate void RoomChangedHandler();                      // Room changed event handler
-        public event ClipboardChangedHandler ClipboardChanged;          // Clipboard contents changed
-        public delegate void ClipboardChangedHandler();                 // Clipboard contents changed handler
-        public event EditModeChangedHandler EditModeChanged;            // Editmode changed
-        public delegate void EditModeChangedHandler();                  // Editmode changed handler
+        public event MousePositionHandler MousePositionChanged;           // Mouse position changed event
+        public delegate void MousePositionHandler();                      // Mouse position changed event handler
+        public event SelectedObjectChangedHandler SelectedObjectChanged;  // Selected object changed event
+        public delegate void SelectedObjectChangedHandler();              // Selected object changed handler
+        public event InstancePositionHandler InstancesPositionChanged;    // Selected instances position changed event
+        public delegate void InstancePositionHandler();                   // Selected instances position changed event handler
+        public event InstanceChangedHandler InstancesChanged;             // Selected instances changed event
+        public delegate void InstanceChangedHandler();                    // Selected instances changed event handler
+        public event RoomChangedHandler RoomChanged;                      // Room changed event
+        public delegate void RoomChangedHandler();                        // Room changed event handler
+        public event ClipboardChangedHandler ClipboardChanged;            // Clipboard contents changed
+        public delegate void ClipboardChangedHandler();                   // Clipboard contents changed handler
+        public event EditModeChangedHandler EditModeChanged;              // Editmode changed
+        public delegate void EditModeChangedHandler();                    // Editmode changed handler
 
-        private Point _previous = Point.Empty;                          // Previous dragging point
-        private bool _handTool = false;                                 // If the hand tool is being pressed
-        private bool _dragging = false;                                 // If Dragging
+        private Point _previous = Point.Empty;                            // Previous dragging point
+        private bool _handTool = false;                                   // If the hand tool is being pressed
+        private bool _dragging = false;                                   // If Dragging
 
         #endregion
 
@@ -441,6 +443,15 @@ namespace GMare.Controls
         }
 
         /// <summary>
+        /// Selected object changed
+        /// </summary>
+        private void pnlRoom_SelectedObjectChanged()
+        {
+            if (SelectedObjectChanged != null)
+                SelectedObjectChanged();
+        }
+
+        /// <summary>
         /// Room panel position changed
         /// </summary>
         private void pnlRoom_MousePositionChanged()
@@ -632,6 +643,18 @@ namespace GMare.Controls
             }
             else
                 sbVertical.Value = 0;
+        }
+
+        /// <summary>
+        /// Set the selected instance as the selected object
+        /// </summary>
+        public void SetObjectFromInstance()
+        {
+            // If not in object editing mode, return
+            if (EditMode != EditType.Objects)
+                return;
+
+            pnlRoom.mnuSetAsObject_Click(this, EventArgs.Empty);
         }
 
         /// <summary>

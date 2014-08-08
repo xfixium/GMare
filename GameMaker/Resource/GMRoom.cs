@@ -472,7 +472,7 @@ namespace GameMaker.Resource
                             background.Visible = GMXBool(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Visible)), background.Visible);
                             background.Foreground = GMXBool(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Visible)), background.Foreground);
                             background.BackgroundName = GMXString(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Name)),background.BackgroundName);
-                            background.BackgroundId = background.BackgroundName == "" ? -1 : GetIdFromName(background.BackgroundName);
+                            background.BackgroundId = GetIdFromName(background.BackgroundName);
                             background.X = GMXInt(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.X)), background.X);
                             background.Y = GMXInt(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Y)), background.Y);
                             background.TileHorizontally = GMXBool(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.HTiled)), background.TileHorizontally);
@@ -488,7 +488,7 @@ namespace GameMaker.Resource
                             GMView view = new GMView();
                             view.Visible = GMXBool(reader.GetAttribute(GMXEnumString(GMXViewProperty.Visible)), view.Visible);
                             view.ObjectToFollowName = GMXString(reader.GetAttribute(GMXEnumString(GMXViewProperty.ObjName)), view.ObjectToFollowName);
-                            view.ObjectToFollow = view.ObjectToFollowName == "" ? -1 : GetIdFromName(view.ObjectToFollowName);
+                            view.ObjectToFollow = GetIdFromName(view.ObjectToFollowName);
                             view.ViewX = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.XView)), view.ViewX);
                             view.ViewY = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.YView)), view.ViewX);
                             view.ViewWidth = GMXInt(reader.GetAttribute(GMXEnumString(GMXViewProperty.WView)), view.ViewWidth);
@@ -508,7 +508,7 @@ namespace GameMaker.Resource
                             // Create an instance and add it to the list of instances
                             GMInstance instance = new GMInstance();
                             instance.ObjectName = GMXString(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.ObjName)), instance.ObjectName);
-                            instance.ObjectId = instance.ObjectName == "" ? -1 : GetIdFromName(instance.ObjectName);
+                            instance.ObjectId = GetIdFromName(instance.ObjectName);
                             instance.X = GMXInt(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.X)), instance.X);
                             instance.Y = GMXInt(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.Y)), instance.Y);
                             instance.Name = GMXString(reader.GetAttribute(GMXEnumString(GMXInstanceProperty.Name)), instance.Name);
@@ -525,7 +525,7 @@ namespace GameMaker.Resource
                             // Create an tile and add it to the list of tiles
                             GMTile tile = new GMTile();
                             tile.BackgroundName = GMXString(reader.GetAttribute(GMXEnumString(GMXTileProperty.BGName)), tile.BackgroundName);
-                            tile.BackgroundId = tile.BackgroundName == "" ? -1 : GetIdFromName(tile.BackgroundName);
+                            tile.BackgroundId = GetIdFromName(tile.BackgroundName);
                             tile.BackgroundX = GMXInt(reader.GetAttribute(GMXEnumString(GMXTileProperty.X)), tile.BackgroundX);
                             tile.BackgroundY = GMXInt(reader.GetAttribute(GMXEnumString(GMXTileProperty.Y)), tile.BackgroundY);
                             tile.Width = GMXInt(reader.GetAttribute(GMXEnumString(GMXTileProperty.W)), tile.Width);
@@ -861,7 +861,7 @@ namespace GameMaker.Resource
         #region Game Maker Studio
 
         /// <summary>
-        /// Write a Game Maker GMX formatted room
+        /// Writes a Game Maker GMX formatted room
         /// </summary>
         /// <param name="room">The given room to write</param>
         /// <param name="directory">The room directory</param>

@@ -218,6 +218,8 @@ namespace GameMaker.Resource
 
         #region Methods
 
+        #region Game Maker Studio
+
         /// <summary>
         /// Reads all GMX objects from a directory
         /// </summary>
@@ -295,49 +297,49 @@ namespace GameMaker.Resource
                             reader.MoveToContent();
 
                             // Create a reader for the actions
-                            using (XmlReader xmlReader2 = reader.ReadSubtree())
+                            using (XmlReader reader2 = reader.ReadSubtree())
                             {
                                 // Argument list
                                 List<GMArgument> arguments = new List<GMArgument>();
 
                                 // Read in action properties
-                                while (xmlReader2.Read())
+                                while (reader2.Read())
                                 {
                                     // If the node is not an element, continue
                                     if (reader.NodeType != XmlNodeType.Element)
                                         continue;
 
                                     // Get the element name
-                                    string nodeName2 = xmlReader2.Name;
+                                    string nodeName2 = reader2.Name;
 
                                     // If the node is an argument
                                     if (nodeName2.ToLower() == EnumString.GetEnumString(GMXObjectProperty.Argument).ToLower())
                                     {
                                         // Seek to content
-                                        xmlReader2.MoveToContent();
+                                        reader2.MoveToContent();
 
                                         // Create a reader for the arguments
-                                        using (XmlReader xmlReader3 = xmlReader2.ReadSubtree())
+                                        using (XmlReader reader3 = reader2.ReadSubtree())
                                         {
                                             // Read in argument properties
-                                            while (xmlReader3.Read())
+                                            while (reader3.Read())
                                             {
                                                 // If the node is not an element, continue
                                                 if (reader.NodeType != XmlNodeType.Element)
                                                     continue;
 
                                                 // Get the element name
-                                                string nodeName3 = xmlReader3.Name;
+                                                string nodeName3 = reader3.Name;
 
                                                 // Read element
-                                                xmlReader3.Read();
+                                                reader3.Read();
 
                                                 // If the element value is null or empty, continue
-                                                if (String.IsNullOrEmpty(xmlReader3.Value))
+                                                if (String.IsNullOrEmpty(reader3.Value))
                                                     continue;
 
                                                 // Set the property value
-                                                argumentProperties[nodeName3] = xmlReader3.Value;
+                                                argumentProperties[nodeName3] = reader3.Value;
                                             }
 
                                             // Create a new argument
@@ -351,14 +353,14 @@ namespace GameMaker.Resource
                                     }
 
                                     // Read element
-                                    xmlReader2.Read();
+                                    reader2.Read();
 
                                     // If the element value is null or empty, continue
-                                    if (String.IsNullOrEmpty(xmlReader2.Value))
+                                    if (String.IsNullOrEmpty(reader2.Value))
                                         continue;
 
                                     // Set the property value
-                                    actionProperties[nodeName2] = xmlReader2.Value;
+                                    actionProperties[nodeName2] = reader2.Value;
                                 }
 
                                 // Create a new action
@@ -373,7 +375,7 @@ namespace GameMaker.Resource
                                 action.FunctionName = GMXString(actionProperties[GMXEnumString(GMXActionProperty.FunctionName)], action.FunctionName);
                                 action.ExecuteCode = GMXString(actionProperties[GMXEnumString(GMXActionProperty.CodeString)], action.ExecuteCode);
                                 action.AppliesToName = GMXString(actionProperties[GMXEnumString(GMXActionProperty.WhoName)], action.AppliesToName);
-                                action.AppliesTo = action.AppliesToName == "" ? -1 : GetIdFromName(action.AppliesToName);
+                                action.AppliesTo = GetIdFromName(action.AppliesToName);
                                 action.Relative = GMXBool(actionProperties[GMXEnumString(GMXActionProperty.Relative)], action.Relative);
                                 action.Not = GMXBool(actionProperties[GMXEnumString(GMXActionProperty.IsNot)], action.Not);
                                 action.Arguments = arguments.ToArray();
@@ -410,15 +412,15 @@ namespace GameMaker.Resource
                 obj.Id = GetIdFromName(name);
                 obj.Name = name;
                 obj.SpriteName = GMXString(objectProperties[GMXEnumString(GMXObjectProperty.SpriteName)], obj.SpriteName);
-                obj.SpriteId = obj.SpriteName == "" ? -1 : GetIdFromName(obj.SpriteName);
+                obj.SpriteId = GetIdFromName(obj.SpriteName);
                 obj.Solid = GMXBool(objectProperties[GMXEnumString(GMXObjectProperty.Solid)], obj.Solid);
                 obj.Visible = GMXBool(objectProperties[GMXEnumString(GMXObjectProperty.Visible)], obj.Visible);
                 obj.Depth = GMXInt(objectProperties[GMXEnumString(GMXObjectProperty.Depth)], obj.Depth);
                 obj.Persistent = GMXBool(objectProperties[GMXEnumString(GMXObjectProperty.Persistent)], obj.Persistent);
                 obj.ParentName = GMXString(objectProperties[GMXEnumString(GMXObjectProperty.ParentName)], obj.ParentName);
-                obj.Parent = obj.ParentName == "" ? -1 : GetIdFromName(obj.ParentName);
+                obj.Parent = GetIdFromName(obj.ParentName);
                 obj.MaskName = GMXString(objectProperties[GMXEnumString(GMXObjectProperty.MaskName)], obj.MaskName);
-                obj.Mask = obj.MaskName == "" ? -1 : GetIdFromName(obj.MaskName);
+                obj.Mask = GetIdFromName(obj.MaskName);
                 obj.Events = events;
 
                 // Add the object
@@ -428,6 +430,10 @@ namespace GameMaker.Resource
             // Return the list of objects
             return objects;
         }
+
+        #endregion
+
+        #region Game Maker 5 - 8.1
 
         /// <summary>
         /// Reads objects from GM file
@@ -549,6 +555,8 @@ namespace GameMaker.Resource
             // Return objects
             return objects;
         }
+
+        #endregion
 
         #endregion
     }

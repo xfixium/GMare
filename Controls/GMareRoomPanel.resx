@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <metadata name="mnuSelectionOptions.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 56</value>
+    <value>22, 56</value>
   </metadata>
   <metadata name="mnuInstanceOptions.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 95</value>
@@ -126,14 +126,13 @@
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="mnuInstanceSnap.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADrwAAA68AZW8ckkAAAE9SURBVDhPY2AgAJYzMCivYGDoW8nAcBCEQWyQGCF9YHmQ
-        wtU8nHuvx4W+/NBU9QeEQWyQGIohjIyMjUC8BhmDDFgItO1afNjLc3Hh7/v4+C6DMIgNEgPJwV0B1LgO
-        xkFmzwI6+VZW0p8uLq7LjQwM1iAMYoPEQHLIBmxAMgDOnsLAcOZyeND/eiANkwexQWIgOWQDNgNthuE2
-        EBskCXTjmbvOdhgGgMRAcsgGbENyAZytpaWVeuDAif8aGhrlMHlsYgxAG3ciGQBnCwsLZ589e/U/kC6G
-        yWMTAxmwBwn3gdggDezs7EnMzMytIBpmADYxkAEHkFwAZxOVWECKgAYcQTKAJDZYH9CA40h4GhHs4yiu
-        A2qARwmpbJhBN5FMJJXNIAfUvB2In5GAQepB+sCAH4glgFiKBAxSD9LHAABywZC/omaY3AAAAABJRU5E
-        rkJggg==
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        vAAADrwBlbxySQAAATpJREFUOE+VkTFLw1AUhW/IECzSDlnEwcUl5C8ILv0HhdotQsBFRwfBRVrQwSFT
+        6eDmVEURQVAEhQhCHVqX0IqFroVO+gMK6T3Pq+Rh0L4Dh/tx7j2vgdJ/ahOtnhFF50RPMBiZrP8WDi8W
+        Fx7fgurks7E/hcHItEcsy6qzL7NGfsq/NtjcmLwGtY+oWExgMDLsVBniwpWgxif8ycPtcHpcKCR1ojUY
+        jAw7OVOla0GNm0TdpFZJD3hKRGBk2EmkSjcZH2Ei52/sjsrrvx5Ahp1E6oFbQY1939+K45fU87w9iXIz
+        lO4FNXZdd6fX66c8dyXKzVB6yDjCRO44Tmjb9iGmOmTlZXggFtR4bnHpWdCYlTjoZNyagztS/RIHP3+J
+        KX/rXSZkyrTCvmOPDYx79JRK7CX2soFxzz2iGXLBkL/Q8keSAAAAAElFTkSuQmCC
 </value>
   </data>
   <metadata name="mnuBrushOptions.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

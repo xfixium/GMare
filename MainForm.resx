@@ -151,6 +151,29 @@
         5mwpKyOMgveth4JDPRQcbhyQv+2Hp3tn1h7fAAAAAElFTkSuQmCC
 </value>
   </data>
+  <data name="butGrid.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        vAAADrwBlbxySQAAAWhJREFUOE+dkD1Lw2AUhbOqP6Dg1lE6uAhSEBwEQTDgYIQOXTpEjUQkEoSUUpz8
+        LYqKWERQ/BikRarixz8QEZOAIE2bhqZ5fc+NUSpFEi8cDu+9zzmBCAulkiiVy3JSISdg5ovFRfaPQY4K
+        5gxjKeCL80c7tsAjRwWzuq74QUAHzMVT6Je/PNqDA48cFcxo2orX7bKTe5udch3dWt86e+h94w4OPHJU
+        MK2qquv77PjOoi8A/MvBgUeOCqYUZdXpdNhh3WKVm5+v9RPu4MAjRwWTsrz24Xls/zr8wsGXV+pmj0d7
+        cOCRo4KJQkF7b7fZTtVku1DNYns1k4MmD4WON/a4gwOPHBWM5/PrtuvSAbN99UYevfvtwSNHBWO5nG62
+        WgTEFXjkqGBUkjZem006YOI4eOSoYEQUjRfHoUNcgUeOClLZ7KbJ/+pzoxFb4JGjgoF0enkok9lKKuSo
+        gM8gV4prOIHA85wgfALAZ7HH2RruVQAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="butGridIso.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        vAAADrwBlbxySQAAAUNJREFUOE+dkLFKw2AURrOqD1Bw6ygdXAQpCA6CIBhwMEKHLh2qRiISCUJKKU4+
+        iw4OLoKDkwgiiPgIItJYEKRp09A0MedKQpUSUj+43Pz9z/kSquw0m6rWatWnHTyFbDcau9E/gicFW7a9
+        F8Y/3L50cg88nhRsWpYehKFckPO7duaGg8eTgg3TPPBHo+jmuZNCSSad4eDxpGDdMAwvCKLrp48Uytpw
+        8HhSsKbrh+5wGF09/hSQBE4yfoaDx5OC1Xr96Mv3o8uHfF8AB48nBSu1mvk5GEQX986vN5FJZzh4PClY
+        rlaPO54nFwmUteHg8aRgqVKxnH4/Bcj4M/l7B48nBYuadvLe66VQng2PJwULqmq/ua5c5B14PCkolMun
+        Tvyvvna7uQceTwpmisX9uVLpbNrBk4I4s/EU4pmfYuBjT1G+AaBQv4lQD7EmAAAAAElFTkSuQmCC
+</value>
+  </data>
   <data name="butShowBlocks.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
@@ -165,29 +188,6 @@
         TOCPk+MTRWOQCZ6TBLfZd6rjpFBIY36l66QoMKiQXy3HubsyVLgVaPAcRVq9IGhmgsntCRjbtAueqJ0Y
         iIrHe0k8eiU7oEuh0Sv2RJg6VShzJqK8Yx+MnUmoGcyEwiIIzrNHmJlkJfJV5Ln2Tom6oWzYBjPC8Fpm
         EgQs6xixjG3L2L0+i+ySAvKsxIYs/vvVs1y6BF/IFhP9BfrrbcbR8MveAAAAAElFTkSuQmCC
-</value>
-  </data>
-  <data name="butGridIso.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vAAADrwBlbxySQAAAUNJREFUOE+dkLFKw2AURrOqD1Bw6ygdXAQpCA6CIBhwMEKHLh2qRiISCUJKKU4+
-        iw4OLoKDkwgiiPgIItJYEKRp09A0MedKQpUSUj+43Pz9z/kSquw0m6rWatWnHTyFbDcau9E/gicFW7a9
-        F8Y/3L50cg88nhRsWpYehKFckPO7duaGg8eTgg3TPPBHo+jmuZNCSSad4eDxpGDdMAwvCKLrp48Uytpw
-        8HhSsKbrh+5wGF09/hSQBE4yfoaDx5OC1Xr96Mv3o8uHfF8AB48nBSu1mvk5GEQX986vN5FJZzh4PClY
-        rlaPO54nFwmUteHg8aRgqVKxnH4/Bcj4M/l7B48nBYuadvLe66VQng2PJwULqmq/ua5c5B14PCkolMun
-        Tvyvvna7uQceTwpmisX9uVLpbNrBk4I4s/EU4pmfYuBjT1G+AaBQv4lQD7EmAAAAAElFTkSuQmCC
-</value>
-  </data>
-  <data name="butGrid.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vAAADrwBlbxySQAAAWhJREFUOE+dkD1Lw2AUhbOqP6Dg1lE6uAhSEBwEQTDgYIQOXTpEjUQkEoSUUpz8
-        LYqKWERQ/BikRarixz8QEZOAIE2bhqZ5fc+NUSpFEi8cDu+9zzmBCAulkiiVy3JSISdg5ovFRfaPQY4K
-        5gxjKeCL80c7tsAjRwWzuq74QUAHzMVT6Je/PNqDA48cFcxo2orX7bKTe5udch3dWt86e+h94w4OPHJU
-        MK2qquv77PjOoi8A/MvBgUeOCqYUZdXpdNhh3WKVm5+v9RPu4MAjRwWTsrz24Xls/zr8wsGXV+pmj0d7
-        cOCRo4KJQkF7b7fZTtVku1DNYns1k4MmD4WON/a4gwOPHBWM5/PrtuvSAbN99UYevfvtwSNHBWO5nG62
-        WgTEFXjkqGBUkjZem006YOI4eOSoYEQUjRfHoUNcgUeOClLZ7KbJ/+pzoxFb4JGjgoF0enkok9lKKuSo
-        gM8gV4prOIHA85wgfALAZ7HH2RruVQAAAABJRU5ErkJggg==
 </value>
   </data>
   <data name="butShowInstances.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
@@ -257,6 +257,6 @@
     <value>121, 17</value>
   </metadata>
   <metadata name="mnuObjects.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>210, 17</value>
+    <value>216, 17</value>
   </metadata>
 </root>

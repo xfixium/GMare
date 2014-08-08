@@ -46,6 +46,8 @@ namespace GMare.Controls
 
         public event MousePositionHandler MousePositionChanged;                      // Mouse position changed event
         public delegate void MousePositionHandler();                                 // Mouse position changed event handler
+        public event SelectedObjectChangedHandler SelectedObjectChanged;             // Selected object changed event
+        public delegate void SelectedObjectChangedHandler();                         // Selected object changed handler
         public event InstancePositionHandler SelectedInstancesPositionChanged;       // Selected instances position changed event
         public delegate void InstancePositionHandler();                              // Selected instances position changed event handler
         public event InstanceChangedHandler SelectedInstanceChanged;                 // Selected instance changed event
@@ -591,6 +593,8 @@ namespace GMare.Controls
             mnuSelectionColor.Click += new EventHandler(mnuSelectionColor_Click);
 
             // Set instance options click events
+            mnuSearchObjects.Click += new EventHandler(mnuSearchObjects_Click);
+            mnuSetAsObject.Click += new EventHandler(mnuSetAsObject_Click);
             mnuInstanceReplace.Click += new EventHandler(mnuInstanceReplace_Click);
             mnuInstanceReplaceAll.Click += new EventHandler(mnuInstanceReplaceAll_Click);
             mnuInstanceCut.Click += new EventHandler(mnuInstanceCut_Click);
@@ -649,7 +653,7 @@ namespace GMare.Controls
                 return;
 
             // Show warning message
-            if (App.Room.Backgrounds[0].Image != null && App.Room.ScaleWarning == true)
+            if (App.Room.Backgrounds[0].Image != null && App.GetConfigFlag(App.ShowScaleWarningAppKey, false))
                 ShowWarning(GMare.Properties.Resources.ScaleWarning);
 
             // Flip brush horizontally
@@ -669,7 +673,7 @@ namespace GMare.Controls
                 return;
 
             // Show warning message
-            if (_background.Image != null && App.Room.ScaleWarning == true)
+            if (_background.Image != null && App.GetConfigFlag(App.ShowScaleWarningAppKey, false))
                 ShowWarning(GMare.Properties.Resources.ScaleWarning);
 
             // Flip the brush vertically
@@ -689,7 +693,7 @@ namespace GMare.Controls
                 return;
 
             // Show warning message
-            if (_background.Image != null && App.Room.BlendWarning == true)
+            if (_background.Image != null && App.GetConfigFlag(App.ShowBlendWarningAppKey, false))
                 ShowWarning(GMare.Properties.Resources.BlendWarning);
 
             // Create a color dialog
@@ -953,7 +957,7 @@ namespace GMare.Controls
                 return;
 
             // Show warning message
-            if (App.Room != null && App.Room.ScaleWarning == true)
+            if (App.Room != null && App.GetConfigFlag(App.ShowScaleWarningAppKey, false))
                 ShowWarning(GMare.Properties.Resources.ScaleWarning);
 
             // Flip selection horizontally
@@ -976,7 +980,7 @@ namespace GMare.Controls
                 return;
 
             // Show warning message
-            if (App.Room != null && App.Room.ScaleWarning == true)
+            if (App.Room != null && App.GetConfigFlag(App.ShowScaleWarningAppKey, false))
                 ShowWarning(GMare.Properties.Resources.ScaleWarning);
 
             // Flip selection vertically
@@ -998,8 +1002,8 @@ namespace GMare.Controls
             if (_selection == null)
                 return;
 
-            // Show warning message
-            if (App.Room != null && App.Room.BlendWarning == true)
+            // If the warning message has not been shown, show it
+            if (App.Room != null && App.GetConfigFlag(App.ShowBlendWarningAppKey, false))
                 ShowWarning(GMare.Properties.Resources.BlendWarning);
 
             // Create a color dialog
@@ -1050,8 +1054,23 @@ namespace GMare.Controls
                 // If a single instance has been selected, enable replacement and position options
                 if (_selectedInstances.Count == 1)
                 {
-                    // Allow position changing
-                    mnuInstancePosition.Enabled = true;
+                    // Allow setting the object selection based on the instance
+                    mnuSetAsObject.Enabled = true;
+
+                    // Set selected item
+                    GMareObject obj = App.Room.Objects.Find(o => o.Resource.Id == _selectedInstances[0].ObjectId);
+
+                    // If the object was found and has an image
+                    if (obj != null && obj.Image != null)
+                    {
+                        // Set menu image to object sprite image
+                        Size size = new Size(Math.Min(obj.Image.Width, 22), Math.Min(obj.Image.Height, 22));
+                        Bitmap image = obj.Image.ToBitmap();
+                        mnuSetAsObject.Image = Graphics.PixelMap.BitmapResize(image, size);
+                        image.Dispose();
+                    }
+                    else
+                        mnuSetAsObject.Image = GMare.Properties.Resources.instance;
 
                     // If an object has been selected
                     if (_selectedObject != null)
@@ -1113,6 +1132,10 @@ namespace GMare.Controls
                     mnuInstanceOptions.Items[i].Visible = false;
             }
 
+            // Always allow object search
+            mnuSearchObjects.Visible = true;
+            mnuSearchObjects.Enabled = true;
+
             // If there is something on the clipboard
             mnuInstancePaste.Enabled = _instanceClip.Count > 0 ? true : false;
             mnuInstancePaste.Visible = true;
@@ -1120,6 +1143,44 @@ namespace GMare.Controls
             // Always allow instance clearing
             mnuInstanceClear.Visible = true;
             mnuInstanceClear.Enabled = true;
+        }
+
+        /// <summary>
+        /// Search objects menu item click
+        /// </summary>
+        public void mnuSearchObjects_Click(object sender, EventArgs e)
+        {
+            // Create an object list form
+            using (ObjectListForm form = new ObjectListForm())
+            {
+                // If the user did not click Ok or the selected object is null
+                if (form.ShowDialog() != DialogResult.OK || form.SelectedObject == null || form.SelectedObject.Image == null)
+                    return;
+
+                // Set the selected object from the form
+                _selectedObject = form.SelectedObject;
+
+                // Selected object changed
+                if (SelectedObjectChanged != null)
+                    SelectedObjectChanged();
+            }
+        }
+
+        /// <summary>
+        /// Set as selected object click
+        /// </summary>
+        public void mnuSetAsObject_Click(object sender, EventArgs e)
+        {
+            // If there is not only one instance, return
+            if (_selectedInstances.Count != 1)
+                return;
+
+            // Set the selected object from the selected instance
+            _selectedObject = App.Room.Objects.Find(o => o.Resource.Id == _selectedInstances[0].ObjectId);
+
+            // Selected object changed
+            if (SelectedObjectChanged != null)
+                SelectedObjectChanged();
         }
 
         /// <summary>
@@ -2054,8 +2115,8 @@ namespace GMare.Controls
                     position.Y = _posY + row * tileSize.Height;
 
                     // If within bounds, add tile
-                    if (source.X > -1 && source.X < GraphicsManager.TileMaps[2].GetLength(0) && source.Y > -1 && source.Y < GraphicsManager.TileMaps[2].GetLength(1))
-                        GraphicsManager.DrawTile(GraphicsManager.TileMaps[2][source.X, source.Y], position.X, position.Y, _brush.Tiles[col, row].GetScale().X, _brush.Tiles[col, row].GetScale().Y, 0, _brush.Tiles[col, row].Blend);
+                    if (source.X > -1 && source.X < GraphicsManager.TileMaps[0].GetLength(0) && source.Y > -1 && source.Y < GraphicsManager.TileMaps[0].GetLength(1))
+                        GraphicsManager.DrawTile(GraphicsManager.TileMaps[0][source.X, source.Y], position.X, position.Y, _brush.Tiles[col, row].GetScale().X, _brush.Tiles[col, row].GetScale().Y, 0, _brush.Tiles[col, row].Blend);
                 }
             }
 
@@ -2579,7 +2640,7 @@ namespace GMare.Controls
             }
 
             // Get the config file
-            Configuration config = App.GetConfig();
+            Configuration config = App.GetConfig(true);
 
             // If the config file was not found, return
             if (config == null)
@@ -2683,10 +2744,10 @@ namespace GMare.Controls
 
                 // Set message flag off
                 if (text == GMare.Properties.Resources.BlendWarning)
-                    App.Room.BlendWarning = false;
+                     App.SetConfigFlag(App.ShowBlendWarningAppKey, false);
 
                 if (text == GMare.Properties.Resources.ScaleWarning)
-                    App.Room.ScaleWarning = false;
+                    App.SetConfigFlag(App.ShowScaleWarningAppKey, false);
             }
         }
 
