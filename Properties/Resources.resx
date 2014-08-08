@@ -388,4 +388,30 @@
   <data name="application-task" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\application-task.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ObjectToolTips" xml:space="preserve">
+    <value>Hold down the shift key and press the left mouse button to create a selection rectangle
+Use the mouse wheel to zoom in and out of the room
+Press the O key to import objects from a Game Maker project
+Hold down the Alt key and press the left button to paint instances of a selected object
+Right click the room editor or an instance to open the options menu
+Press the H key to hand drag the room
+Press the Z key to open a list of objects to choose from
+Right click a tile on the block editor to unassign the object</value>
+  </data>
+  <data name="TileToolTips" xml:space="preserve">
+    <value>When painting, hold down the shift key and press the left mouse button to erase tiles
+Use the mouse wheel to zoom in and out of the room
+Right click the room editor or a tile selection to open the options menu
+Press the H key to hand drag the room
+Press the up arrow key to select the layer above
+Press the down arrow key to select the layer below
+Press the left arrow key to flip the brush tiles horizontally
+Press the right arrow key to flip the brush tiles vertically
+Press the B key to import a background
+Press the U key to hide the currently selected layer
+Press the P key to switch to the paint tool
+Press the F key to switch to the bucket fill tool
+Press the S key to switch to the selection tool
+Press the R key to replace tiles with other tiles</value>
+  </data>
 </root>

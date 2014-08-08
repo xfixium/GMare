@@ -257,7 +257,7 @@ namespace GMare.Forms
                 // Close the form
                 Close();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Notify the user that the export failed
                 MessageBox.Show("An error occurred while exporting the room, export aborted.", "GMare",

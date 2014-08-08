@@ -61,7 +61,8 @@ namespace GMare.Controls
         public enum ListboxType
         {
             Backgrounds,
-            Instances
+            Instances,
+            Objects
         };
 
         #endregion
@@ -177,6 +178,23 @@ namespace GMare.Controls
                     // Return glyph
                     return glyph;
 
+                case ListboxType.Objects:
+                    // Get the object
+                    GMareObject gmObject2 = Items[e.Index] == null ? null : (Items[e.Index] as GMareObject);
+
+                    // If the instance or object or object image is empty, return default glyph
+                    if (gmObject2 == null || gmObject2.Image == null)
+                        return GMare.Properties.Resources.instance;
+
+                    // Create a new glyph
+                    GDI.Bitmap glyph2 = new GDI.Bitmap(CellSize.Width * 2 + 2, CellSize.Height);
+                    GDI.Bitmap icon2 = ScaleImage((GDI.Bitmap)gmObject2.Image.ToBitmap(), CellSize.Width, CellSize.Height);
+                    GDI.Graphics gfx2 = GDI.Graphics.FromImage(glyph2);
+                    gfx2.DrawImageUnscaled(icon2, GDI.Point.Empty);
+
+                    // Return glyph
+                    return glyph2;
+
                 default: return Glyph;
             }
         }
@@ -235,7 +253,6 @@ namespace GMare.Controls
                     // Set selection text to cell width if less than cell width
                     rect.X = e.Bounds.X + (glyphSize.Width < _cellSize.Width ? _cellSize.Width : glyphSize.Width) + TextOffsetX;
                     base.OnDrawSelected(e, font, rect, glyphSize, text);
-
                     break;
 
                 case ListboxType.Instances:
@@ -256,6 +273,8 @@ namespace GMare.Controls
                         CurrentTheme.Theme.ControlSelectionTextForeColor, CurrentTheme.Theme.ControlSelectionTextBackColor);
 
                     break;
+
+                default: base.OnDrawSelected(e, font, rect, glyphSize, text); break;
             }
         }
 
@@ -344,6 +363,34 @@ namespace GMare.Controls
 
                     // Add new item
                     this.Items.AddRange(list.ToArray());
+                    break;
+
+                // Sorting instances
+                case ListboxType.Objects:
+
+                    // If no room was loaded, return
+                    if (App.Room == null)
+                        return;
+
+                    // Create a new list of instances
+                    List<GMareObject> objList = new List<GMareObject>();
+
+                    // Add all the current room instances
+                    foreach (GMareObject obj in App.Room.Objects)
+                        objList.Add(obj);
+
+                    // Sort
+                    switch (_sortMode)
+                    {
+                        case SortType.Ascending: objList.Sort(delegate(GMareObject inst1, GMareObject inst2) { return inst1.Resource.Name.CompareTo(inst2.Resource.Name); }); break;
+                        case SortType.Descending: objList.Sort(delegate(GMareObject inst1, GMareObject inst2) { return inst2.Resource.Name.CompareTo(inst1.Resource.Name); }); break;
+                    }
+
+                    // Clear all the current items
+                    this.Items.Clear();
+
+                    // Add new item
+                    this.Items.AddRange(objList.ToArray());
                     break;
             }
         }

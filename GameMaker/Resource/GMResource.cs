@@ -97,7 +97,7 @@ namespace GameMaker.Resource
         public static int GetIdFromName(string name)
         {
             // If the nme is empty, so is the id
-            if (name == "")
+            if (string.IsNullOrWhiteSpace(name))
                 return -1;
 
             // Id varible

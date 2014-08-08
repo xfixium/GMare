@@ -44,6 +44,9 @@
             this.mnuSelectionDeselect = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuSelectionDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuInstanceOptions = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mnuSearchObjects = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuSetAsObject = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuSeparator01 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuInstanceReplace = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuInstanceReplaceAll = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuSeperator03 = new System.Windows.Forms.ToolStripSeparator();
@@ -123,7 +126,7 @@
             // 
             this.mnuSelectionFlipHorizontal.Image = global::GMare.Properties.Resources.flip_horizontal;
             this.mnuSelectionFlipHorizontal.Name = "mnuSelectionFlipHorizontal";
-            this.mnuSelectionFlipHorizontal.ShortcutKeyDisplayString = "Right Arrow";
+            this.mnuSelectionFlipHorizontal.ShortcutKeyDisplayString = "Left Arrow";
             this.mnuSelectionFlipHorizontal.Size = new System.Drawing.Size(281, 22);
             this.mnuSelectionFlipHorizontal.Text = "Flip Selection Horizontally";
             // 
@@ -131,7 +134,7 @@
             // 
             this.mnuSelectionFlipVertical.Image = global::GMare.Properties.Resources.flip_vertical;
             this.mnuSelectionFlipVertical.Name = "mnuSelectionFlipVertical";
-            this.mnuSelectionFlipVertical.ShortcutKeyDisplayString = "Down Arrow";
+            this.mnuSelectionFlipVertical.ShortcutKeyDisplayString = "Right Arrow";
             this.mnuSelectionFlipVertical.Size = new System.Drawing.Size(281, 22);
             this.mnuSelectionFlipVertical.Text = "Flip Selection Vertically";
             // 
@@ -179,6 +182,9 @@
             // mnuInstanceOptions
             // 
             this.mnuInstanceOptions.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuSearchObjects,
+            this.mnuSetAsObject,
+            this.mnuSeparator01,
             this.mnuInstanceReplace,
             this.mnuInstanceReplaceAll,
             this.mnuSeperator03,
@@ -196,34 +202,54 @@
             this.mnuInstanceDeleteAll,
             this.mnuInstanceClear});
             this.mnuInstanceOptions.Name = "cms_InstanceOptions";
-            this.mnuInstanceOptions.Size = new System.Drawing.Size(171, 308);
+            this.mnuInstanceOptions.Size = new System.Drawing.Size(192, 358);
             this.mnuInstanceOptions.Opening += new System.ComponentModel.CancelEventHandler(this.mnuInstanceOptions_Opening);
+            // 
+            // mnuSearchObjects
+            // 
+            this.mnuSearchObjects.Image = global::GMare.Properties.Resources.magnifier;
+            this.mnuSearchObjects.Name = "mnuSearchObjects";
+            this.mnuSearchObjects.ShortcutKeyDisplayString = "Z";
+            this.mnuSearchObjects.Size = new System.Drawing.Size(191, 22);
+            this.mnuSearchObjects.Text = "Search Objects";
+            // 
+            // mnuSetAsObject
+            // 
+            this.mnuSetAsObject.Image = global::GMare.Properties.Resources.instance;
+            this.mnuSetAsObject.Name = "mnuSetAsObject";
+            this.mnuSetAsObject.Size = new System.Drawing.Size(191, 22);
+            this.mnuSetAsObject.Text = "Set As Selected Object";
+            // 
+            // mnuSeparator01
+            // 
+            this.mnuSeparator01.Name = "mnuSeparator01";
+            this.mnuSeparator01.Size = new System.Drawing.Size(188, 6);
             // 
             // mnuInstanceReplace
             // 
             this.mnuInstanceReplace.Image = global::GMare.Properties.Resources.arrow_switch;
             this.mnuInstanceReplace.Name = "mnuInstanceReplace";
-            this.mnuInstanceReplace.Size = new System.Drawing.Size(170, 22);
+            this.mnuInstanceReplace.Size = new System.Drawing.Size(191, 22);
             this.mnuInstanceReplace.Text = "Instance Replace";
             // 
             // mnuInstanceReplaceAll
             // 
             this.mnuInstanceReplaceAll.Image = global::GMare.Properties.Resources.instance_replace;
             this.mnuInstanceReplaceAll.Name = "mnuInstanceReplaceAll";
-            this.mnuInstanceReplaceAll.Size = new System.Drawing.Size(170, 22);
+            this.mnuInstanceReplaceAll.Size = new System.Drawing.Size(191, 22);
             this.mnuInstanceReplaceAll.Text = "Replace All";
             // 
             // mnuSeperator03
             // 
             this.mnuSeperator03.Name = "mnuSeperator03";
-            this.mnuSeperator03.Size = new System.Drawing.Size(167, 6);
+            this.mnuSeperator03.Size = new System.Drawing.Size(188, 6);
             // 
             // mnuInstanceCut
             // 
             this.mnuInstanceCut.Image = global::GMare.Properties.Resources.clipboard_cut;
             this.mnuInstanceCut.Name = "mnuInstanceCut";
             this.mnuInstanceCut.ShortcutKeyDisplayString = "Ctrl + X";
-            this.mnuInstanceCut.Size = new System.Drawing.Size(170, 22);
+            this.mnuInstanceCut.Size = new System.Drawing.Size(191, 22);
             this.mnuInstanceCut.Text = "Cut";
             // 
             // mnuInstanceCopy
@@ -231,7 +257,7 @@
             this.mnuInstanceCopy.Image = global::GMare.Properties.Resources.clipboard_copy;
             this.mnuInstanceCopy.Name = "mnuInstanceCopy";
             this.mnuInstanceCopy.ShortcutKeyDisplayString = "Ctrl + C";
-            this.mnuInstanceCopy.Size = new System.Drawing.Size(170, 22);
+            this.mnuInstanceCopy.Size = new System.Drawing.Size(191, 22);
             this.mnuInstanceCopy.Text = "Copy";
             // 
             // mnuInstancePaste
@@ -239,74 +265,74 @@
             this.mnuInstancePaste.Image = global::GMare.Properties.Resources.clipboard_paste;
             this.mnuInstancePaste.Name = "mnuInstancePaste";
             this.mnuInstancePaste.ShortcutKeyDisplayString = "Ctrl + V";
-            this.mnuInstancePaste.Size = new System.Drawing.Size(170, 22);
+            this.mnuInstancePaste.Size = new System.Drawing.Size(191, 22);
             this.mnuInstancePaste.Text = "Paste";
             // 
             // mnuSeperator04
             // 
             this.mnuSeperator04.Name = "mnuSeperator04";
-            this.mnuSeperator04.Size = new System.Drawing.Size(167, 6);
+            this.mnuSeperator04.Size = new System.Drawing.Size(188, 6);
             // 
             // mnuInstancePosition
             // 
             this.mnuInstancePosition.Image = global::GMare.Properties.Resources.instance_position;
             this.mnuInstancePosition.Name = "mnuInstancePosition";
-            this.mnuInstancePosition.Size = new System.Drawing.Size(170, 22);
+            this.mnuInstancePosition.Size = new System.Drawing.Size(191, 22);
             this.mnuInstancePosition.Text = "Change Position...";
             // 
             // mnuInstanceBringFront
             // 
             this.mnuInstanceBringFront.Image = global::GMare.Properties.Resources.bring_to_front;
             this.mnuInstanceBringFront.Name = "mnuInstanceBringFront";
-            this.mnuInstanceBringFront.Size = new System.Drawing.Size(170, 22);
+            this.mnuInstanceBringFront.Size = new System.Drawing.Size(191, 22);
             this.mnuInstanceBringFront.Text = "Bring To Front";
             // 
             // mnuInstanceSendBack
             // 
             this.mnuInstanceSendBack.Image = global::GMare.Properties.Resources.send_to_back;
             this.mnuInstanceSendBack.Name = "mnuInstanceSendBack";
-            this.mnuInstanceSendBack.Size = new System.Drawing.Size(170, 22);
+            this.mnuInstanceSendBack.Size = new System.Drawing.Size(191, 22);
             this.mnuInstanceSendBack.Text = "Send To Back";
             // 
             // mnuInstanceSnap
             // 
             this.mnuInstanceSnap.Image = ((System.Drawing.Image)(resources.GetObject("mnuInstanceSnap.Image")));
             this.mnuInstanceSnap.Name = "mnuInstanceSnap";
-            this.mnuInstanceSnap.Size = new System.Drawing.Size(170, 22);
+            this.mnuInstanceSnap.Size = new System.Drawing.Size(191, 22);
             this.mnuInstanceSnap.Text = "Snap To Grid";
             // 
             // mnuInstanceCode
             // 
             this.mnuInstanceCode.Image = global::GMare.Properties.Resources.script;
             this.mnuInstanceCode.Name = "mnuInstanceCode";
-            this.mnuInstanceCode.Size = new System.Drawing.Size(170, 22);
+            this.mnuInstanceCode.Size = new System.Drawing.Size(191, 22);
             this.mnuInstanceCode.Text = "Creation Code...";
             // 
             // mnuSeperator05
             // 
             this.mnuSeperator05.Name = "mnuSeperator05";
-            this.mnuSeperator05.Size = new System.Drawing.Size(167, 6);
+            this.mnuSeperator05.Size = new System.Drawing.Size(188, 6);
             // 
             // mnuInstanceDelete
             // 
             this.mnuInstanceDelete.Image = global::GMare.Properties.Resources.delete;
             this.mnuInstanceDelete.Name = "mnuInstanceDelete";
             this.mnuInstanceDelete.ShortcutKeyDisplayString = "Del";
-            this.mnuInstanceDelete.Size = new System.Drawing.Size(170, 22);
+            this.mnuInstanceDelete.Size = new System.Drawing.Size(191, 22);
             this.mnuInstanceDelete.Text = "Delete";
             // 
             // mnuInstanceDeleteAll
             // 
             this.mnuInstanceDeleteAll.Image = global::GMare.Properties.Resources.button_decline;
             this.mnuInstanceDeleteAll.Name = "mnuInstanceDeleteAll";
-            this.mnuInstanceDeleteAll.Size = new System.Drawing.Size(170, 22);
+            this.mnuInstanceDeleteAll.Size = new System.Drawing.Size(191, 22);
             this.mnuInstanceDeleteAll.Text = "Delete All";
             // 
             // mnuInstanceClear
             // 
             this.mnuInstanceClear.Image = global::GMare.Properties.Resources.bin;
             this.mnuInstanceClear.Name = "mnuInstanceClear";
-            this.mnuInstanceClear.Size = new System.Drawing.Size(170, 22);
+            this.mnuInstanceClear.Size = new System.Drawing.Size(191, 22);
             this.mnuInstanceClear.Text = "Clear All Instances";
             // 
             // mnuBrushOptions
@@ -410,5 +436,8 @@
         private System.Windows.Forms.ToolStripMenuItem mnuInstanceReplaceAll;
         private System.Windows.Forms.ToolStripSeparator mnuSeperator03;
         private System.Windows.Forms.ToolStripMenuItem mnuInstancePosition;
+        private System.Windows.Forms.ToolStripMenuItem mnuSearchObjects;
+        private System.Windows.Forms.ToolStripMenuItem mnuSetAsObject;
+        private System.Windows.Forms.ToolStripSeparator mnuSeparator01;
     }
 }

@@ -140,6 +140,12 @@
     <Compile Include="Forms\ImportGMareForm.Designer.cs">
       <DependentUpon>ImportGMareForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ObjectListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ObjectListForm.Designer.cs">
+      <DependentUpon>ObjectListForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\PreferencesForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -350,6 +356,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportGMareForm.resx">
       <DependentUpon>ImportGMareForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ObjectListForm.resx">
+      <DependentUpon>ObjectListForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PreferencesForm.resx">
       <DependentUpon>PreferencesForm.cs</DependentUpon>

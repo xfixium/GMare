@@ -1493,7 +1493,7 @@ namespace GMare.Objects
                 // Iterate through layer columns, if the iterated tile id matches the target, add point
                 for (int x = 0; x < _tiles.GetLength(0); x++)
                     for (int y = 0; y < _tiles.GetLength(1); y++)
-                        if (_tiles[x, y].TileId == id)
+                        if (_tiles[x, y].TileId == id && !(_tiles[x, y].TileId == -1 && id == -1))
                             points.Add(new Point(x, y));
 
                 // Add point list
@@ -2677,6 +2677,19 @@ namespace GMare.Objects
             GMareObject obj = (GMareObject)this.MemberwiseClone();
             obj.Image = _image == null ? null : _image.Clone();
             return obj;
+        }
+
+        #endregion
+
+        #region Override
+
+        /// <summary>
+        /// To string
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return _resource.Name;
         }
 
         #endregion

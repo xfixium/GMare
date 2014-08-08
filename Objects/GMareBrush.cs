@@ -268,7 +268,14 @@ namespace GMare.Objects
         {
             GMareBrush brush = (GMareBrush)this.MemberwiseClone();
             brush.Glyph = _glyph == null ? null : (Bitmap)_glyph.Clone();
-            brush.Tiles = (GMareTile[,])_tiles.Clone();
+            GMareTile[,] tiles = new GMareTile[_tiles.GetLength(0), _tiles.GetLength(1)];
+
+            // Deep clone
+            for (int x = 0; x < _tiles.GetLength(0); x++)
+                for (int y = 0; y < _tiles.GetLength(1); y++)
+                    tiles[x, y] = _tiles[x, y].Clone();
+
+            brush.Tiles = tiles;
             return brush;
         }
 

@@ -196,7 +196,7 @@ namespace GameMaker.Project
                     case GMResourceType.Sprites: Sprites = GMSprite.ReadSpritesGMX(item.Value, ref Assets); break;
                     //case GMResourceType.Configs: Settings.Configs = GMSettings.GetConfigsGMX(item.Value); break;
                     //case GMResourceType.Constants: Settings.Constants = GMSettings.ReadConstantsGMX(item.Value); break;
-                    case GMResourceType.Backgrounds: Backgrounds = GMBackground.ReadBackgroundGMX(item.Value, ref Assets); break;
+                    case GMResourceType.Backgrounds: Backgrounds = GMBackground.ReadBackgroundsGMX(item.Value, ref Assets); break;
                     case GMResourceType.Objects: Objects = GMObject.ReadObjectsGMX(item.Value, ref Assets); break;
                     case GMResourceType.Rooms: Rooms = GMRoom.ReadRoomsGMX(item.Value, ref Assets, out LastTileId); break;
                     //case GMResourceType.TimeLines: Timelines = GMTimeline.ReadTimelinesGMX(item.Value, Assets); break;
