@@ -216,7 +216,7 @@ namespace GMare.Objects
         /// <summary>
         /// Gets the width of the room
         /// </summary>
-        
+
         public int Width
         {
             get { return _columns * _backgrounds[0].TileWidth; }
@@ -225,7 +225,7 @@ namespace GMare.Objects
         /// <summary>
         /// Gets the height of the room
         /// </summary>
-        
+
         public int Height
         {
             get { return _rows * _backgrounds[0].TileHeight; }
@@ -235,7 +235,7 @@ namespace GMare.Objects
         /// Gets or sets the columns of the room
         /// </summary>
         [XmlIgnore]
-        
+
         public int Columns
         {
             get { return _columns; }
@@ -263,7 +263,7 @@ namespace GMare.Objects
         /// Gets or sets the rows of the room
         /// </summary>
         [XmlIgnore]
-        
+
         public int Rows
         {
             get { return _rows; }
@@ -299,7 +299,7 @@ namespace GMare.Objects
         /// <summary>
         /// Gets the room size
         /// </summary>
-        
+
         public Size RoomSize
         {
             get { return new Size(Width, Height); }
@@ -334,7 +334,7 @@ namespace GMare.Objects
 
         #endregion
 
-        #region Constructor
+        #region Constructors
 
         /// <summary>
         /// Constructs a new room
@@ -773,7 +773,7 @@ namespace GMare.Objects
             for (int x = 0; x < topLayer.Tiles.GetLength(0); x++)
                 for (int y = 0; y < topLayer.Tiles.GetLength(1); y++)
                     if (topLayer.Tiles[x, y].TileId != -1)
-                        bottomLayer.Tiles[x,y] = topLayer.Tiles[x, y].Clone();
+                        bottomLayer.Tiles[x, y] = topLayer.Tiles[x, y].Clone();
 
             // Delete the top layer
             Layers.Remove(topLayer);
@@ -807,7 +807,7 @@ namespace GMare.Objects
         {
             // Create a list of Game Maker tiles
             List<GMTile> tiles = new List<GMTile>();
-            
+
             // Local variables
             int tileCols = background.GetCondensedTileset().Width / background.TileWidth;
             Point offset = new Point(background.OffsetX, background.OffsetY);
@@ -840,20 +840,26 @@ namespace GMare.Objects
                             if (sector == -1)
                                 continue;
 
+                            PointF scale = GMareTile.GetScale(layer.Tiles[col, row].FlipMode);
+                            Size flipOffset = new Size(scale.X == -1 ? tileSize.Width : 0, scale.Y == -1 ? tileSize.Height : 0);
+
                             // Create a new GM tile
                             GMTile tile = new GMTile();
                             tile.Id = lastTileId++;
                             tile.Depth = depth;
                             tile.BackgroundId = background.GameMakerId;
                             tile.BackgroundName = background.Name;
-                            tile.X = col * _backgrounds[0].TileWidth;
-                            tile.Y = row * _backgrounds[0].TileHeight;
+                            tile.X = (col * _backgrounds[0].TileWidth) + flipOffset.Width;
+                            tile.Y = (row * _backgrounds[0].TileHeight) + flipOffset.Height;
                             tile.Width = _backgrounds[0].TileWidth;
                             tile.Height = _backgrounds[0].TileHeight;
                             tile.BackgroundX = (sector - (sector / tileCols) * tileCols) * tileSize.Width;
                             tile.BackgroundY = (sector / tileCols) * tileSize.Height;
                             tile.BackgroundX += ((tile.BackgroundX / tileSize.Width) * spacing.X) + offset.X;
                             tile.BackgroundY += ((tile.BackgroundY / tileSize.Height) * spacing.Y) + offset.Y;
+                            tile.ScaleX = scale.X;
+                            tile.ScaleY = scale.Y;
+                            tile.UBlendColor = GMUtilities.ColorToGMSColor(layer.Tiles[col, row].Blend);
 
                             // Add the Game Maker tile to the list
                             tiles.Add(tile);
@@ -1048,7 +1054,7 @@ namespace GMare.Objects
         /// Gets the byte size of a room for binary export
         /// </summary>
         /// <returns>The byte size of a room</returns>
-        public int GetByteCount(GMareBackground background, bool writeTiles, bool useFlipValues, bool useBlendColor, 
+        public int GetByteCount(GMareBackground background, bool writeTiles, bool useFlipValues, bool useBlendColor,
             bool writeInstances, bool writeBlockInstances)
         {
             // WriteTiles            (1)
@@ -1171,7 +1177,7 @@ namespace GMare.Objects
 
         #endregion
     }
-    
+
     /// <summary>
     /// Layer class that holds indexing and tile data
     /// </summary>
@@ -1229,7 +1235,7 @@ namespace GMare.Objects
         /// <summary>
         /// XML conversion doesn't support 2d arrays, use jagged arrays instead
         /// </summary>
-        [XmlArrayItemAttribute("Tiles", typeof(GMareTile[]), IsNullable=false)]
+        [XmlArrayItemAttribute("Tiles", typeof(GMareTile[]), IsNullable = false)]
         public GMareTile[][] XMLTiles
         {
             get
@@ -1945,7 +1951,7 @@ namespace GMare.Objects
                 // If the image is empty, return null
                 if (_image == null)
                     return null;
-                
+
                 // Copy the bitmap into memory, return byte array
                 using (MemoryStream ms = new MemoryStream())
                 {
@@ -2416,6 +2422,28 @@ namespace GMare.Objects
         /// Converts the flipping data to a scale point
         /// </summary>
         /// <returns>A converted flip point</returns>
+        public static PointF GetScale(FlipType type)
+        {
+            // Create a new point
+            PointF point = new PointF(1.0f, 1.0f);
+
+            // Set flipping data
+            switch (type)
+            {
+                case FlipType.None: break;
+                case FlipType.Horizontal: point.X = -1.0f; break;
+                case FlipType.Vertical: point.Y = -1.0f; break;
+                case FlipType.Both: point.X = -1.0f; point.Y = -1.0f; break;
+            }
+
+            // Return converted data point
+            return point;
+        }
+
+        /// <summary>
+        /// Converts the flipping data to a scale point
+        /// </summary>
+        /// <returns>A converted flip point</returns>
         public PointF GetScale()
         {
             // Create a new point
@@ -2449,7 +2477,7 @@ namespace GMare.Objects
                         _flip = FlipType.Horizontal;
                     else
                         _flip = FlipType.Vertical;
-                    
+
                     break;
 
                 case FlipType.Horizontal:
@@ -2467,7 +2495,7 @@ namespace GMare.Objects
                         _flip = FlipType.Both;
                     else
                         _flip = FlipType.None;
-                    
+
                     break;
 
                 case FlipType.Both:
@@ -2476,7 +2504,7 @@ namespace GMare.Objects
                         _flip = FlipType.Vertical;
                     else
                         _flip = FlipType.Horizontal;
-                    
+
                     break;
             }
         }
@@ -2536,7 +2564,7 @@ namespace GMare.Objects
             {
                 // Create an object array to store the complex object
                 object[] res = new object[3];
-                res[0] =_resource.Id;
+                res[0] = _resource.Id;
                 res[1] = (string)_resource.Name.Clone();
                 res[2] = _resource.LastChanged;
 
@@ -2635,7 +2663,7 @@ namespace GMare.Objects
 
         #endregion
 
-        #region Constructor
+        #region Constructors
 
         /// <summary>
         /// Constructs a new GMare object
@@ -2681,7 +2709,7 @@ namespace GMare.Objects
 
         #endregion
 
-        #region Override
+        #region Overrides
 
         /// <summary>
         /// To string
@@ -2722,7 +2750,7 @@ namespace GMare.Objects
         /// Gets the location point of the instance within a room
         /// </summary>
         [XmlIgnore]
-        
+
         public Point Location
         {
             get { return new Point(X, Y); }
@@ -2920,9 +2948,12 @@ namespace GMare.Objects
         /// <param name="blendColor">The blend color of the tile</param>
         public ExportTile(int id, Point location, Rectangle rect, int background, string backgroundName, int depth, FlipType flipMode, Color blendColor)
         {
+            PointF scale = GMareTile.GetScale(flipMode);
+            Size flipOffset = new Size(scale.X == -1 ? rect.Width : 0, scale.Y == -1 ? rect.Height : 0);
+
             Id = id;
-            X = rect.X;
-            Y = rect.Y;
+            X = rect.X + flipOffset.Width;
+            Y = rect.Y + flipOffset.Height;
             Width = rect.Width;
             Height = rect.Height;
             BackgroundX = location.X;
@@ -2930,6 +2961,9 @@ namespace GMare.Objects
             BackgroundId = background;
             Depth = depth;
             BackgroundName = backgroundName;
+            ScaleX = scale.X;
+            ScaleY = scale.Y;
+            UBlendColor = GMUtilities.ColorToGMSColor(blendColor);
             _flipMode = flipMode;
             _blendColor = blendColor;
         }
