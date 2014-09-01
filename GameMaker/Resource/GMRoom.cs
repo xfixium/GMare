@@ -45,6 +45,8 @@ namespace GameMaker.Resource
         private GMView[] _views = new GMView[8];
         private string _caption = "";
         private string _creationCode = "";
+        private double _physicsWorldGravityX = 0;
+        private double _physicsWorldGravityY = 10;
         private double _physicsWorldPixToMeters = 0.100000001490116;
         private int _currentTab = 0;
         private int _width = 640;
@@ -69,8 +71,6 @@ namespace GameMaker.Resource
         private int _physicsWorldLeft = 0;
         private int _physicsWorldRight = 640;
         private int _physicsWorldBottom = 480;
-        private int _physicsWorldGravityX = 0;
-        private int _physicsWorldGravityY = 10;
         private bool _isSet = true;
         private bool _persistent = false;
         private bool _drawBackgroundColor = true;
@@ -261,13 +261,13 @@ namespace GameMaker.Resource
             set { _physicsWorldBottom = value; }
         }
 
-        public int PhysicsWorldGravityX
+        public double PhysicsWorldGravityX
         {
             get { return _physicsWorldGravityX; }
             set { _physicsWorldGravityX = value; }
         }
 
-        public int PhysicsWorldGravityY
+        public double PhysicsWorldGravityY
         {
             get { return _physicsWorldGravityY; }
             set { _physicsWorldGravityY = value; }
@@ -471,7 +471,7 @@ namespace GameMaker.Resource
                             GMParallax background = new GMParallax();
                             background.Visible = GMXBool(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Visible)), background.Visible);
                             background.Foreground = GMXBool(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Visible)), background.Foreground);
-                            background.BackgroundName = GMXString(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Name)),background.BackgroundName);
+                            background.BackgroundName = GMXString(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Name)), background.BackgroundName);
                             background.BackgroundId = GetIdFromName(background.BackgroundName);
                             background.X = GMXInt(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.X)), background.X);
                             background.Y = GMXInt(reader.GetAttribute(GMXEnumString(GMXParallaxProperty.Y)), background.Y);
@@ -595,8 +595,8 @@ namespace GameMaker.Resource
                 room.PhysicsWorldLeft = GMXInt(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldLeft)], room.PhysicsWorldLeft);
                 room.PhysicsWorldRight = GMXInt(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldRight)], room.PhysicsWorldRight);
                 room.PhysicsWorldBottom = GMXInt(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldBottom)], room.PhysicsWorldBottom);
-                room.PhysicsWorldGravityX = GMXInt(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldGravityX)], room.PhysicsWorldGravityX);
-                room.PhysicsWorldGravityY = GMXInt(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldGravityY)], room.PhysicsWorldGravityY);
+                room.PhysicsWorldGravityX = GMXDouble(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldGravityX)], room.PhysicsWorldGravityX);
+                room.PhysicsWorldGravityY = GMXDouble(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldGravityY)], room.PhysicsWorldGravityY);
                 room.PhysicsWorldPixToMeters = GMXDouble(properties[GMXEnumString(GMXRoomProperty.PhysicsWorldPixToMeters)], room.PhysicsWorldPixToMeters);
                 room.Parallaxes = backgrounds.ToArray();
                 room.Views = views.ToArray();
@@ -1057,8 +1057,9 @@ namespace GameMaker.Resource
     {
         #region Fields
 
+        private string _name = "";
         private string _backgroundName = "";
-        private int _backgroundId = -1; 
+        private int _backgroundId = -1;
         private int _x = 0;
         private int _y = 0;
         private int _horizontalSpeed = 0;
@@ -1072,6 +1073,11 @@ namespace GameMaker.Resource
         #endregion
 
         #region Properties
+
+        public string Name
+        {
+            get { return _name; }
+        }
 
         public string BackgroundName
         {
@@ -1140,6 +1146,28 @@ namespace GameMaker.Resource
         }
 
         #endregion
+
+        #region Constructors
+
+        public GMParallax()
+        {
+        }
+
+        public GMParallax(string name)
+        {
+            _name = name;
+        }
+
+        #endregion
+
+        #region Overrides
+
+        public override string ToString()
+        {
+            return _name;
+        }
+
+        #endregion
     }
 
     [Serializable]
@@ -1147,6 +1175,7 @@ namespace GameMaker.Resource
     {
         #region Fields
 
+        private string _name = "";
         private string _objectToFollowName = "";
         private int _viewX = 0;
         private int _viewY = 0;
@@ -1166,6 +1195,11 @@ namespace GameMaker.Resource
         #endregion
 
         #region Properties
+
+        public string Name
+        {
+            get { return _name; }
+        }
 
         public string ObjectToFollowName
         {
@@ -1255,6 +1289,28 @@ namespace GameMaker.Resource
         {
             get { return _visible; }
             set { _visible = value; }
+        }
+
+        #endregion
+
+        #region Constructors
+
+        public GMView()
+        {
+        }
+
+        public GMView(string name)
+        {
+            _name = name;
+        }
+
+        #endregion
+
+        #region Overrides
+
+        public override string ToString()
+        {
+            return _name;
         }
 
         #endregion

@@ -350,7 +350,7 @@
             // 
             // mnuPreferences
             // 
-            this.mnuPreferences.Image = global::GMare.Properties.Resources.application_task;
+            this.mnuPreferences.Image = global::GMare.Properties.Resources.preferences;
             this.mnuPreferences.Name = "mnuPreferences";
             this.mnuPreferences.Size = new System.Drawing.Size(218, 22);
             this.mnuPreferences.Text = "Preferences";

@@ -124,7 +124,7 @@
   <data name="clipboard_script" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\clipboard-paste-document-text.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="hand-point" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="skip" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\hand-point.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="image_import" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -163,7 +163,7 @@
   <data name="script" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\script-code.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="alarm-clock--arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="reminder" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\alarm-clock--arrow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="clipboard_copy" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -354,7 +354,7 @@ Right click a tile on the block editor to unassign the object</value>
   <data name="hide_blocks" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\hide_blocks.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="application-task" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="preferences" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\application-task.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="contents" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -372,7 +372,7 @@ Right click a tile on the block editor to unassign the object</value>
   <data name="tool_selection" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\selection-select.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="arrow-270" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="download" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\arrow-2701.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="persistent" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -426,7 +426,7 @@ Right click a tile on the block editor to unassign the object</value>
   <data name="instance" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\control-record.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="server--arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="update" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\server--arrow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

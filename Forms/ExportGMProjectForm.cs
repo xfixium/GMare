@@ -124,13 +124,6 @@ namespace GMare.Forms
         {
             try
             {
-                // Create a backup of the original project file
-                string filePath = MakeBackup();
-
-                // If the backup failed, return, else write the file
-                if (filePath == "")
-                    return;
-
                 // Get the currently selected node
                 GMNode node = tvRooms.SelectedNode.Tag as GMNode;
                 
@@ -148,6 +141,13 @@ namespace GMare.Forms
                     if (result != DialogResult.Yes)
                         return;
                 }
+
+                // Create a backup of the original project file
+                string filePath = MakeBackup();
+
+                // If the backup failed, return, else write the file
+                if (filePath == "")
+                    return;
 
                 // If the node is being overwritten, overwrite, else add the node
                 if (node.NodeType == GMNodeType.Child)
@@ -383,26 +383,30 @@ namespace GMare.Forms
             // Set room instances
             for (int i = 0; i < gmareInstances.Count; i++)
             {
-                // If game maker studio, else Game Maker legacy
-                if (_project.GameMakerVersion == GMVersionType.GameMakerStudio)
+                bool studio = _project.GameMakerVersion == GMVersionType.GameMakerStudio;
+                GMObject obj = studio ? _project.Objects.Find(o => o.Name == gmareInstances[i].ObjectName) :
+                    _project.Objects.Find(o => o.Id == gmareInstances[i].ObjectId);
+
+                // If the object does not exist in the target project, abort
+                if (obj == null)
                 {
-                    // If the object id does not exist in the export project, abort
-                    if (_project.Objects.Find(o => o.Name == gmareInstances[i].ObjectName) == null)
-                    {
-                        MessageBox.Show("Could not find the object: " + gmareInstances[i].ObjectName + " within the target export project.",
-                            "GMare", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
-                        return null;
-                    }
+                    string objMessage = studio ? gmareInstances[i].ObjectName : gmareInstances[i].Name + "(Id: " + gmareInstances[i].ObjectId + ")";
+                    MessageBox.Show("Could not find the object: " + objMessage + " within the target export project.",
+                        "GMare", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                    return null;
                 }
-                else
+
+                // Get the sprite for the instance offsets
+                GMSprite sprite = studio ? _project.Sprites.Find(s => s.Name == obj.SpriteName) :
+                    _project.Sprites.Find(s => obj.SpriteId == obj.SpriteId);
+
+                // If the sprite does not exist in the target project, abort
+                if (sprite == null)
                 {
-                    // If the object id does not exist in the export project, abort
-                    if (_project.Objects.Find(o => o.Id == gmareInstances[i].ObjectId) == null)
-                    {
-                        MessageBox.Show("Could not find the object: " + gmareInstances[i].Name + "(Id: " + gmareInstances[i].ObjectId + ") within the target export project.",
-                            "GMare", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
-                        return null;
-                    }
+                    string spriteMessage = studio ? obj.SpriteName : obj.SpriteId.ToString();
+                    MessageBox.Show("Could not find the sprite: " + spriteMessage + " within the target export project.",
+                        "GMare", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                    return null;
                 }
 
                 // Increment project last instance id
@@ -415,10 +419,11 @@ namespace GMare.Forms
                 instances[i].Id = _project.LastInstanceId;
                 instances[i].ObjectName = gmareInstances[i].ObjectName;
                 instances[i].ObjectId = gmareInstances[i].ObjectId;
-                instances[i].X = gmareInstances[i].X;
-                instances[i].Y = gmareInstances[i].Y;
+                instances[i].X = gmareInstances[i].X + sprite.OriginX;
+                instances[i].Y = gmareInstances[i].Y + sprite.OriginY;
                 instances[i].ScaleX = gmareInstances[i].ScaleX == 0 ? 1 : gmareInstances[i].ScaleX;
                 instances[i].ScaleY = gmareInstances[i].ScaleY == 0 ? 1 : gmareInstances[i].ScaleY;
+                instances[i].Rotation = gmareInstances[i].Rotation;
             }
 
             // Return an array of instances
