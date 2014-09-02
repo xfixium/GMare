@@ -117,6 +117,8 @@ namespace GMare. Forms
             // chkWriteInstances
             // 
             this.chkWriteInstances.AutoSize = true;
+            this.chkWriteInstances.Checked = true;
+            this.chkWriteInstances.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkWriteInstances.Location = new System.Drawing.Point(12, 48);
             this.chkWriteInstances.Name = "chkWriteInstances";
             this.chkWriteInstances.Size = new System.Drawing.Size(150, 17);

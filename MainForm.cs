@@ -116,7 +116,7 @@ namespace GMare
 
             // Check for an update
             AutoUpdater.Start(GMare.Properties.Resources.UpdateURL);
-
+            
             // Initialize UI with data
             SetUI();
         }
@@ -223,7 +223,7 @@ namespace GMare
             // Get the calling menu item name
             string name = (sender as ToolStripMenuItem).Name;
 
-            // If saving and the room is empty, return
+            // If saving or exporting and the room is empty, return
             if ((mnuSave.Name == name || mnuSaveAs.Name == name || mnuExportImage.Name == name || mnuExportBinary.Name == name) && App.Room == null)
                 return;
 
@@ -382,12 +382,8 @@ namespace GMare
             }
             else if (mnuExportImage.Name == name)
             {
-                // If the background is empty or the background's image data is empty
-                if (_background == null || _background.Image == null)
-                    return;
-
                 // Create a new export image dialog
-                using (ExportImageForm form = new ExportImageForm(App.Room.Layers, _background.GetCondensedTileset(), App.Room.RoomSize, _background.TileSize))
+                using (ExportImageForm form = new ExportImageForm())
                 {
                     form.ShowDialog();
                 }
@@ -935,6 +931,14 @@ namespace GMare
 
             // Raise edit button event
             butLayerOption_Click(butLayerEdit, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Editor effects button check changed
+        /// </summary>
+        private void butEditorEffects_CheckChanged(object sender)
+        {
+            pnlRoomEditor.Opaque = butEditorEffects.Checked;
         }
 
         #endregion
@@ -2019,7 +2023,7 @@ namespace GMare
             txtObject.Text = "<undefined>";
             txtObject.Enabled = false;
             grpRoomEditor.ShowStatusBar = App.GetConfigFlag(App.ShowTipsAppKey, true);
-            
+
             // Update UI
             if (!grpRoomEditor.ShowStatusBar)
                 SetRoomEditorHeight();

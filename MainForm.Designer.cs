@@ -88,18 +88,19 @@
             this.pnlRoom = new System.Windows.Forms.Panel();
             this.butGrid = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butInvertGridColor = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
-            this.butGridIso = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
-            this.lblRoomGridX = new System.Windows.Forms.Label();
-            this.butGridSnap = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.lblRoomGridY = new System.Windows.Forms.Label();
-            this.butShowBlocks = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
+            this.butGridIso = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.nudRoomGridX = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
+            this.butGridSnap = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.nudRoomGridY = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
+            this.butShowBlocks = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
+            this.lblRoomGridX = new System.Windows.Forms.Label();
+            this.butShowInstances = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.lblRoomMagnify = new System.Windows.Forms.Label();
             this.trkRoomMagnify = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTrackBar();
-            this.butShowInstances = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.pnlRoomMagnify = new System.Windows.Forms.Panel();
             this.grpRoomEditor = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTabbedGroupBox();
+            this.pnlRoomEditor = new GMare.Controls.GMareRoomEditor();
             this.splRoom = new System.Windows.Forms.Splitter();
             this.pnlLeft = new System.Windows.Forms.Panel();
             this.tabMain = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTabControl();
@@ -114,8 +115,10 @@
             this.butSelectionTool = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.trkBackgroundMagnify = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTrackBar();
             this.butReplace = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
+            this.pnlBackground = new GMare.Controls.GMareBackgroundPanel();
             this.splBackground = new System.Windows.Forms.Splitter();
             this.grpLayers = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxGroupBox();
+            this.butEditorEffects = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butLayerView = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butLayerMove = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butLayerMerge = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
@@ -129,6 +132,7 @@
             this.pnlObject = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxPanel();
             this.tabInstancesMain = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTabControl();
             this.tabInstances = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTabPage();
+            this.lstInstances = new GMare.Controls.GMareListbox();
             this.mnuInstances = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnuSearchObjects = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuSetAsObject = new System.Windows.Forms.ToolStripMenuItem();
@@ -158,6 +162,7 @@
             this.lblBlockMagnify = new System.Windows.Forms.Label();
             this.pnlBlockMagnify = new System.Windows.Forms.Panel();
             this.trkBlockMagnify = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTrackBar();
+            this.pnlBlockEditor = new GMare.Controls.GMareBlockEditor();
             this.lblObject = new System.Windows.Forms.Label();
             this.butObjectsImport = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.ssMain = new System.Windows.Forms.StatusStrip();
@@ -165,10 +170,6 @@
             this.sslActual = new System.Windows.Forms.ToolStripStatusLabel();
             this.sslSnapped = new System.Windows.Forms.ToolStripStatusLabel();
             this.mnuObjects = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.pnlRoomEditor = new GMare.Controls.GMareRoomEditor();
-            this.pnlBackground = new GMare.Controls.GMareBackgroundPanel();
-            this.lstInstances = new GMare.Controls.GMareListbox();
-            this.pnlBlockEditor = new GMare.Controls.GMareBlockEditor();
             this.mnuMain.SuspendLayout();
             this.pnlTop.SuspendLayout();
             this.grpEdit.SuspendLayout();
@@ -232,8 +233,8 @@
             // 
             this.mnuNewProject.Image = global::GMare.Properties.Resources.application;
             this.mnuNewProject.Name = "mnuNewProject";
-            this.mnuNewProject.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
-            | System.Windows.Forms.Keys.N)));
+            this.mnuNewProject.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
+                        | System.Windows.Forms.Keys.N)));
             this.mnuNewProject.Size = new System.Drawing.Size(218, 22);
             this.mnuNewProject.Text = "New Project";
             this.mnuNewProject.Click += new System.EventHandler(this.mnuMenuItem_Click);
@@ -242,8 +243,8 @@
             // 
             this.mnuOpenProject.Image = global::GMare.Properties.Resources.file_open;
             this.mnuOpenProject.Name = "mnuOpenProject";
-            this.mnuOpenProject.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
-            | System.Windows.Forms.Keys.O)));
+            this.mnuOpenProject.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
+                        | System.Windows.Forms.Keys.O)));
             this.mnuOpenProject.Size = new System.Drawing.Size(218, 22);
             this.mnuOpenProject.Text = "Open Project";
             this.mnuOpenProject.Click += new System.EventHandler(this.mnuMenuItem_Click);
@@ -634,8 +635,8 @@
             // 
             // grpRoom
             // 
-            this.grpRoom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpRoom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.grpRoom.BackColor = System.Drawing.Color.Transparent;
             this.grpRoom.CenterStatus = false;
             this.grpRoom.Controls.Add(this.butRoomScript);
@@ -887,6 +888,7 @@
             // 
             // pnlRight
             // 
+            this.pnlRight.Controls.Add(this.pnlRoom);
             this.pnlRight.Controls.Add(this.grpRoomEditor);
             this.pnlRight.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlRight.Location = new System.Drawing.Point(308, 0);
@@ -899,18 +901,18 @@
             // 
             this.pnlRoom.Controls.Add(this.butGrid);
             this.pnlRoom.Controls.Add(this.butInvertGridColor);
-            this.pnlRoom.Controls.Add(this.butGridIso);
-            this.pnlRoom.Controls.Add(this.lblRoomGridX);
-            this.pnlRoom.Controls.Add(this.butGridSnap);
             this.pnlRoom.Controls.Add(this.lblRoomGridY);
-            this.pnlRoom.Controls.Add(this.butShowBlocks);
+            this.pnlRoom.Controls.Add(this.butGridIso);
             this.pnlRoom.Controls.Add(this.nudRoomGridX);
+            this.pnlRoom.Controls.Add(this.butGridSnap);
             this.pnlRoom.Controls.Add(this.nudRoomGridY);
+            this.pnlRoom.Controls.Add(this.butShowBlocks);
+            this.pnlRoom.Controls.Add(this.lblRoomGridX);
+            this.pnlRoom.Controls.Add(this.butShowInstances);
             this.pnlRoom.Controls.Add(this.lblRoomMagnify);
             this.pnlRoom.Controls.Add(this.trkRoomMagnify);
-            this.pnlRoom.Controls.Add(this.butShowInstances);
             this.pnlRoom.Controls.Add(this.pnlRoomMagnify);
-            this.pnlRoom.Location = new System.Drawing.Point(12, 24);
+            this.pnlRoom.Location = new System.Drawing.Point(12, 32);
             this.pnlRoom.Name = "pnlRoom";
             this.pnlRoom.Size = new System.Drawing.Size(454, 28);
             this.pnlRoom.TabIndex = 14;
@@ -924,7 +926,7 @@
             this.butGrid.Image = ((System.Drawing.Image)(resources.GetObject("butGrid.Image")));
             this.butGrid.ImageXOffset = 1;
             this.butGrid.ImageYOffset = 0;
-            this.butGrid.Location = new System.Drawing.Point(0, 2);
+            this.butGrid.Location = new System.Drawing.Point(0, 0);
             this.butGrid.Name = "butGrid";
             this.butGrid.PushButtonImage = null;
             this.butGrid.Size = new System.Drawing.Size(23, 24);
@@ -946,7 +948,7 @@
             this.butInvertGridColor.Image = global::GMare.Properties.Resources.grid_color;
             this.butInvertGridColor.ImageXOffset = 0;
             this.butInvertGridColor.ImageYOffset = 0;
-            this.butInvertGridColor.Location = new System.Drawing.Point(73, 2);
+            this.butInvertGridColor.Location = new System.Drawing.Point(73, 0);
             this.butInvertGridColor.Name = "butInvertGridColor";
             this.butInvertGridColor.PushButtonImage = null;
             this.butInvertGridColor.Size = new System.Drawing.Size(24, 24);
@@ -959,6 +961,15 @@
             this.butInvertGridColor.UseVisualStyleBackColor = true;
             this.butInvertGridColor.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
             // 
+            // lblRoomGridY
+            // 
+            this.lblRoomGridY.AutoSize = true;
+            this.lblRoomGridY.Location = new System.Drawing.Point(232, 8);
+            this.lblRoomGridY.Name = "lblRoomGridY";
+            this.lblRoomGridY.Size = new System.Drawing.Size(39, 13);
+            this.lblRoomGridY.TabIndex = 7;
+            this.lblRoomGridY.Text = "Grid Y:";
+            // 
             // butGridIso
             // 
             this.butGridIso.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.PushButton;
@@ -968,7 +979,7 @@
             this.butGridIso.Image = ((System.Drawing.Image)(resources.GetObject("butGridIso.Image")));
             this.butGridIso.ImageXOffset = 1;
             this.butGridIso.ImageYOffset = 0;
-            this.butGridIso.Location = new System.Drawing.Point(24, 2);
+            this.butGridIso.Location = new System.Drawing.Point(24, 0);
             this.butGridIso.Name = "butGridIso";
             this.butGridIso.PushButtonImage = null;
             this.butGridIso.Size = new System.Drawing.Size(23, 24);
@@ -980,68 +991,6 @@
             this.butGridIso.UseDropShadow = true;
             this.butGridIso.UseVisualStyleBackColor = true;
             this.butGridIso.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
-            // 
-            // lblRoomGridX
-            // 
-            this.lblRoomGridX.AutoSize = true;
-            this.lblRoomGridX.Location = new System.Drawing.Point(148, 8);
-            this.lblRoomGridX.Name = "lblRoomGridX";
-            this.lblRoomGridX.Size = new System.Drawing.Size(39, 13);
-            this.lblRoomGridX.TabIndex = 5;
-            this.lblRoomGridX.Text = "Grid X:";
-            // 
-            // butGridSnap
-            // 
-            this.butGridSnap.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.PushButton;
-            this.butGridSnap.Checked = true;
-            this.butGridSnap.FlatStyled = false;
-            this.butGridSnap.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.butGridSnap.Image = global::GMare.Properties.Resources.grid_snap;
-            this.butGridSnap.ImageXOffset = 0;
-            this.butGridSnap.ImageYOffset = 0;
-            this.butGridSnap.Location = new System.Drawing.Point(48, 2);
-            this.butGridSnap.Name = "butGridSnap";
-            this.butGridSnap.PushButtonImage = null;
-            this.butGridSnap.Size = new System.Drawing.Size(24, 24);
-            this.butGridSnap.TabIndex = 2;
-            this.butGridSnap.TextXOffset = 0;
-            this.butGridSnap.TextYOffset = 0;
-            this.butGridSnap.ToolTipText = "Snap or un-snap instances to the grid";
-            this.butGridSnap.ToolTipTitle = "Snap/UnSnap To Grid (N)";
-            this.butGridSnap.UseDropShadow = true;
-            this.butGridSnap.UseVisualStyleBackColor = true;
-            this.butGridSnap.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
-            // 
-            // lblRoomGridY
-            // 
-            this.lblRoomGridY.AutoSize = true;
-            this.lblRoomGridY.Location = new System.Drawing.Point(232, 8);
-            this.lblRoomGridY.Name = "lblRoomGridY";
-            this.lblRoomGridY.Size = new System.Drawing.Size(39, 13);
-            this.lblRoomGridY.TabIndex = 7;
-            this.lblRoomGridY.Text = "Grid Y:";
-            // 
-            // butShowBlocks
-            // 
-            this.butShowBlocks.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.PushButton;
-            this.butShowBlocks.Checked = true;
-            this.butShowBlocks.FlatStyled = false;
-            this.butShowBlocks.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.butShowBlocks.Image = ((System.Drawing.Image)(resources.GetObject("butShowBlocks.Image")));
-            this.butShowBlocks.ImageXOffset = 0;
-            this.butShowBlocks.ImageYOffset = 0;
-            this.butShowBlocks.Location = new System.Drawing.Point(123, 2);
-            this.butShowBlocks.Name = "butShowBlocks";
-            this.butShowBlocks.PushButtonImage = null;
-            this.butShowBlocks.Size = new System.Drawing.Size(24, 24);
-            this.butShowBlocks.TabIndex = 4;
-            this.butShowBlocks.TextXOffset = 0;
-            this.butShowBlocks.TextYOffset = 0;
-            this.butShowBlocks.ToolTipText = "Show or hide instances that are used as blocks";
-            this.butShowBlocks.ToolTipTitle = "Show/Hide Block Instances (Q)";
-            this.butShowBlocks.UseDropShadow = true;
-            this.butShowBlocks.UseVisualStyleBackColor = true;
-            this.butShowBlocks.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
             // 
             // nudRoomGridX
             // 
@@ -1069,6 +1018,28 @@
             0});
             this.nudRoomGridX.ValueChanged += new System.EventHandler(this.nudRoomGrid_ValueChanged);
             // 
+            // butGridSnap
+            // 
+            this.butGridSnap.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.PushButton;
+            this.butGridSnap.Checked = true;
+            this.butGridSnap.FlatStyled = false;
+            this.butGridSnap.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.butGridSnap.Image = global::GMare.Properties.Resources.grid_snap;
+            this.butGridSnap.ImageXOffset = 0;
+            this.butGridSnap.ImageYOffset = 0;
+            this.butGridSnap.Location = new System.Drawing.Point(48, 0);
+            this.butGridSnap.Name = "butGridSnap";
+            this.butGridSnap.PushButtonImage = null;
+            this.butGridSnap.Size = new System.Drawing.Size(24, 24);
+            this.butGridSnap.TabIndex = 2;
+            this.butGridSnap.TextXOffset = 0;
+            this.butGridSnap.TextYOffset = 0;
+            this.butGridSnap.ToolTipText = "Snap or un-snap instances to the grid";
+            this.butGridSnap.ToolTipTitle = "Snap/UnSnap To Grid (N)";
+            this.butGridSnap.UseDropShadow = true;
+            this.butGridSnap.UseVisualStyleBackColor = true;
+            this.butGridSnap.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
+            // 
             // nudRoomGridY
             // 
             this.nudRoomGridY.IgnoreHeight = true;
@@ -1094,6 +1065,59 @@
             0,
             0});
             this.nudRoomGridY.ValueChanged += new System.EventHandler(this.nudRoomGrid_ValueChanged);
+            // 
+            // butShowBlocks
+            // 
+            this.butShowBlocks.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.PushButton;
+            this.butShowBlocks.Checked = true;
+            this.butShowBlocks.FlatStyled = false;
+            this.butShowBlocks.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.butShowBlocks.Image = ((System.Drawing.Image)(resources.GetObject("butShowBlocks.Image")));
+            this.butShowBlocks.ImageXOffset = 0;
+            this.butShowBlocks.ImageYOffset = 0;
+            this.butShowBlocks.Location = new System.Drawing.Point(123, 0);
+            this.butShowBlocks.Name = "butShowBlocks";
+            this.butShowBlocks.PushButtonImage = null;
+            this.butShowBlocks.Size = new System.Drawing.Size(24, 24);
+            this.butShowBlocks.TabIndex = 4;
+            this.butShowBlocks.TextXOffset = 0;
+            this.butShowBlocks.TextYOffset = 0;
+            this.butShowBlocks.ToolTipText = "Show or hide instances that are used as blocks";
+            this.butShowBlocks.ToolTipTitle = "Show/Hide Block Instances (Q)";
+            this.butShowBlocks.UseDropShadow = true;
+            this.butShowBlocks.UseVisualStyleBackColor = true;
+            this.butShowBlocks.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
+            // 
+            // lblRoomGridX
+            // 
+            this.lblRoomGridX.AutoSize = true;
+            this.lblRoomGridX.Location = new System.Drawing.Point(150, 6);
+            this.lblRoomGridX.Name = "lblRoomGridX";
+            this.lblRoomGridX.Size = new System.Drawing.Size(39, 13);
+            this.lblRoomGridX.TabIndex = 5;
+            this.lblRoomGridX.Text = "Grid X:";
+            // 
+            // butShowInstances
+            // 
+            this.butShowInstances.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.PushButton;
+            this.butShowInstances.Checked = true;
+            this.butShowInstances.FlatStyled = false;
+            this.butShowInstances.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.butShowInstances.Image = ((System.Drawing.Image)(resources.GetObject("butShowInstances.Image")));
+            this.butShowInstances.ImageXOffset = 0;
+            this.butShowInstances.ImageYOffset = 0;
+            this.butShowInstances.Location = new System.Drawing.Point(98, 0);
+            this.butShowInstances.Name = "butShowInstances";
+            this.butShowInstances.PushButtonImage = null;
+            this.butShowInstances.Size = new System.Drawing.Size(24, 24);
+            this.butShowInstances.TabIndex = 3;
+            this.butShowInstances.TextXOffset = 0;
+            this.butShowInstances.TextYOffset = 0;
+            this.butShowInstances.ToolTipText = "Show or hide instances when in tile mode";
+            this.butShowInstances.ToolTipTitle = "Show/Hide Instances (A)";
+            this.butShowInstances.UseDropShadow = true;
+            this.butShowInstances.UseVisualStyleBackColor = true;
+            this.butShowInstances.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
             // 
             // lblRoomMagnify
             // 
@@ -1121,28 +1145,6 @@
             this.trkRoomMagnify.Value = 3;
             this.trkRoomMagnify.ValueChanged += new System.EventHandler(this.trkMagnify_ValueChanged);
             // 
-            // butShowInstances
-            // 
-            this.butShowInstances.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.PushButton;
-            this.butShowInstances.Checked = true;
-            this.butShowInstances.FlatStyled = false;
-            this.butShowInstances.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.butShowInstances.Image = ((System.Drawing.Image)(resources.GetObject("butShowInstances.Image")));
-            this.butShowInstances.ImageXOffset = 0;
-            this.butShowInstances.ImageYOffset = 0;
-            this.butShowInstances.Location = new System.Drawing.Point(98, 2);
-            this.butShowInstances.Name = "butShowInstances";
-            this.butShowInstances.PushButtonImage = null;
-            this.butShowInstances.Size = new System.Drawing.Size(24, 24);
-            this.butShowInstances.TabIndex = 3;
-            this.butShowInstances.TextXOffset = 0;
-            this.butShowInstances.TextYOffset = 0;
-            this.butShowInstances.ToolTipText = "Show or hide instances when in tile mode";
-            this.butShowInstances.ToolTipTitle = "Show/Hide Instances (A)";
-            this.butShowInstances.UseDropShadow = true;
-            this.butShowInstances.UseVisualStyleBackColor = true;
-            this.butShowInstances.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
-            // 
             // pnlRoomMagnify
             // 
             this.pnlRoomMagnify.BackgroundImage = global::GMare.Properties.Resources.magnifier;
@@ -1156,7 +1158,6 @@
             // 
             this.grpRoomEditor.BackColor = System.Drawing.Color.Transparent;
             this.grpRoomEditor.CenterStatus = false;
-            this.grpRoomEditor.Controls.Add(this.pnlRoom);
             this.grpRoomEditor.Controls.Add(this.pnlRoomEditor);
             this.grpRoomEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grpRoomEditor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -1171,6 +1172,44 @@
             this.grpRoomEditor.TabIndex = 4;
             this.grpRoomEditor.TabStop = false;
             this.grpRoomEditor.Text = "Room Editor";
+            // 
+            // pnlRoomEditor
+            // 
+            this.pnlRoomEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlRoomEditor.AvoidMouseEvents = false;
+            this.pnlRoomEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(171)))), ((int)(((byte)(173)))), ((int)(((byte)(179)))));
+            this.pnlRoomEditor.DepthIndex = 0;
+            this.pnlRoomEditor.EditMode = GMare.Objects.EditType.Layers;
+            this.pnlRoomEditor.GridMode = GMare.Objects.GridType.Normal;
+            this.pnlRoomEditor.GridX = 16;
+            this.pnlRoomEditor.GridY = 16;
+            this.pnlRoomEditor.InvertGridColor = false;
+            this.pnlRoomEditor.LayerIndex = -1;
+            this.pnlRoomEditor.Level = 0;
+            this.pnlRoomEditor.Location = new System.Drawing.Point(12, 56);
+            this.pnlRoomEditor.Name = "pnlRoomEditor";
+            this.pnlRoomEditor.Opaque = false;
+            this.pnlRoomEditor.Padding = new System.Windows.Forms.Padding(1);
+            this.pnlRoomEditor.SelectedBackground = null;
+            this.pnlRoomEditor.SelectedObject = null;
+            this.pnlRoomEditor.ShowBlocks = true;
+            this.pnlRoomEditor.ShowGrid = true;
+            this.pnlRoomEditor.ShowInstances = true;
+            this.pnlRoomEditor.Size = new System.Drawing.Size(450, 349);
+            this.pnlRoomEditor.Snap = true;
+            this.pnlRoomEditor.TabIndex = 12;
+            this.pnlRoomEditor.Tiles = null;
+            this.pnlRoomEditor.ToolMode = GMare.Objects.ToolType.Brush;
+            this.pnlRoomEditor.MousePositionChanged += new GMare.Controls.GMareRoomEditor.MousePositionHandler(this.pnlRoomEditor_MousePositionChanged);
+            this.pnlRoomEditor.SelectedObjectChanged += new GMare.Controls.GMareRoomEditor.SelectedObjectChangedHandler(this.pnlRoomEditor_SelectedObjectChanged);
+            this.pnlRoomEditor.InstancesPositionChanged += new GMare.Controls.GMareRoomEditor.InstancePositionHandler(this.pnlRoomEditor_InstancesPositionChanged);
+            this.pnlRoomEditor.InstancesChanged += new GMare.Controls.GMareRoomEditor.InstanceChangedHandler(this.pnlRoomEditor_InstanceChanged);
+            this.pnlRoomEditor.RoomChanged += new GMare.Controls.GMareRoomEditor.RoomChangedHandler(this.pnlRoomEditor_RoomChanged);
+            this.pnlRoomEditor.ClipboardChanged += new GMare.Controls.GMareRoomEditor.ClipboardChangedHandler(this.pnlRoomEditor_ClipboardChanged);
+            this.pnlRoomEditor.EditModeChanged += new GMare.Controls.GMareRoomEditor.EditModeChangedHandler(this.pnlRoomEditor_EditModeChanged);
+            this.pnlRoomEditor.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pnlRoomEditor_MouseUp);
             // 
             // splRoom
             // 
@@ -1377,6 +1416,7 @@
             this.trkBackgroundMagnify.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trkBackgroundMagnify.ToolTipText = "Slide to set the magnification level";
             this.trkBackgroundMagnify.ToolTipTitle = "Background Magnification";
+            this.trkBackgroundMagnify.Value = 1;
             this.trkBackgroundMagnify.ValueChanged += new System.EventHandler(this.trkMagnify_ValueChanged);
             // 
             // butReplace
@@ -1401,6 +1441,34 @@
             this.butReplace.UseVisualStyleBackColor = true;
             this.butReplace.Click += new System.EventHandler(this.butBackgroundEdit_Click);
             // 
+            // pnlBackground
+            // 
+            this.pnlBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlBackground.AutoScroll = true;
+            this.pnlBackground.AutoScrollMinSize = new System.Drawing.Size(256, 169);
+            this.pnlBackground.AvoidMouseEvents = false;
+            this.pnlBackground.BackColor = System.Drawing.Color.White;
+            this.pnlBackground.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.pnlBackground.CheckerColor = System.Drawing.Color.Silver;
+            this.pnlBackground.CheckerSize = new System.Drawing.Size(16, 16);
+            this.pnlBackground.Image = null;
+            this.pnlBackground.ImageScale = 1;
+            this.pnlBackground.Location = new System.Drawing.Point(11, 60);
+            this.pnlBackground.Name = "pnlBackground";
+            this.pnlBackground.SelectMode = GMare.Controls.GMareBackgroundPanel.SelectType.Normal;
+            this.pnlBackground.Size = new System.Drawing.Size(260, 173);
+            this.pnlBackground.SnapSize = new System.Drawing.Size(8, 8);
+            this.pnlBackground.TabIndex = 1;
+            this.pnlBackground.TileBrush = null;
+            this.pnlBackground.Title = "Background Tiles";
+            this.pnlBackground.ToolTipText = "";
+            this.pnlBackground.ToolTipTitle = "";
+            this.pnlBackground.UseCheckerBoard = true;
+            this.pnlBackground.Zoom = 1F;
+            this.pnlBackground.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pnlBackground_MouseUp);
+            // 
             // splBackground
             // 
             this.splBackground.BackColor = System.Drawing.SystemColors.ControlLight;
@@ -1414,6 +1482,7 @@
             // grpLayers
             // 
             this.grpLayers.BackColor = System.Drawing.Color.Transparent;
+            this.grpLayers.Controls.Add(this.butEditorEffects);
             this.grpLayers.Controls.Add(this.butLayerView);
             this.grpLayers.Controls.Add(this.butLayerMove);
             this.grpLayers.Controls.Add(this.butLayerMerge);
@@ -1433,6 +1502,28 @@
             this.grpLayers.TabStop = false;
             this.grpLayers.Text = "Layers";
             this.grpLayers.TextBarHeight = 24;
+            // 
+            // butEditorEffects
+            // 
+            this.butEditorEffects.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.PushButton;
+            this.butEditorEffects.Checked = false;
+            this.butEditorEffects.FlatStyled = false;
+            this.butEditorEffects.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.butEditorEffects.Image = global::GMare.Properties.Resources.room;
+            this.butEditorEffects.ImageXOffset = 0;
+            this.butEditorEffects.ImageYOffset = 0;
+            this.butEditorEffects.Location = new System.Drawing.Point(180, 28);
+            this.butEditorEffects.Name = "butEditorEffects";
+            this.butEditorEffects.PushButtonImage = null;
+            this.butEditorEffects.Size = new System.Drawing.Size(24, 24);
+            this.butEditorEffects.TabIndex = 7;
+            this.butEditorEffects.TextXOffset = 0;
+            this.butEditorEffects.TextYOffset = 0;
+            this.butEditorEffects.ToolTipText = "Enables or disables the room editor \r\nlayer and instance drawing effects";
+            this.butEditorEffects.ToolTipTitle = "Enable/Disable Editor Effects";
+            this.butEditorEffects.UseDropShadow = true;
+            this.butEditorEffects.UseVisualStyleBackColor = true;
+            this.butEditorEffects.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butEditorEffects_CheckChanged);
             // 
             // butLayerView
             // 
@@ -1590,9 +1681,9 @@
             // 
             // lstLayers
             // 
-            this.lstLayers.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstLayers.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.lstLayers.CheckBoxCheckedImage = global::GMare.Properties.Resources.eye;
             this.lstLayers.CheckBoxImageOffsetX = 0;
             this.lstLayers.CheckBoxImageOffsetY = -1;
@@ -1611,7 +1702,7 @@
             this.lstLayers.Name = "lstLayers";
             this.lstLayers.RowHeight = 17;
             this.lstLayers.Size = new System.Drawing.Size(259, 76);
-            this.lstLayers.TabIndex = 7;
+            this.lstLayers.TabIndex = 8;
             this.lstLayers.TextOffsetX = 4;
             this.lstLayers.TextOffsetY = 0;
             this.lstLayers.ToolTipText = "";
@@ -1636,8 +1727,8 @@
             // 
             // txtObject
             // 
-            this.txtObject.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtObject.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.txtObject.ButtonImage = null;
             this.txtObject.ButtonImageXOffset = 0;
             this.txtObject.ButtonImageYOffset = 0;
@@ -1674,9 +1765,9 @@
             // 
             // tabInstancesMain
             // 
-            this.tabInstancesMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabInstancesMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tabInstancesMain.BackColor = System.Drawing.Color.Transparent;
             this.tabInstancesMain.Controls.Add(this.tabInstances);
             this.tabInstancesMain.Controls.Add(this.tabBlocks);
@@ -1702,6 +1793,37 @@
             this.tabInstances.Size = new System.Drawing.Size(280, 329);
             this.tabInstances.TabIndex = 0;
             this.tabInstances.Text = "Instances";
+            // 
+            // lstInstances
+            // 
+            this.lstInstances.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstInstances.CellSize = new System.Drawing.Size(16, 16);
+            this.lstInstances.ContextMenuStrip = this.mnuInstances;
+            this.lstInstances.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.lstInstances.EmptyListText = "No Instances";
+            this.lstInstances.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lstInstances.FormattingEnabled = true;
+            this.lstInstances.Glyph = null;
+            this.lstInstances.GlyphOffsetX = 2;
+            this.lstInstances.GlyphOffsetY = 0;
+            this.lstInstances.HorizontalExtent = 256;
+            this.lstInstances.HorizontalScrollbar = true;
+            this.lstInstances.IntegralHeight = false;
+            this.lstInstances.ItemHeight = 22;
+            this.lstInstances.ListboxMode = GMare.Controls.GMareListbox.ListboxType.Instances;
+            this.lstInstances.Location = new System.Drawing.Point(9, 8);
+            this.lstInstances.Name = "lstInstances";
+            this.lstInstances.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.lstInstances.ShowBlocks = true;
+            this.lstInstances.Size = new System.Drawing.Size(260, 312);
+            this.lstInstances.TabIndex = 0;
+            this.lstInstances.TextOffsetX = 2;
+            this.lstInstances.TextOffsetY = 0;
+            this.lstInstances.ToolTipText = "";
+            this.lstInstances.ToolTipTitle = "";
+            this.lstInstances.SelectedIndexChanged += new System.EventHandler(this.lstInstances_SelectedIndexChanged);
             // 
             // mnuInstances
             // 
@@ -1963,7 +2085,35 @@
             this.trkBlockMagnify.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trkBlockMagnify.ToolTipText = "Slide to set the magnification level";
             this.trkBlockMagnify.ToolTipTitle = "Block Magnification";
+            this.trkBlockMagnify.Value = 1;
             this.trkBlockMagnify.ValueChanged += new System.EventHandler(this.trkMagnify_ValueChanged);
+            // 
+            // pnlBlockEditor
+            // 
+            this.pnlBlockEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlBlockEditor.AutoScroll = true;
+            this.pnlBlockEditor.AutoScrollMinSize = new System.Drawing.Size(256, 263);
+            this.pnlBlockEditor.BackColor = System.Drawing.Color.White;
+            this.pnlBlockEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.pnlBlockEditor.CheckerColor = System.Drawing.Color.Silver;
+            this.pnlBlockEditor.CheckerSize = new System.Drawing.Size(16, 16);
+            this.pnlBlockEditor.Image = null;
+            this.pnlBlockEditor.ImageScale = 1;
+            this.pnlBlockEditor.Location = new System.Drawing.Point(9, 8);
+            this.pnlBlockEditor.Name = "pnlBlockEditor";
+            this.pnlBlockEditor.ObjectId = -1;
+            this.pnlBlockEditor.SelectedBackground = null;
+            this.pnlBlockEditor.Size = new System.Drawing.Size(260, 267);
+            this.pnlBlockEditor.SnapSize = new System.Drawing.Size(8, 8);
+            this.pnlBlockEditor.TabIndex = 0;
+            this.pnlBlockEditor.Title = "Block Object Editor";
+            this.pnlBlockEditor.ToolTipText = "";
+            this.pnlBlockEditor.ToolTipTitle = "";
+            this.pnlBlockEditor.UseCheckerBoard = true;
+            this.pnlBlockEditor.Zoom = 1F;
+            this.pnlBlockEditor.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlBlockEditor_MouseDown);
             // 
             // lblObject
             // 
@@ -2037,129 +2187,6 @@
             this.mnuObjects.Name = "mnuInstances";
             this.mnuObjects.Size = new System.Drawing.Size(61, 4);
             // 
-            // pnlRoomEditor
-            // 
-            this.pnlRoomEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pnlRoomEditor.AvoidMouseEvents = false;
-            this.pnlRoomEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(171)))), ((int)(((byte)(173)))), ((int)(((byte)(179)))));
-            this.pnlRoomEditor.DepthIndex = 0;
-            this.pnlRoomEditor.EditMode = GMare.Objects.EditType.Layers;
-            this.pnlRoomEditor.GridMode = GMare.Objects.GridType.Normal;
-            this.pnlRoomEditor.GridX = 16;
-            this.pnlRoomEditor.GridY = 16;
-            this.pnlRoomEditor.InvertGridColor = false;
-            this.pnlRoomEditor.LayerIndex = -1;
-            this.pnlRoomEditor.Level = 0;
-            this.pnlRoomEditor.Location = new System.Drawing.Point(12, 56);
-            this.pnlRoomEditor.Name = "pnlRoomEditor";
-            this.pnlRoomEditor.Padding = new System.Windows.Forms.Padding(1);
-            this.pnlRoomEditor.SelectedBackground = null;
-            this.pnlRoomEditor.SelectedObject = null;
-            this.pnlRoomEditor.ShowBlocks = true;
-            this.pnlRoomEditor.ShowGrid = true;
-            this.pnlRoomEditor.ShowInstances = true;
-            this.pnlRoomEditor.Size = new System.Drawing.Size(450, 349);
-            this.pnlRoomEditor.Snap = true;
-            this.pnlRoomEditor.TabIndex = 12;
-            this.pnlRoomEditor.Tiles = null;
-            this.pnlRoomEditor.ToolMode = GMare.Objects.ToolType.Brush;
-            this.pnlRoomEditor.MousePositionChanged += new GMare.Controls.GMareRoomEditor.MousePositionHandler(this.pnlRoomEditor_MousePositionChanged);
-            this.pnlRoomEditor.SelectedObjectChanged += new GMare.Controls.GMareRoomEditor.SelectedObjectChangedHandler(this.pnlRoomEditor_SelectedObjectChanged);
-            this.pnlRoomEditor.InstancesPositionChanged += new GMare.Controls.GMareRoomEditor.InstancePositionHandler(this.pnlRoomEditor_InstancesPositionChanged);
-            this.pnlRoomEditor.InstancesChanged += new GMare.Controls.GMareRoomEditor.InstanceChangedHandler(this.pnlRoomEditor_InstanceChanged);
-            this.pnlRoomEditor.RoomChanged += new GMare.Controls.GMareRoomEditor.RoomChangedHandler(this.pnlRoomEditor_RoomChanged);
-            this.pnlRoomEditor.ClipboardChanged += new GMare.Controls.GMareRoomEditor.ClipboardChangedHandler(this.pnlRoomEditor_ClipboardChanged);
-            this.pnlRoomEditor.EditModeChanged += new GMare.Controls.GMareRoomEditor.EditModeChangedHandler(this.pnlRoomEditor_EditModeChanged);
-            this.pnlRoomEditor.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pnlRoomEditor_MouseUp);
-            // 
-            // pnlBackground
-            // 
-            this.pnlBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pnlBackground.AutoScroll = true;
-            this.pnlBackground.AutoScrollMinSize = new System.Drawing.Size(256, 169);
-            this.pnlBackground.AvoidMouseEvents = false;
-            this.pnlBackground.BackColor = System.Drawing.Color.White;
-            this.pnlBackground.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.pnlBackground.CheckerColor = System.Drawing.Color.Silver;
-            this.pnlBackground.CheckerSize = new System.Drawing.Size(16, 16);
-            this.pnlBackground.Image = null;
-            this.pnlBackground.ImageScale = 1;
-            this.pnlBackground.Location = new System.Drawing.Point(11, 60);
-            this.pnlBackground.Name = "pnlBackground";
-            this.pnlBackground.SelectMode = GMare.Controls.GMareBackgroundPanel.SelectType.Normal;
-            this.pnlBackground.Size = new System.Drawing.Size(260, 173);
-            this.pnlBackground.SnapSize = new System.Drawing.Size(8, 8);
-            this.pnlBackground.TabIndex = 1;
-            this.pnlBackground.TileBrush = null;
-            this.pnlBackground.Title = "Background Tiles";
-            this.pnlBackground.ToolTipText = "";
-            this.pnlBackground.ToolTipTitle = "";
-            this.pnlBackground.UseCheckerBoard = true;
-            this.pnlBackground.Zoom = 1F;
-            this.pnlBackground.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pnlBackground_MouseUp);
-            // 
-            // lstInstances
-            // 
-            this.lstInstances.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lstInstances.CellSize = new System.Drawing.Size(16, 16);
-            this.lstInstances.ContextMenuStrip = this.mnuInstances;
-            this.lstInstances.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.lstInstances.EmptyListText = "No Instances";
-            this.lstInstances.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lstInstances.FormattingEnabled = true;
-            this.lstInstances.Glyph = null;
-            this.lstInstances.GlyphOffsetX = 2;
-            this.lstInstances.GlyphOffsetY = 0;
-            this.lstInstances.HorizontalExtent = 256;
-            this.lstInstances.HorizontalScrollbar = true;
-            this.lstInstances.IntegralHeight = false;
-            this.lstInstances.ItemHeight = 22;
-            this.lstInstances.ListboxMode = GMare.Controls.GMareListbox.ListboxType.Instances;
-            this.lstInstances.Location = new System.Drawing.Point(9, 8);
-            this.lstInstances.Name = "lstInstances";
-            this.lstInstances.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.lstInstances.ShowBlocks = true;
-            this.lstInstances.Size = new System.Drawing.Size(260, 312);
-            this.lstInstances.TabIndex = 0;
-            this.lstInstances.TextOffsetX = 2;
-            this.lstInstances.TextOffsetY = 0;
-            this.lstInstances.ToolTipText = "";
-            this.lstInstances.ToolTipTitle = "";
-            this.lstInstances.SelectedIndexChanged += new System.EventHandler(this.lstInstances_SelectedIndexChanged);
-            // 
-            // pnlBlockEditor
-            // 
-            this.pnlBlockEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pnlBlockEditor.AutoScroll = true;
-            this.pnlBlockEditor.AutoScrollMinSize = new System.Drawing.Size(256, 263);
-            this.pnlBlockEditor.BackColor = System.Drawing.Color.White;
-            this.pnlBlockEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.pnlBlockEditor.CheckerColor = System.Drawing.Color.Silver;
-            this.pnlBlockEditor.CheckerSize = new System.Drawing.Size(16, 16);
-            this.pnlBlockEditor.Image = null;
-            this.pnlBlockEditor.ImageScale = 1;
-            this.pnlBlockEditor.Location = new System.Drawing.Point(9, 8);
-            this.pnlBlockEditor.Name = "pnlBlockEditor";
-            this.pnlBlockEditor.ObjectId = -1;
-            this.pnlBlockEditor.SelectedBackground = null;
-            this.pnlBlockEditor.Size = new System.Drawing.Size(260, 267);
-            this.pnlBlockEditor.SnapSize = new System.Drawing.Size(8, 8);
-            this.pnlBlockEditor.TabIndex = 0;
-            this.pnlBlockEditor.Title = "Block Object Editor";
-            this.pnlBlockEditor.ToolTipText = "";
-            this.pnlBlockEditor.ToolTipTitle = "";
-            this.pnlBlockEditor.UseCheckerBoard = true;
-            this.pnlBlockEditor.Zoom = 1F;
-            this.pnlBlockEditor.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlBlockEditor_MouseDown);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2170,7 +2197,7 @@
             this.Controls.Add(this.pnlTop);
             this.Controls.Add(this.mnuMain);
             this.Controls.Add(this.ssMain);
-            this.MinimumSize = new System.Drawing.Size(802, 576);
+            this.MinimumSize = new System.Drawing.Size(802, 577);
             this.Name = "MainForm";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -2301,7 +2328,6 @@
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown nudRoomColumns;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butGridSnap;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butGridIso;
-        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butGrid;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butRoomScript;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butRoomPersistent;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butRoomBackColor;
@@ -2353,6 +2379,8 @@
         private System.Windows.Forms.ToolStripMenuItem mnuSetAsObject;
         private System.Windows.Forms.ToolStripSeparator mnuSeparator01;
         private System.Windows.Forms.Panel pnlRoom;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butEditorEffects;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butGrid;
     }
 }
 

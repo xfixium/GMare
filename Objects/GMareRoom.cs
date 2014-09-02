@@ -690,6 +690,166 @@ namespace GMare.Objects
             }
         }
 
+        /// <summary>
+        /// Converts the room into an image file
+        /// </summary>
+        /// <param name="layers">The list of layers to draw</param>
+        /// <param name="drawInstances">If drawing instances</param>
+        /// <returns>An image representation of the room</returns>
+        public Bitmap ToBitmap(List<GMareLayer> layers, bool drawInstances)
+        {
+            // Create a bitmap the size of the room
+            Bitmap background = _backgrounds[0].GetCondensedTileset();
+            Bitmap image = new Bitmap(Width, Height, PixelFormat.Format32bppArgb);
+            System.Drawing.Graphics gfx = System.Drawing.Graphics.FromImage(image);
+
+            // Calculate rows and columns
+            Size tileSize = _backgrounds[0].TileSize;
+            int cols = RoomSize.Width / tileSize.Width;
+            int rows = RoomSize.Height / tileSize.Height;
+
+            // Destination rectangle
+            Rectangle dest = Rectangle.Empty;
+            dest.Width = tileSize.Width;
+            dest.Height = tileSize.Height;
+
+            // Source rectangle
+            Rectangle source = Rectangle.Empty;
+            source.Width = tileSize.Width;
+            source.Height = tileSize.Height;
+
+            List<int> depths = new List<int>();
+
+            // Get all the instances with their depths
+            List<Tuple<int, GMareInstance>> instances = new List<Tuple<int,GMareInstance>>();
+            foreach (GMareInstance instance in _instances)
+            {
+                // Get the object depth
+                GMareObject obj = _objects.Find(o => o.Resource.Id == instance.ObjectId);
+
+                // If the object was not found, continue
+                if (obj == null)
+                    continue;
+
+                // If the depth does not exist, add it
+                if (!depths.Contains(obj.Depth))
+                    depths.Add(obj.Depth);
+
+                // Add the instance to the instance list with the object depth
+                instances.Add(new Tuple<int, GMareInstance>(obj.Depth, instance));
+            }
+
+            // Get unique layer depths
+            foreach (GMareLayer layer in _layers)
+                if (!depths.Contains(layer.Depth))
+                    depths.Add(layer.Depth);
+
+            // Sort the used depths
+            depths.Sort(delegate(int p1, int p2) { return p2.CompareTo(p1); });
+
+            // Create image attributes
+            using (ImageAttributes ia = new ImageAttributes())
+            {
+                // Iterate through layers
+                foreach (int i in depths)
+                {
+                    // See if there is a layer that matches the current depth index
+                    GMareLayer layer = _layers.Find(l => l.Depth == i);
+
+                    // If a background and layer exists, draw layer
+                    if (layer != null && background != null)
+                    {
+                        // Iterate through columns
+                        for (int col = 0; col < cols; col++)
+                        {
+                            // Iterate through rows
+                            for (int row = 0; row < rows; row++)
+                            {
+                                // Get tile id
+                                int tileId = layer.Tiles[col, row].TileId;
+
+                                // If the tile is empty, continue looping
+                                if (tileId == -1)
+                                    continue;
+
+                                // Calculate destination rectangle
+                                dest.X = col * tileSize.Width;
+                                dest.Y = row * tileSize.Height;
+
+                                // Calculate source point
+                                source.Location = GMareBrush.TileIdToPosition(tileId, background.Width, tileSize);
+
+                                // Get tile
+                                Bitmap temp = Graphics.PixelMap.PixelDataToBitmap(Graphics.PixelMap.GetPixels(background, source));
+
+                                // Get converted blend color
+                                Color color = layer.Tiles[col, row].Blend;
+                                float red = color.R / 255.0f;
+                                float green = color.G / 255.0f;
+                                float blue = color.B / 255.0f;
+
+                                // Alpha changing color matrix
+                                ColorMatrix cm = new ColorMatrix(new float[][] {
+                                    new float[]{ red, 0.0f, 0.0f, 0.0f, 0.0f},
+                                    new float[]{ 0.0f, green, 0.0f, 0.0f, 0.0f},
+                                    new float[]{ 0.0f, 0.0f, blue, 0.0f, 0.0f},
+                                    new float[]{ 0.0f, 0.0f, 0.0f, 1.0f, 0.0f},
+                                    new float[]{ 0.0f, 0.0f, 0.0f, 0.0f, 1.0f} });
+
+                                // Set image attributes color matrix
+                                ia.SetColorMatrix(cm);
+
+                                // Flip tile
+                                switch (layer.Tiles[col, row].FlipMode)
+                                {
+                                    case FlipType.Horizontal: temp.RotateFlip(RotateFlipType.RotateNoneFlipX); break;
+                                    case FlipType.Vertical: temp.RotateFlip(RotateFlipType.RotateNoneFlipY); break;
+                                    case FlipType.Both: temp.RotateFlip(RotateFlipType.RotateNoneFlipX); temp.RotateFlip(RotateFlipType.RotateNoneFlipY); break;
+                                }
+
+                                // Draw the image to the bitmap
+                                gfx.DrawImage(temp, dest, 0, 0, tileSize.Width, tileSize.Height, GraphicsUnit.Pixel, ia);
+
+                                // Dispose of things
+                                temp.Dispose();
+                            }
+                        }
+                    }
+
+                    // If drawing instances
+                    if (drawInstances)
+                    {
+                        // Iterate through instances that are at this depth
+                        foreach (var instance in instances.FindAll(inst => inst.Item1 == i && inst.Item2.TileId == -1))
+                        {
+                            // Get the instance parent object
+                            GMareObject obj = _objects.Find(o => o.Resource.Id == instance.Item2.ObjectId);
+
+                            // If the object is empty, continue
+                            if (obj == null)
+                                continue;
+
+                            // Get the pixel data from the object
+                            PixelMap pixelMap = obj.Image;
+
+                            // If the image data is empty continue
+                            if (pixelMap == null)
+                                continue;
+
+                            // Create a new bitmap from the object image data and draw it
+                            using (Bitmap sprite = pixelMap.ToBitmap())
+                            {
+                                gfx.DrawImage(sprite, instance.Item2.Location);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Return the image
+            return image;
+        }
+
         #endregion
 
         #region Layers

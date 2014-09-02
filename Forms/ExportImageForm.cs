@@ -39,36 +39,17 @@ namespace GMare.Forms
     /// </summary>
     public partial class ExportImageForm : Form
     {
-        #region Fields
-
-        private Bitmap _background = null;    // The background used for the image
-        private Size _roomSize = Size.Empty;  // The room size in pixels
-        private Size _tileSize = Size.Empty;  // The size of a single tile in pixels
-        private int _backgroundWidth = 0;     // The width of the background in pixels
-
-        #endregion
-
-        #region Constructor
+        #region Constructors
 
         /// <summary>
         /// Constructs a new export image form
         /// </summary>
-        /// <param name="layers">The layers to draw</param>
-        /// <param name="tileset">The tileset to use for tile rendering</param>
-        /// <param name="roomSize">The size of the room</param>
-        /// <param name="tileSize">The size of a single tile</param>
-        public ExportImageForm(List<GMareLayer> layers, Bitmap tileset, Size roomSize, Size tileSize)
+        public ExportImageForm()
         {
             InitializeComponent();
 
-            // Set fields
-            _background = tileset;
-            _roomSize = roomSize;
-            _tileSize = tileSize;
-            _backgroundWidth = _background.Width;
-
             // Add layers to the list box and select the first one if available
-            lstLayers.Items.AddRange(layers.ToArray());
+            lstLayers.Items.AddRange(App.Room.Layers.ToArray());
             lstLayers.SelectedIndex = lstLayers.Items.Count > 0 ? 0 : -1;
         }
 
@@ -81,10 +62,6 @@ namespace GMare.Forms
         /// </summary>
         private void butExport_Click(object sender, EventArgs e)
         {
-            // If no tileset, return
-            if (_background == null)
-                return;
-
             // Create a save file dialog box
             using (SaveFileDialog form = new SaveFileDialog())
             {
@@ -102,92 +79,8 @@ namespace GMare.Forms
                 foreach (object obj in lstLayers.CheckedItems)
                     layers.Add((GMareLayer)obj);
 
-                // If there are no layers to draw, return
-                if (layers.Count == 0)
-                    return;
-
-                // Create a bitmap the size of the room
-                Bitmap image = new Bitmap(_roomSize.Width, _roomSize.Height, PixelFormat.Format32bppArgb);
-                System.Drawing.Graphics gfx = System.Drawing.Graphics.FromImage(image);
-
-                // Calculate rows and columns
-                int cols = _roomSize.Width / _tileSize.Width;
-                int rows = _roomSize.Height / _tileSize.Height;
-
-                // Destination rectangle
-                Rectangle dest = Rectangle.Empty;
-                dest.Width = _tileSize.Width;
-                dest.Height = _tileSize.Height;
-
-                // Source rectangle
-                Rectangle source = Rectangle.Empty;
-                source.Width = _tileSize.Width;
-                source.Height = _tileSize.Height;
-
-                // Sort by depth
-                layers.Sort(delegate(GMareLayer p1, GMareLayer p2) { return p2.Depth.CompareTo(p1.Depth); });
-
-                // Iterate through layers
-                foreach (GMareLayer layer in layers)
-                {
-                    // Iterate through columns
-                    for (int col = 0; col < cols; col++)
-                    {
-                        // Iterate through rows
-                        for (int row = 0; row < rows; row++)
-                        {
-                            // Get tile id
-                            int tileId = layer.Tiles[col, row].TileId;
-
-                            // If the tile is empty, continue looping
-                            if (tileId == -1)
-                                continue;
-
-                            // Calculate destination rectangle
-                            dest.X = col * _tileSize.Width;
-                            dest.Y = row * _tileSize.Height;
-
-                            // Calculate source point
-                            source.Location = GMareBrush.TileIdToPosition(tileId, _backgroundWidth, _tileSize);
-
-                            // Get tile
-                            Bitmap temp = Graphics.PixelMap.PixelDataToBitmap(Graphics.PixelMap.GetPixels(_background, source));
-
-                            // Get converted blend color
-                            Color color = layer.Tiles[col, row].Blend;
-                            float red = color.R / 255.0f;
-                            float green = color.G / 255.0f;
-                            float blue = color.B / 255.0f;
-
-                            // Alpha changing color matrix
-                            ColorMatrix cm = new ColorMatrix(new float[][] {
-                                    new float[]{ red, 0.0f, 0.0f, 0.0f, 0.0f},
-                                    new float[]{ 0.0f, green, 0.0f, 0.0f, 0.0f},
-                                    new float[]{ 0.0f, 0.0f, blue, 0.0f, 0.0f},
-                                    new float[]{ 0.0f, 0.0f, 0.0f, 1.0f, 0.0f},
-                                    new float[]{ 0.0f, 0.0f, 0.0f, 0.0f, 1.0f} });
-
-                            // Create new image attributes
-                            ImageAttributes ia = new ImageAttributes();
-                            ia.SetColorMatrix(cm);
-
-                            // Flip tile
-                            switch (layer.Tiles[col, row].FlipMode)
-                            {
-                                case FlipType.Horizontal: temp.RotateFlip(RotateFlipType.RotateNoneFlipX); break;
-                                case FlipType.Vertical: temp.RotateFlip(RotateFlipType.RotateNoneFlipY); break;
-                                case FlipType.Both: temp.RotateFlip(RotateFlipType.RotateNoneFlipX); temp.RotateFlip(RotateFlipType.RotateNoneFlipY); break;
-                            }
-
-                            // Draw the image to the bitmap
-                            gfx.DrawImage(temp, dest, 0, 0, _tileSize.Width, _tileSize.Height, GraphicsUnit.Pixel, ia);
-
-                            // Dispose of things
-                            temp.Dispose();
-                            ia.Dispose();
-                        }
-                    }
-                }
+                // Get the room image
+                Bitmap image = App.Room.ToBitmap(layers, butDrawInstances.Checked);
 
                 // Save the room to file
                 switch (form.FilterIndex)
