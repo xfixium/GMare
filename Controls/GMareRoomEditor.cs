@@ -335,6 +335,15 @@ namespace GMare.Controls
             set { pnlRoom.InvertGridColor = value; }
         }
 
+        /// <summary>
+        /// Gets or sets if drawing the room opaque with no layer effects
+        /// </summary>
+        public bool Opaque
+        {
+            get { return pnlRoom.Opaque; }
+            set { pnlRoom.Opaque = value; }
+        }
+
         #endregion
 
         #region Constructor

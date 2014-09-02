@@ -103,6 +103,7 @@ namespace GMare.Controls
         private bool _mouseDown = false;                                             // If the mouse if being held down
         private bool _avoidMouseEvents = false;                                      // If avoiding the mouse events by dialog double click
         private bool _invertGridColor = false;                                       // If using white as the grid color
+        private bool _opaque = false;                                                // If drawing without layer effects
 
         #endregion
 
@@ -541,6 +542,15 @@ namespace GMare.Controls
         {
             get { return _invertGridColor; }
             set { _invertGridColor = value; Invalidate(); }
+        }
+
+        /// <summary>
+        /// Gets or sets if drawing the room opaque with no layer effects
+        /// </summary>
+        public bool Opaque
+        {
+            get { return _opaque; }
+            set { _opaque = value; Invalidate(); }
         }
 
         #endregion
@@ -1898,7 +1908,7 @@ namespace GMare.Controls
                 depth = App.Room.Layers[layer].Depth;
 
                 // Set the blend mode based on drawing depth
-                int index = GetIndex(depth);
+                int index = _opaque && _editMode == EditType.Layers ? 0 : GetIndex(depth);
 
                 // Iterate through columns
                 for (int col = 0; col < cols; col++)
@@ -2163,10 +2173,13 @@ namespace GMare.Controls
                 switch (_editMode)
                 {
                     case EditType.Layers:
+                        // Get alpha value
+                        int alpha = _opaque && _editMode == EditType.Layers ? 255 : 128;
+
                         if (_showBlocks && instance.TileId > -1)
-                            GraphicsManager.DrawSpriteCached(instance.ObjectId, instance.X, instance.Y, Color.FromArgb(128, Color.White));
+                            GraphicsManager.DrawSpriteCached(instance.ObjectId, instance.X, instance.Y, Color.FromArgb(alpha, Color.White));
                         else if (_showInstances && instance.TileId == -1)
-                            GraphicsManager.DrawSpriteCached(instance.ObjectId, instance.X, instance.Y, Color.FromArgb(128, Color.White));
+                            GraphicsManager.DrawSpriteCached(instance.ObjectId, instance.X, instance.Y, Color.FromArgb(alpha, Color.White));
                         break;
 
                     case EditType.Objects:

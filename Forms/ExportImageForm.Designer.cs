@@ -36,23 +36,26 @@ namespace GMare.Forms
             this.butCancel = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butExport = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butCheckAll = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
+            this.butDrawInstances = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.grpMain.SuspendLayout();
             this.SuspendLayout();
             // 
             // lstLayers
             // 
-            this.lstLayers.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstLayers.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstLayers.CheckBoxCheckedImage = null;
+            this.lstLayers.CheckBoxImageOffsetX = 0;
+            this.lstLayers.CheckBoxImageOffsetY = 0;
+            this.lstLayers.CheckBoxUnCheckedImage = null;
             this.lstLayers.DisplayFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.lstLayers.EmptyListText = "Layers";
             this.lstLayers.Font = new System.Drawing.Font("Microsoft Sans Serif", 17F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.lstLayers.FormattingEnabled = true;
             this.lstLayers.Glyph = global::GMare.Properties.Resources.layer;
-            this.lstLayers.CheckBoxCheckedImage = null;
             this.lstLayers.GlyphOffsetX = 0;
             this.lstLayers.GlyphOffsetY = 0;
-            this.lstLayers.CheckBoxUnCheckedImage = null;
             this.lstLayers.HorizontalExtent = 276;
             this.lstLayers.IntegralHeight = false;
             this.lstLayers.Location = new System.Drawing.Point(12, 32);
@@ -74,7 +77,7 @@ namespace GMare.Forms
             this.grpMain.Name = "grpMain";
             this.grpMain.Padding = new System.Windows.Forms.Padding(10, 12, 10, 0);
             this.grpMain.Size = new System.Drawing.Size(304, 308);
-            this.grpMain.TabIndex = 3;
+            this.grpMain.TabIndex = 4;
             this.grpMain.TabStop = false;
             this.grpMain.Text = "Layers To Export";
             this.grpMain.TextBarHeight = 24;
@@ -145,11 +148,33 @@ namespace GMare.Forms
             this.butCheckAll.UseVisualStyleBackColor = true;
             this.butCheckAll.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butCheckAll_CheckChanged);
             // 
+            // butDrawInstances
+            // 
+            this.butDrawInstances.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.PushButton;
+            this.butDrawInstances.Checked = false;
+            this.butDrawInstances.FlatStyled = false;
+            this.butDrawInstances.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.butDrawInstances.Image = global::GMare.Properties.Resources.show_instances;
+            this.butDrawInstances.ImageXOffset = 0;
+            this.butDrawInstances.ImageYOffset = 0;
+            this.butDrawInstances.Location = new System.Drawing.Point(80, 4);
+            this.butDrawInstances.Name = "butDrawInstances";
+            this.butDrawInstances.PushButtonImage = null;
+            this.butDrawInstances.Size = new System.Drawing.Size(24, 24);
+            this.butDrawInstances.TabIndex = 3;
+            this.butDrawInstances.TextXOffset = 0;
+            this.butDrawInstances.TextYOffset = 0;
+            this.butDrawInstances.ToolTipText = "Check or uncheck if \r\ndrawing room instances";
+            this.butDrawInstances.ToolTipTitle = "Check/Uncheck Include Instances";
+            this.butDrawInstances.UseDropShadow = true;
+            this.butDrawInstances.UseVisualStyleBackColor = true;
+            // 
             // ExportImageForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(315, 348);
+            this.Controls.Add(this.butDrawInstances);
             this.Controls.Add(this.butCheckAll);
             this.Controls.Add(this.butCancel);
             this.Controls.Add(this.butExport);
@@ -175,5 +200,6 @@ namespace GMare.Forms
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butCancel;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butExport;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butCheckAll;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butDrawInstances;
     }
 }
