@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.grpMain = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTabbedGroupBox();
+            this.chkShowTips = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxCheckBox();
             this.nudUpperLayerTransparency = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
             this.lblUpperLayerTransparency = new System.Windows.Forms.Label();
             this.nudLowerLayerBrightness = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
@@ -37,11 +38,19 @@
             this.lblMaximumUndoRedo = new System.Windows.Forms.Label();
             this.butCancel = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butOk = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
-            this.chkShowTips = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxCheckBox();
+            this.grpAreaGrid = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxCheckedTabbedGroupBox();
+            this.lblGridSize = new System.Windows.Forms.Label();
+            this.lblGridHeight = new System.Windows.Forms.Label();
+            this.nudGridWidth = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
+            this.nudGridHeight = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
+            this.lblGridWidth = new System.Windows.Forms.Label();
             this.grpMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudUpperLayerTransparency)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLowerLayerBrightness)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaximumUndoRedo)).BeginInit();
+            this.grpAreaGrid.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudGridWidth)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudGridHeight)).BeginInit();
             this.SuspendLayout();
             // 
             // grpMain
@@ -61,11 +70,25 @@
             this.grpMain.Name = "grpMain";
             this.grpMain.Padding = new System.Windows.Forms.Padding(10, 12, 10, 30);
             this.grpMain.ShowStatusBar = false;
-            this.grpMain.Size = new System.Drawing.Size(232, 116);
+            this.grpMain.Size = new System.Drawing.Size(232, 112);
             this.grpMain.StatusBarHeight = 24;
             this.grpMain.StatusBarText = "Status:";
             this.grpMain.TabIndex = 0;
             this.grpMain.TabStop = false;
+            // 
+            // chkShowTips
+            // 
+            this.chkShowTips.AutoSize = true;
+            this.chkShowTips.Checked = true;
+            this.chkShowTips.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkShowTips.Location = new System.Drawing.Point(12, 88);
+            this.chkShowTips.Name = "chkShowTips";
+            this.chkShowTips.Size = new System.Drawing.Size(111, 17);
+            this.chkShowTips.TabIndex = 6;
+            this.chkShowTips.Text = "Show GMare Tips";
+            this.chkShowTips.ToolTipCaption = "";
+            this.chkShowTips.ToolTipText = "";
+            this.chkShowTips.UseVisualStyleBackColor = true;
             // 
             // nudUpperLayerTransparency
             // 
@@ -160,7 +183,7 @@
             this.nudMaximumUndoRedo.Size = new System.Drawing.Size(40, 20);
             this.nudMaximumUndoRedo.TabIndex = 1;
             this.nudMaximumUndoRedo.ToolTipText = "The amount you can undo or redo room changes\r\nThe higher the number, the more mem" +
-                "ory it requires\r\nUse caution when adjusting this number";
+    "ory it requires\r\nUse caution when adjusting this number";
             this.nudMaximumUndoRedo.ToolTipTitle = "Maximum Undo/Redo Amount";
             this.nudMaximumUndoRedo.Value = new decimal(new int[] {
             10,
@@ -185,11 +208,11 @@
             this.butCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.butCancel.ImageXOffset = 0;
             this.butCancel.ImageYOffset = 0;
-            this.butCancel.Location = new System.Drawing.Point(160, 124);
+            this.butCancel.Location = new System.Drawing.Point(160, 204);
             this.butCancel.Name = "butCancel";
             this.butCancel.PushButtonImage = null;
             this.butCancel.Size = new System.Drawing.Size(76, 24);
-            this.butCancel.TabIndex = 2;
+            this.butCancel.TabIndex = 3;
             this.butCancel.Text = "Cancel";
             this.butCancel.TextXOffset = 0;
             this.butCancel.TextYOffset = 0;
@@ -207,11 +230,11 @@
             this.butOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.butOk.ImageXOffset = 0;
             this.butOk.ImageYOffset = 0;
-            this.butOk.Location = new System.Drawing.Point(80, 124);
+            this.butOk.Location = new System.Drawing.Point(80, 204);
             this.butOk.Name = "butOk";
             this.butOk.PushButtonImage = null;
             this.butOk.Size = new System.Drawing.Size(76, 24);
-            this.butOk.TabIndex = 1;
+            this.butOk.TabIndex = 2;
             this.butOk.Text = "OK";
             this.butOk.TextXOffset = 0;
             this.butOk.TextYOffset = 0;
@@ -221,25 +244,113 @@
             this.butOk.UseVisualStyleBackColor = true;
             this.butOk.Click += new System.EventHandler(this.butOk_Click);
             // 
-            // chkShowTips
+            // grpAreaGrid
             // 
-            this.chkShowTips.AutoSize = true;
-            this.chkShowTips.Checked = true;
-            this.chkShowTips.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShowTips.Location = new System.Drawing.Point(12, 88);
-            this.chkShowTips.Name = "chkShowTips";
-            this.chkShowTips.Size = new System.Drawing.Size(111, 17);
-            this.chkShowTips.TabIndex = 6;
-            this.chkShowTips.Text = "Show GMare Tips";
-            this.chkShowTips.ToolTipCaption = "";
-            this.chkShowTips.ToolTipText = "";
-            this.chkShowTips.UseVisualStyleBackColor = true;
+            this.grpAreaGrid.BackColor = System.Drawing.Color.Transparent;
+            this.grpAreaGrid.CenterStatus = false;
+            this.grpAreaGrid.Checked = false;
+            this.grpAreaGrid.Controls.Add(this.lblGridSize);
+            this.grpAreaGrid.Controls.Add(this.lblGridHeight);
+            this.grpAreaGrid.Controls.Add(this.nudGridWidth);
+            this.grpAreaGrid.Controls.Add(this.nudGridHeight);
+            this.grpAreaGrid.Controls.Add(this.lblGridWidth);
+            this.grpAreaGrid.Location = new System.Drawing.Point(4, 120);
+            this.grpAreaGrid.MinimumSize = new System.Drawing.Size(99, 0);
+            this.grpAreaGrid.Name = "grpAreaGrid";
+            this.grpAreaGrid.Padding = new System.Windows.Forms.Padding(10, 12, 10, 30);
+            this.grpAreaGrid.ShowStatusBar = false;
+            this.grpAreaGrid.Size = new System.Drawing.Size(232, 80);
+            this.grpAreaGrid.StatusBarHeight = 16;
+            this.grpAreaGrid.StatusBarText = "Status:";
+            this.grpAreaGrid.TabIndex = 1;
+            this.grpAreaGrid.TabStop = false;
+            this.grpAreaGrid.Text = "Use Area Grid";
+            // 
+            // lblGridSize
+            // 
+            this.lblGridSize.AutoSize = true;
+            this.lblGridSize.Location = new System.Drawing.Point(8, 56);
+            this.lblGridSize.Name = "lblGridSize";
+            this.lblGridSize.Size = new System.Drawing.Size(52, 13);
+            this.lblGridSize.TabIndex = 4;
+            this.lblGridSize.Text = "Grid Size:";
+            // 
+            // lblGridHeight
+            // 
+            this.lblGridHeight.AutoSize = true;
+            this.lblGridHeight.Location = new System.Drawing.Point(116, 32);
+            this.lblGridHeight.Name = "lblGridHeight";
+            this.lblGridHeight.Size = new System.Drawing.Size(41, 13);
+            this.lblGridHeight.TabIndex = 2;
+            this.lblGridHeight.Text = "Height:";
+            // 
+            // nudGridWidth
+            // 
+            this.nudGridWidth.IgnoreHeight = true;
+            this.nudGridWidth.Location = new System.Drawing.Point(52, 28);
+            this.nudGridWidth.Maximum = new decimal(new int[] {
+            999999,
+            0,
+            0,
+            0});
+            this.nudGridWidth.Minimum = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            this.nudGridWidth.Name = "nudGridWidth";
+            this.nudGridWidth.Size = new System.Drawing.Size(60, 20);
+            this.nudGridWidth.TabIndex = 1;
+            this.nudGridWidth.ToolTipText = "The width of the area cell in pixels";
+            this.nudGridWidth.ToolTipTitle = "Grid Width";
+            this.nudGridWidth.Value = new decimal(new int[] {
+            320,
+            0,
+            0,
+            0});
+            this.nudGridWidth.ValueChanged += new System.EventHandler(this.nudAreaGrid_ValueChanged);
+            // 
+            // nudGridHeight
+            // 
+            this.nudGridHeight.IgnoreHeight = true;
+            this.nudGridHeight.Location = new System.Drawing.Point(160, 28);
+            this.nudGridHeight.Maximum = new decimal(new int[] {
+            999999,
+            0,
+            0,
+            0});
+            this.nudGridHeight.Minimum = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            this.nudGridHeight.Name = "nudGridHeight";
+            this.nudGridHeight.Size = new System.Drawing.Size(60, 20);
+            this.nudGridHeight.TabIndex = 3;
+            this.nudGridHeight.ToolTipText = "The height of the area cell in pixels";
+            this.nudGridHeight.ToolTipTitle = "Grid Height";
+            this.nudGridHeight.Value = new decimal(new int[] {
+            240,
+            0,
+            0,
+            0});
+            this.nudGridHeight.ValueChanged += new System.EventHandler(this.nudAreaGrid_ValueChanged);
+            // 
+            // lblGridWidth
+            // 
+            this.lblGridWidth.AutoSize = true;
+            this.lblGridWidth.Location = new System.Drawing.Point(8, 32);
+            this.lblGridWidth.Name = "lblGridWidth";
+            this.lblGridWidth.Size = new System.Drawing.Size(38, 13);
+            this.lblGridWidth.TabIndex = 0;
+            this.lblGridWidth.Text = "Width:";
             // 
             // PreferencesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(242, 155);
+            this.ClientSize = new System.Drawing.Size(242, 234);
+            this.Controls.Add(this.grpAreaGrid);
             this.Controls.Add(this.butCancel);
             this.Controls.Add(this.butOk);
             this.Controls.Add(this.grpMain);
@@ -256,6 +367,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudUpperLayerTransparency)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLowerLayerBrightness)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaximumUndoRedo)).EndInit();
+            this.grpAreaGrid.ResumeLayout(false);
+            this.grpAreaGrid.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudGridWidth)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudGridHeight)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -272,5 +387,11 @@
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butCancel;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butOk;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxCheckBox chkShowTips;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxCheckedTabbedGroupBox grpAreaGrid;
+        private System.Windows.Forms.Label lblGridHeight;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown nudGridWidth;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown nudGridHeight;
+        private System.Windows.Forms.Label lblGridWidth;
+        private System.Windows.Forms.Label lblGridSize;
     }
 }
