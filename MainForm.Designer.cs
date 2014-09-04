@@ -233,8 +233,8 @@
             // 
             this.mnuNewProject.Image = global::GMare.Properties.Resources.application;
             this.mnuNewProject.Name = "mnuNewProject";
-            this.mnuNewProject.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
-                        | System.Windows.Forms.Keys.N)));
+            this.mnuNewProject.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.N)));
             this.mnuNewProject.Size = new System.Drawing.Size(218, 22);
             this.mnuNewProject.Text = "New Project";
             this.mnuNewProject.Click += new System.EventHandler(this.mnuMenuItem_Click);
@@ -243,8 +243,8 @@
             // 
             this.mnuOpenProject.Image = global::GMare.Properties.Resources.file_open;
             this.mnuOpenProject.Name = "mnuOpenProject";
-            this.mnuOpenProject.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
-                        | System.Windows.Forms.Keys.O)));
+            this.mnuOpenProject.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.O)));
             this.mnuOpenProject.Size = new System.Drawing.Size(218, 22);
             this.mnuOpenProject.Text = "Open Project";
             this.mnuOpenProject.Click += new System.EventHandler(this.mnuMenuItem_Click);
@@ -635,8 +635,8 @@
             // 
             // grpRoom
             // 
-            this.grpRoom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpRoom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.grpRoom.BackColor = System.Drawing.Color.Transparent;
             this.grpRoom.CenterStatus = false;
             this.grpRoom.Controls.Add(this.butRoomScript);
@@ -883,7 +883,7 @@
             this.pnlBottom.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlBottom.Location = new System.Drawing.Point(0, 72);
             this.pnlBottom.Name = "pnlBottom";
-            this.pnlBottom.Size = new System.Drawing.Size(786, 442);
+            this.pnlBottom.Size = new System.Drawing.Size(786, 443);
             this.pnlBottom.TabIndex = 5;
             // 
             // pnlRight
@@ -894,7 +894,7 @@
             this.pnlRight.Location = new System.Drawing.Point(308, 0);
             this.pnlRight.Name = "pnlRight";
             this.pnlRight.Padding = new System.Windows.Forms.Padding(0, 4, 4, 4);
-            this.pnlRight.Size = new System.Drawing.Size(478, 442);
+            this.pnlRight.Size = new System.Drawing.Size(478, 443);
             this.pnlRight.TabIndex = 4;
             // 
             // pnlRoom
@@ -964,7 +964,7 @@
             // lblRoomGridY
             // 
             this.lblRoomGridY.AutoSize = true;
-            this.lblRoomGridY.Location = new System.Drawing.Point(232, 8);
+            this.lblRoomGridY.Location = new System.Drawing.Point(232, 6);
             this.lblRoomGridY.Name = "lblRoomGridY";
             this.lblRoomGridY.Size = new System.Drawing.Size(39, 13);
             this.lblRoomGridY.TabIndex = 7;
@@ -995,7 +995,7 @@
             // nudRoomGridX
             // 
             this.nudRoomGridX.IgnoreHeight = true;
-            this.nudRoomGridX.Location = new System.Drawing.Point(188, 4);
+            this.nudRoomGridX.Location = new System.Drawing.Point(188, 2);
             this.nudRoomGridX.Maximum = new decimal(new int[] {
             999,
             0,
@@ -1043,7 +1043,7 @@
             // nudRoomGridY
             // 
             this.nudRoomGridY.IgnoreHeight = true;
-            this.nudRoomGridY.Location = new System.Drawing.Point(272, 4);
+            this.nudRoomGridY.Location = new System.Drawing.Point(272, 2);
             this.nudRoomGridY.Maximum = new decimal(new int[] {
             999,
             0,
@@ -1122,7 +1122,7 @@
             // lblRoomMagnify
             // 
             this.lblRoomMagnify.AutoSize = true;
-            this.lblRoomMagnify.Location = new System.Drawing.Point(420, 8);
+            this.lblRoomMagnify.Location = new System.Drawing.Point(420, 6);
             this.lblRoomMagnify.Name = "lblRoomMagnify";
             this.lblRoomMagnify.Size = new System.Drawing.Size(33, 13);
             this.lblRoomMagnify.TabIndex = 11;
@@ -1132,7 +1132,7 @@
             // 
             this.trkRoomMagnify.BackColor = System.Drawing.Color.Transparent;
             this.trkRoomMagnify.LargeChange = 1;
-            this.trkRoomMagnify.Location = new System.Drawing.Point(336, 4);
+            this.trkRoomMagnify.Location = new System.Drawing.Point(336, 2);
             this.trkRoomMagnify.Maximum = 7;
             this.trkRoomMagnify.Minimum = 1;
             this.trkRoomMagnify.Name = "trkRoomMagnify";
@@ -1149,7 +1149,7 @@
             // 
             this.pnlRoomMagnify.BackgroundImage = global::GMare.Properties.Resources.magnifier;
             this.pnlRoomMagnify.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.pnlRoomMagnify.Location = new System.Drawing.Point(316, 2);
+            this.pnlRoomMagnify.Location = new System.Drawing.Point(316, 0);
             this.pnlRoomMagnify.Name = "pnlRoomMagnify";
             this.pnlRoomMagnify.Size = new System.Drawing.Size(24, 24);
             this.pnlRoomMagnify.TabIndex = 9;
@@ -1166,7 +1166,7 @@
             this.grpRoomEditor.Name = "grpRoomEditor";
             this.grpRoomEditor.Padding = new System.Windows.Forms.Padding(10, 12, 10, 0);
             this.grpRoomEditor.ShowStatusBar = true;
-            this.grpRoomEditor.Size = new System.Drawing.Size(474, 434);
+            this.grpRoomEditor.Size = new System.Drawing.Size(474, 435);
             this.grpRoomEditor.StatusBarHeight = 24;
             this.grpRoomEditor.StatusBarText = "";
             this.grpRoomEditor.TabIndex = 4;
@@ -1175,9 +1175,11 @@
             // 
             // pnlRoomEditor
             // 
-            this.pnlRoomEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlRoomEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlRoomEditor.AreaX = 320;
+            this.pnlRoomEditor.AreaY = 240;
             this.pnlRoomEditor.AvoidMouseEvents = false;
             this.pnlRoomEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(171)))), ((int)(((byte)(173)))), ((int)(((byte)(179)))));
             this.pnlRoomEditor.DepthIndex = 0;
@@ -1194,10 +1196,11 @@
             this.pnlRoomEditor.Padding = new System.Windows.Forms.Padding(1);
             this.pnlRoomEditor.SelectedBackground = null;
             this.pnlRoomEditor.SelectedObject = null;
+            this.pnlRoomEditor.ShowArea = false;
             this.pnlRoomEditor.ShowBlocks = true;
             this.pnlRoomEditor.ShowGrid = true;
             this.pnlRoomEditor.ShowInstances = true;
-            this.pnlRoomEditor.Size = new System.Drawing.Size(450, 349);
+            this.pnlRoomEditor.Size = new System.Drawing.Size(450, 350);
             this.pnlRoomEditor.Snap = true;
             this.pnlRoomEditor.TabIndex = 12;
             this.pnlRoomEditor.Tiles = null;
@@ -1215,7 +1218,7 @@
             // 
             this.splRoom.Location = new System.Drawing.Point(304, 0);
             this.splRoom.Name = "splRoom";
-            this.splRoom.Size = new System.Drawing.Size(4, 442);
+            this.splRoom.Size = new System.Drawing.Size(4, 443);
             this.splRoom.TabIndex = 3;
             this.splRoom.TabStop = false;
             // 
@@ -1227,7 +1230,7 @@
             this.pnlLeft.MinimumSize = new System.Drawing.Size(304, 416);
             this.pnlLeft.Name = "pnlLeft";
             this.pnlLeft.Padding = new System.Windows.Forms.Padding(4, 4, 0, 4);
-            this.pnlLeft.Size = new System.Drawing.Size(304, 442);
+            this.pnlLeft.Size = new System.Drawing.Size(304, 443);
             this.pnlLeft.TabIndex = 2;
             // 
             // tabMain
@@ -1243,7 +1246,7 @@
             this.tabMain.SelectedIndex = 0;
             this.tabMain.SelectedTab = this.tabTiles;
             this.tabMain.SelectTabMargin = 2;
-            this.tabMain.Size = new System.Drawing.Size(300, 434);
+            this.tabMain.Size = new System.Drawing.Size(300, 435);
             this.tabMain.TabDock = System.Windows.Forms.DockStyle.Top;
             this.tabMain.TabIndent = 8;
             this.tabMain.TabIndex = 2;
@@ -1259,7 +1262,7 @@
             this.tabTiles.Location = new System.Drawing.Point(3, 28);
             this.tabTiles.Name = "tabTiles";
             this.tabTiles.Padding = new System.Windows.Forms.Padding(4, 4, 8, 6);
-            this.tabTiles.Size = new System.Drawing.Size(294, 403);
+            this.tabTiles.Size = new System.Drawing.Size(294, 404);
             this.tabTiles.TabIndex = 0;
             this.tabTiles.Text = "Tiles";
             // 
@@ -1274,7 +1277,7 @@
             this.grpTiles.MinimumSize = new System.Drawing.Size(24, 0);
             this.grpTiles.Name = "grpTiles";
             this.grpTiles.Padding = new System.Windows.Forms.Padding(10, 12, 10, 30);
-            this.grpTiles.Size = new System.Drawing.Size(282, 245);
+            this.grpTiles.Size = new System.Drawing.Size(282, 246);
             this.grpTiles.TabIndex = 2;
             this.grpTiles.TabStop = false;
             this.grpTiles.Text = "Background";
@@ -1443,11 +1446,11 @@
             // 
             // pnlBackground
             // 
-            this.pnlBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlBackground.AutoScroll = true;
-            this.pnlBackground.AutoScrollMinSize = new System.Drawing.Size(256, 169);
+            this.pnlBackground.AutoScrollMinSize = new System.Drawing.Size(256, 170);
             this.pnlBackground.AvoidMouseEvents = false;
             this.pnlBackground.BackColor = System.Drawing.Color.White;
             this.pnlBackground.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
@@ -1458,7 +1461,7 @@
             this.pnlBackground.Location = new System.Drawing.Point(11, 60);
             this.pnlBackground.Name = "pnlBackground";
             this.pnlBackground.SelectMode = GMare.Controls.GMareBackgroundPanel.SelectType.Normal;
-            this.pnlBackground.Size = new System.Drawing.Size(260, 173);
+            this.pnlBackground.Size = new System.Drawing.Size(260, 174);
             this.pnlBackground.SnapSize = new System.Drawing.Size(8, 8);
             this.pnlBackground.TabIndex = 1;
             this.pnlBackground.TileBrush = null;
@@ -1681,9 +1684,9 @@
             // 
             // lstLayers
             // 
-            this.lstLayers.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstLayers.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lstLayers.CheckBoxCheckedImage = global::GMare.Properties.Resources.eye;
             this.lstLayers.CheckBoxImageOffsetX = 0;
             this.lstLayers.CheckBoxImageOffsetY = -1;
@@ -1727,8 +1730,8 @@
             // 
             // txtObject
             // 
-            this.txtObject.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtObject.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtObject.ButtonImage = null;
             this.txtObject.ButtonImageXOffset = 0;
             this.txtObject.ButtonImageYOffset = 0;
@@ -1765,9 +1768,9 @@
             // 
             // tabInstancesMain
             // 
-            this.tabInstancesMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabInstancesMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabInstancesMain.BackColor = System.Drawing.Color.Transparent;
             this.tabInstancesMain.Controls.Add(this.tabInstances);
             this.tabInstancesMain.Controls.Add(this.tabBlocks);
@@ -1796,9 +1799,9 @@
             // 
             // lstInstances
             // 
-            this.lstInstances.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstInstances.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lstInstances.CellSize = new System.Drawing.Size(16, 16);
             this.lstInstances.ContextMenuStrip = this.mnuInstances;
             this.lstInstances.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
@@ -2090,9 +2093,9 @@
             // 
             // pnlBlockEditor
             // 
-            this.pnlBlockEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlBlockEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlBlockEditor.AutoScroll = true;
             this.pnlBlockEditor.AutoScrollMinSize = new System.Drawing.Size(256, 263);
             this.pnlBlockEditor.BackColor = System.Drawing.Color.White;
@@ -2153,7 +2156,7 @@
             this.sslInfo,
             this.sslActual,
             this.sslSnapped});
-            this.ssMain.Location = new System.Drawing.Point(0, 514);
+            this.ssMain.Location = new System.Drawing.Point(0, 515);
             this.ssMain.Name = "ssMain";
             this.ssMain.Size = new System.Drawing.Size(786, 24);
             this.ssMain.TabIndex = 5;
@@ -2192,7 +2195,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.ClientSize = new System.Drawing.Size(786, 538);
+            this.ClientSize = new System.Drawing.Size(786, 539);
             this.Controls.Add(this.pnlBottom);
             this.Controls.Add(this.pnlTop);
             this.Controls.Add(this.mnuMain);

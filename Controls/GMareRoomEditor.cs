@@ -273,6 +273,24 @@ namespace GMare.Controls
         }
 
         /// <summary>
+        /// Gets or sets the horizontal area spacing
+        /// </summary>
+        public int AreaX
+        {
+            get { return pnlRoom.AreaX; }
+            set { pnlRoom.AreaX = value; Invalidate(); }
+        }
+
+        /// <summary>
+        /// Gets or sets the vertical area spacing
+        /// </summary>
+        public int AreaY
+        {
+            get { return pnlRoom.AreaY; }
+            set { pnlRoom.AreaY = value; Invalidate(); }
+        }
+
+        /// <summary>
         /// Gets or sets the level of the collsion
         /// </summary>
         public int Level
@@ -288,6 +306,15 @@ namespace GMare.Controls
         {
             get { return pnlRoom.ShowGrid; }
             set { pnlRoom.ShowGrid = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the show area property
+        /// </summary>
+        public bool ShowArea
+        {
+            get { return pnlRoom.ShowArea; }
+            set { pnlRoom.ShowArea = value; Invalidate(); }
         }
 
         /// <summary>

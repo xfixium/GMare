@@ -84,11 +84,14 @@ namespace GMare.Controls
         private int _layerIndex = -1;                                                // The selected layer index
         private int _gridX = 16;                                                     // Offset for grid width
         private int _gridY = 16;                                                     // Offset for grid height
+        private int _areaX = 320;                                                    // Offset for area width
+        private int _areaY = 240;                                                    // Offset for area height
         private int _posX = 0;                                                       // Last mouse x position
         private int _posY = 0;                                                       // Last mouse y position
         private int _level = 0;                                                      // The level of the collision
         private int _backgroundWidth = 0;                                            // Width of a condensed background image
         private bool _showGrid = true;                                               // If the grid should be displayed
+        private bool _showArea = false;                                              // If the area should be displayed
         private bool _showCursor = false;                                            // If the cursor should be displayed
         private bool _showInstances = true;                                          // If instances should be displayed in layer edit mode
         private bool _showBlocks = true;                                             // If block instances should be displayed in layer edit mode
@@ -405,6 +408,24 @@ namespace GMare.Controls
         }
 
         /// <summary>
+        /// Gets or sets the horizontal area spacing
+        /// </summary>
+        public int AreaX
+        {
+            get { return _areaX; }
+            set { _areaX = value; Invalidate(); }
+        }
+
+        /// <summary>
+        /// Gets or sets the vertical area spacing
+        /// </summary>
+        public int AreaY
+        {
+            get { return _areaY; }
+            set { _areaY = value; Invalidate(); }
+        }
+
+        /// <summary>
         /// Gets the grid size
         /// </summary>
         private Size GridSize
@@ -428,6 +449,15 @@ namespace GMare.Controls
         {
             get { return _showGrid; }
             set { _showGrid = value; Invalidate(); }
+        }
+
+        /// <summary>
+        /// Gets or sets the show area property
+        /// </summary>
+        public bool ShowArea
+        {
+            get { return _showArea; }
+            set { _showArea = value; Invalidate(); }
         }
 
         /// <summary>
@@ -663,7 +693,7 @@ namespace GMare.Controls
                 return;
 
             // Show warning message
-            if (App.Room.Backgrounds[0].Image != null && App.GetConfigFlag(App.ShowScaleWarningAppKey, false))
+            if (App.Room.Backgrounds[0].Image != null && App.GetConfigBool(App.ShowScaleWarningAppKey, false))
                 ShowWarning(GMare.Properties.Resources.ScaleWarning);
 
             // Flip brush horizontally
@@ -683,7 +713,7 @@ namespace GMare.Controls
                 return;
 
             // Show warning message
-            if (_background.Image != null && App.GetConfigFlag(App.ShowScaleWarningAppKey, false))
+            if (_background.Image != null && App.GetConfigBool(App.ShowScaleWarningAppKey, false))
                 ShowWarning(GMare.Properties.Resources.ScaleWarning);
 
             // Flip the brush vertically
@@ -703,7 +733,7 @@ namespace GMare.Controls
                 return;
 
             // Show warning message
-            if (_background.Image != null && App.GetConfigFlag(App.ShowBlendWarningAppKey, false))
+            if (_background.Image != null && App.GetConfigBool(App.ShowBlendWarningAppKey, false))
                 ShowWarning(GMare.Properties.Resources.BlendWarning);
 
             // Create a color dialog
@@ -967,7 +997,7 @@ namespace GMare.Controls
                 return;
 
             // Show warning message
-            if (App.Room != null && App.GetConfigFlag(App.ShowScaleWarningAppKey, false))
+            if (App.Room != null && App.GetConfigBool(App.ShowScaleWarningAppKey, false))
                 ShowWarning(GMare.Properties.Resources.ScaleWarning);
 
             // Flip selection horizontally
@@ -990,7 +1020,7 @@ namespace GMare.Controls
                 return;
 
             // Show warning message
-            if (App.Room != null && App.GetConfigFlag(App.ShowScaleWarningAppKey, false))
+            if (App.Room != null && App.GetConfigBool(App.ShowScaleWarningAppKey, false))
                 ShowWarning(GMare.Properties.Resources.ScaleWarning);
 
             // Flip selection vertically
@@ -1013,7 +1043,7 @@ namespace GMare.Controls
                 return;
 
             // If the warning message has not been shown, show it
-            if (App.Room != null && App.GetConfigFlag(App.ShowBlendWarningAppKey, false))
+            if (App.Room != null && App.GetConfigBool(App.ShowBlendWarningAppKey, false))
                 ShowWarning(GMare.Properties.Resources.BlendWarning);
 
             // Create a color dialog
@@ -1701,6 +1731,7 @@ namespace GMare.Controls
 
             // Draw grid
             DrawGrid();
+            DrawAreaGrid();
 
             // Draw selection
             if (_editMode == EditType.Layers)
@@ -2083,6 +2114,56 @@ namespace GMare.Controls
 
             // Draw line batch
             GraphicsManager.DrawStippledLineBatch(0, _gridMode == GridType.Normal ? 2 : 1);
+        }
+
+        /// <summary>
+        /// Draws the grid
+        /// </summary>
+        private void DrawAreaGrid()
+        {
+            // If the grid is not being shown, return
+            if (!_showGrid || !_showArea)
+                return;
+
+            // Position variables
+            int x = 0;
+            int y = 0;
+            Size canvas = GetSmallestCanvas();
+
+            // Calculate line amounts
+            int cols = (int)((float)canvas.Width / (float)_areaX / Zoom) + 2;
+            int rows = (int)((float)canvas.Height / (float)_areaY / Zoom) + 2;
+
+            // Calculate offsets
+            int offsetX = Offset.X % App.Room.Width;
+            int offsetY = Offset.Y % App.Room.Height;
+
+            // Calculate snap
+            Point snap = GetTranslatedSnappedPoint(new Point(Offset.X - offsetX, Offset.Y - offsetY), new Size(_areaX, _areaY));
+
+            // List of rectangles
+            List<Rectangle> rects = new List<Rectangle>();
+
+            // Draw vertical lines
+            for (int col = 0; col < cols; col++)
+            {
+                // Draw horizontal lines
+                for (int row = 0; row < rows; row++)
+                {
+                    // Calculate coordinates
+                    x = col * _areaX + snap.X;
+                    y = row * _areaY + snap.Y;
+
+                    // Draw line
+                    Rectangle rect = new Rectangle(x, y, _areaX + 1, _areaY + 1);
+                    rects.Add(rect);
+                    rect.Inflate(-1, -1);
+                    rects.Add(rect);
+                }
+            }
+
+            // Draw line batch
+            GraphicsManager.DrawRectangles(rects.ToArray(), Color.FromArgb(64, _invertGridColor ? Color.White : Color.Black), true);
         }
 
         #endregion
@@ -2652,25 +2733,9 @@ namespace GMare.Controls
                 return;
             }
 
-            // Get the config file
-            Configuration config = App.GetConfig(true);
-
-            // If the config file was not found, return
-            if (config == null)
-                return;
-
-            // Get the brightness and transparency settings
-            float brightness;
-            float transparency;
-            bool result1 = float.TryParse(config.AppSettings.Settings[App.LowerLayerBrightnessAppKey].Value, out brightness);
-            bool result2 = float.TryParse(config.AppSettings.Settings[App.UpperLayerTransparencyAppKey].Value, out transparency);
-
-            // If the parse was not successful, set to default values
-            if (!result1)
-                brightness = -0.4f;
-
-            if (!result2)
-                transparency = 0.4f;
+            // Get app setting values
+            float brightness = App.GetConfigFloat(App.LowerLayerBrightnessAppKey, App.LowerLayerBrightnessAppDefault);
+            float transparency = App.GetConfigFloat(App.UpperLayerTransparencyAppKey, App.UndoRedoMaximumAppDefault);
 
             // Delete any previous tilemaps
             GraphicsManager.DeleteTilemaps();
@@ -2757,10 +2822,10 @@ namespace GMare.Controls
 
                 // Set message flag off
                 if (text == GMare.Properties.Resources.BlendWarning)
-                     App.SetConfigFlag(App.ShowBlendWarningAppKey, false);
+                     App.SetConfigBool(App.ShowBlendWarningAppKey, false);
 
                 if (text == GMare.Properties.Resources.ScaleWarning)
-                    App.SetConfigFlag(App.ShowScaleWarningAppKey, false);
+                    App.SetConfigBool(App.ShowScaleWarningAppKey, false);
             }
         }
 

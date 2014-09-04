@@ -426,11 +426,20 @@ namespace GMare
             else if (mnuPreferences.Name == name)
             {
                 // Create a new preferences dialog
-                using (PreferencesForm form = new PreferencesForm())
+                using (PreferencesForm form = new PreferencesForm(pnlRoomEditor.ShowArea, pnlRoomEditor.AreaX, pnlRoomEditor.AreaY))
                 {
+                    // Check if the config file exists
+                    if (App.GetConfig(false) == null)
+                        return;
+
                     // If the dialog result is not Ok, return
                     if (form.ShowDialog() != DialogResult.OK)
                         return;
+
+                    // Set the room edito area properties
+                    pnlRoomEditor.ShowArea = form.UseAreaGrid;
+                    pnlRoomEditor.AreaX = form.AreaSize.Width;
+                    pnlRoomEditor.AreaY = form.AreaSize.Height;
 
                     // If unod/redo update is required, notify the user
                     if (form.UpdateUnodRedo)
@@ -447,7 +456,7 @@ namespace GMare
                     }
 
                     // Set the status bar visibility
-                    bool showTips = App.GetConfigFlag(App.ShowTipsAppKey, true);
+                    bool showTips = App.GetConfigBool(App.ShowTipsAppKey, true);
 
                     // If there is no change, return
                     if (grpRoomEditor.ShowStatusBar == showTips)
@@ -2008,7 +2017,7 @@ namespace GMare
             App.Room.Layers.Add(new GMareLayer(App.Room.Columns, App.Room.Rows));
 
             // Set form level variables
-            _history = new UndoRedoHistory<IRoomOwner>(this, App.GetUndoRedoMax(true));
+            _history = new UndoRedoHistory<IRoomOwner>(this, App.GetConfigInt(App.UndoRedoMaximumAppKey, App.UndoRedoMaximumAppDefault));
             _layer = App.Room.Layers[0];
 
             // Set UI based on room properties
@@ -2022,7 +2031,7 @@ namespace GMare
             pnlRoomEditor.EditMode = tabMain.SelectedTab == tabTiles ? EditType.Layers : EditType.Objects;
             txtObject.Text = "<undefined>";
             txtObject.Enabled = false;
-            grpRoomEditor.ShowStatusBar = App.GetConfigFlag(App.ShowTipsAppKey, true);
+            grpRoomEditor.ShowStatusBar = App.GetConfigBool(App.ShowTipsAppKey, true);
 
             // Update UI
             if (!grpRoomEditor.ShowStatusBar)

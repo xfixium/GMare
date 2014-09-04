@@ -54,6 +54,12 @@ namespace GMare.Objects
         public static string ShowScaleWarningAppKey = "ShowScaleWarning";              // Scale warning app.config settings key
         public static string ShowBlendWarningAppKey = "ShowBlendWarning";              // Blend color warning app.config settings key
         public static string ShowTipsAppKey = "ShowTips";                              // If showing tips app.config settings key
+        public static int UndoRedoMaximumAppDefault = 15;                              // Undo/Redo maximum default value
+        public static float LowerLayerBrightnessAppDefault = -0.4f;                    // Lower layer brightness default value
+        public static float UpperLayerTransparencyAppDefault = 0.4f;                   // Upper layer transparency default value
+        public static bool ShowScaleWarningAppDefault = false;                         // Scale warning default value
+        public static bool ShowBlendWarningAppDefault = false;                         // Blend color warning default value
+        public static bool ShowTipsAppDefault = true;                                  // If showing tips default value
 
         #endregion
 
@@ -69,11 +75,14 @@ namespace GMare.Objects
             string appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string configPath = Path.Combine(appPath, "app.config");
 
-            // If the app.config file does not exist, and not supressing the warning, notify the user and return
-            if (!File.Exists(configPath) && !supressWarning)
+            // If the app.config file does not exist
+            if (!File.Exists(configPath))
             {
-                MessageBox.Show("GMare could not find the file: app.config. Please make sure it resides in the same directory as GMare.",
-                    "GMare", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+                // If not supressing the warning
+                if (!supressWarning)
+                    MessageBox.Show("GMare could not find the file: app.config. Please make sure it resides in the same directory as GMare.",
+                        "GMare", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+
                 return null;
             }
 
@@ -84,63 +93,94 @@ namespace GMare.Objects
         }
 
         /// <summary>
-        /// Gets the undo/redo maximum from app.config
+        /// Gets the applications global configuration settings
         /// </summary>
-        /// <returns></returns>
-        public static int GetUndoRedoMax(bool supressWarning)
+        /// <returns>A configuration file</returns>
+        private static bool ConfigKeyExists(Configuration config, string key)
         {
-            // Get the config file
-            Configuration config = App.GetConfig(supressWarning);
+            // If the given config is empty, return false
+            if (config == null)
+                return false;
 
-            // If the config file was not found, return default
-            if (config == null || config.AppSettings.Settings.Count == 0)
-                return 10;
+            // Iterate through app setting keys to see if the given key exists
+            foreach (var k in config.AppSettings.Settings.AllKeys)
+                if (k == key)
+                    return true;
 
-            try
-            {
-                // Get the undo/redo max setting
-                int undoRedoMaximum;
-                bool result = int.TryParse(config.AppSettings.Settings[UndoRedoMaximumAppKey].Value, out undoRedoMaximum);
-                return result ? undoRedoMaximum + 1 : 10;
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Error retrieving app setting: " + UndoRedoMaximumAppKey + ", app.config may be corrupted.", "GMare", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
-                return 10;
-            }
+            return false;
         }
 
         /// <summary>
-        /// Gets a flag value from the app.config
+        /// Gets a boolean type from the given app setting key
         /// </summary>
-        /// <returns>The app.config flag value</returns>
-        public static bool GetConfigFlag(string key, bool defaultValue)
+        /// <param name="key">The key to search the value of</param>
+        /// <param name="defaultValue">The default value if the key was not found</param>
+        /// <returns>A boolean type value from the given app setting key</returns>
+        public static bool GetConfigBool(string key, bool defaultValue)
         {
             // Get the config file
             Configuration config = App.GetConfig(true);
 
-            // If the config file was not found, return default
-            if (config == null || config.AppSettings.Settings.Count == 0)
+            // If the config file does not exist, or the key does not exist, return default value
+            if (config == null || !ConfigKeyExists(config, key))
                 return defaultValue;
 
-            // Get flag
-            bool flag;
-            bool success = bool.TryParse(config.AppSettings.Settings[key].Value, out flag);
-            return success ? flag : defaultValue;
+            bool value = defaultValue;
+            bool result = bool.TryParse(config.AppSettings.Settings[key].Value, out value);
+            return result ? value : defaultValue;
+        }
+
+        /// <summary>
+        /// Gets a int type from the given app setting key
+        /// </summary>
+        /// <param name="key">The key to search the value of</param>
+        /// <param name="defaultValue">The default value if the key was not found</param>
+        /// <returns>A int type value from the given app setting key</returns>
+        public static int GetConfigInt(string key, int defaultValue)
+        {
+            // Get the config file
+            Configuration config = App.GetConfig(true);
+
+            // If the config file does not exist, or the key does not exist, return default value
+            if (config == null || !ConfigKeyExists(config, key))
+                return defaultValue;
+
+            int value = defaultValue;
+            bool result = int.TryParse(config.AppSettings.Settings[key].Value, out value);
+            return result ? value : defaultValue;
+        }
+
+        /// <summary>
+        /// Gets a float type from the given app setting key
+        /// </summary>
+        /// <param name="key">The key to search the value of</param>
+        /// <param name="defaultValue">The default value if the key was not found</param>
+        /// <returns>A float type value from the given app setting key</returns>
+        public static float GetConfigFloat(string key, float defaultValue)
+        {
+            // Get the config file
+            Configuration config = App.GetConfig(true);
+
+            // If the config file does not exist, or the key does not exist, return default value
+            if (config == null || !ConfigKeyExists(config, key))
+                return defaultValue;
+
+            float value = defaultValue;
+            bool result = float.TryParse(config.AppSettings.Settings[key].Value, out value);
+            return result ? value : defaultValue;
         }
 
         /// <summary>
         /// Gets a flag value from the app.config
         /// </summary>
         /// <returns>The app.config flag value</returns>
-        public static void SetConfigFlag(string key, bool val)
+        public static void SetConfigBool(string key, bool val)
         {
             // Get the config file
             Configuration config = App.GetConfig(true);
 
             // If the config file was not found, return default
-            if (config == null || config.AppSettings.Settings.Count == 0)
+            if (config == null || !ConfigKeyExists(config, key))
                 return;
 
             try

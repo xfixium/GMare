@@ -27,6 +27,7 @@
 
 using System;
 using System.IO;
+using System.Drawing;
 using System.Configuration;
 using System.Windows.Forms;
 using GMare.Objects;
@@ -67,6 +68,22 @@ namespace GMare.Forms
             get { return _updateTextures; }
         }
 
+        /// <summary>
+        /// Gets if using the area grid
+        /// </summary>
+        public bool UseAreaGrid
+        {
+            get { return grpAreaGrid.Checked; }
+        }
+
+        /// <summary>
+        /// Gets the area size
+        /// </summary>
+        public Size AreaSize
+        {
+            get { return new Size((int)nudGridWidth.Value, (int)nudGridHeight.Value); }
+        }
+
         #endregion
 
         #region Constructors
@@ -74,44 +91,42 @@ namespace GMare.Forms
         /// <summary>
         /// Constructs a new preferences dialog
         /// </summary>
-        public PreferencesForm()
+        public PreferencesForm(bool useAreaGrid, int areaWidth, int areaHeight)
         {
             InitializeComponent();
 
-            // Get the config file
-            Configuration config = App.GetConfig(true);
+            // Get app settings
+            _undoRedoMaximum = App.GetConfigInt(App.UndoRedoMaximumAppKey, App.UndoRedoMaximumAppDefault);
+            _brightness = App.GetConfigFloat(App.LowerLayerBrightnessAppKey, App.LowerLayerBrightnessAppDefault);
+            _transparency = App.GetConfigFloat(App.UpperLayerTransparencyAppKey, App.UpperLayerTransparencyAppDefault);
+            _showTips = App.GetConfigBool(App.ShowTipsAppKey, App.ShowTipsAppDefault);
 
-            // If the config file was not found, return
-            if (config == null || config.AppSettings.Settings.Count == 0)
-            {
-                DialogResult = System.Windows.Forms.DialogResult.Cancel;
-                return;
-            }
+            // Set UI
+            nudMaximumUndoRedo.Value = _undoRedoMaximum;
+            nudLowerLayerBrightness.Value = (decimal)_brightness;
+            nudUpperLayerTransparency.Value = (decimal)_transparency;
+            chkShowTips.Checked = _showTips;
+            grpAreaGrid.Checked = useAreaGrid;
+            nudGridWidth.Value = areaWidth;
+            nudGridHeight.Value = areaHeight;
 
-            try
-            {
-                // Get the undo/redo max, brightness, and transparency settings
-                bool result1 = int.TryParse(config.AppSettings.Settings[App.UndoRedoMaximumAppKey].Value, out _undoRedoMaximum);
-                bool result2 = float.TryParse(config.AppSettings.Settings[App.LowerLayerBrightnessAppKey].Value, out _brightness);
-                bool result3 = float.TryParse(config.AppSettings.Settings[App.UpperLayerTransparencyAppKey].Value, out _transparency);
-                bool result4 = bool.TryParse(config.AppSettings.Settings[App.ShowTipsAppKey].Value, out _showTips);
-
-                // Set UI
-                nudMaximumUndoRedo.Value = result2 ? _undoRedoMaximum : 10;
-                nudLowerLayerBrightness.Value = result2 ? (decimal)_brightness : -0.4m;
-                nudUpperLayerTransparency.Value = result3 ? (decimal)_transparency : 0.4m;
-                chkShowTips.Checked = result4 ? _showTips : true;
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Error retrieving an app setting, app.config may be corrupted.", "GMare", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
-            }
+            // Trigger area grid change
+            nudAreaGrid_ValueChanged(this, EventArgs.Empty);
         }
 
         #endregion
 
         #region Events
+
+        /// <summary>
+        /// Area size value changed
+        /// </summary>
+        private void nudAreaGrid_ValueChanged(object sender, EventArgs e)
+        {
+            int cols = App.Room.Backgrounds.Count > 0 ? (int)nudGridWidth.Value / App.Room.Backgrounds[0].TileSize.Width : 0;
+            int rows = App.Room.Backgrounds.Count > 0 ? (int)nudGridHeight.Value / App.Room.Backgrounds[0].TileSize.Height : 0;
+            lblGridSize.Text = "Grid Size: Columns: " + cols + " Rows: " + rows;
+        }
 
         /// <summary>
         /// Button Ok click
