@@ -53,8 +53,10 @@ namespace GMare.Controls
 
         #region Fields
 
+        private ToolTip _tileIdTip = new ToolTip();
         private SelectType _selectMode = SelectType.Normal;  // Mode of the tileset panel
         private GMareBrush _tileBrush = null;                // Tile brush
+        private GMareBrush _highlighter = null;              // Tile highlight brush
         private Rectangle _selection = new Rectangle();      // Selection rectangle
         private Point _origin = Point.Empty;                 // Origin point of the selection
         private bool _avoidMouseEvents = false;              // If avoiding mouse events
@@ -91,6 +93,20 @@ namespace GMare.Controls
         }
 
         /// <summary>
+        /// Gets or sets the highlighter brush
+        /// </summary>
+        public GMareBrush Highlighter
+        {
+            get { return _highlighter; }
+            set
+            {
+                // If the value is null or the same as the current highlighter, set the highlighter to null, else copy the value
+                _highlighter = value == null || (_highlighter != null && _highlighter.Same(_tileBrush)) ? null : value.Clone();
+                UpdateBackBuffer();
+            }
+        }
+
+        /// <summary>
         /// Gets or sets if mouse events should be ignored because of a dialog double click
         /// </summary>
         public bool AvoidMouseEvents
@@ -109,6 +125,13 @@ namespace GMare.Controls
         public GMareBackgroundPanel()
         {
             InitializeComponent();
+
+            // Set selected tiles tooltip
+            _tileIdTip.ToolTipTitle = "Selected Tiles";
+            _tileIdTip.AutomaticDelay = 1;
+            _tileIdTip.AutoPopDelay = 1;
+            _tileIdTip.InitialDelay = 1;
+            _tileIdTip.UseFading = false;
         }
 
         #endregion
@@ -120,7 +143,8 @@ namespace GMare.Controls
         /// </summary>
         protected override void OnDrawOnBackbuffer(ref System.Drawing.Graphics gfx)
         {
-            // Draw selection rectangle
+            // Draw highlights and selection rectangle
+            DrawHighlights(gfx);
             DrawSelection(gfx);
         }
 
@@ -162,7 +186,18 @@ namespace GMare.Controls
             Focus();
 
             // If the image is empty or not pressing the left mouse button, return
-            if (Image == null || e.Button != MouseButtons.Left)
+            if (Image == null)
+                return;
+
+            // If the right mouse button was clicked, show brush information
+            if (e.Button == MouseButtons.Right && _tileBrush != null)
+            {
+                _tileIdTip.Hide(this);
+                _tileIdTip.Show(_tileBrush.To2DArrayString(), this, 5000);
+            }
+            
+            // If the left mouse button was not clicked, return
+            if (e.Button != MouseButtons.Left)
                 return;
 
             // Get the snapped point
@@ -251,9 +286,59 @@ namespace GMare.Controls
             UpdateBackBuffer();
         }
 
+        /// <summary>
+        /// On mouse hover
+        /// </summary>
+        protected override void OnMouseHover(EventArgs e)
+        {
+            // Call base method and hide the tool tip
+            base.OnMouseHover(e);
+            _tileIdTip.Hide(this);
+        }
+
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Draws highlight over tile
+        /// </summary>
+        private void DrawHighlights(System.Drawing.Graphics gfx)
+        {
+            // If there isn't a highlight brush, return
+            if (_highlighter == null)
+                return;
+
+            // Calculate row and column amounts
+            int cols = (int)Math.Floor((double)(Image.Width) / (double)(SnapSize.Width));
+            int rows = (int)Math.Floor((double)(Image.Height) / (double)(SnapSize.Height));
+
+            // Create a rectangle
+            Rectangle cell = new Rectangle(0, 0, SnapSize.Width, SnapSize.Height);
+
+            // Draw the tile highlight
+            using (SolidBrush highlighter = new SolidBrush(Color.FromArgb(128, Color.Yellow)))
+            {
+                // Iterate through vertical tiles
+                for (int row = 0; row < rows; row++)
+                {
+                    // Iterate through horizontal tiles
+                    for (int col = 0; col < cols; col++)
+                    {
+                        // Get position coordinates
+                        cell.X = (int)(col * SnapSize.Width);
+                        cell.Y = (int)(row * SnapSize.Height);
+
+                        // If the highlight brush does not contain the iterated tile id, continue
+                        if (!_highlighter.Contains(GMareBrush.PositionToTileId(cell.X, cell.Y, Image.Width, SnapSize)))
+                            continue;
+
+                        // Draw highlight
+                        gfx.FillRectangle(highlighter, cell);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Draws a selection rectangle

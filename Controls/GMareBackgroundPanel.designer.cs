@@ -30,11 +30,9 @@ namespace GMare.Controls
         {
             this.SuspendLayout();
             // 
-            // MapPanel
+            // GMareBackgroundPanel
             // 
-            this.AutoScroll = true;
             this.BackColor = System.Drawing.Color.White;
-            this.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.ResumeLayout(false);
 
         }

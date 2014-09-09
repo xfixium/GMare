@@ -361,6 +361,9 @@
     <EmbeddedResource Include="AutoUpdater\UpdateForm.resx">
       <DependentUpon>UpdateForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\GMareBackgroundPanel.resx">
+      <DependentUpon>GMareBackgroundPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\GMareListbox.resx">
       <DependentUpon>GMareListbox.cs</DependentUpon>
     </EmbeddedResource>
@@ -838,6 +841,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\server--arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\highlighter-color.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

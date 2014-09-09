@@ -56,6 +56,8 @@ namespace GMare.Controls
         public delegate void RoomChangingHandler();                                  // Room changing event handler
         public event ClipboardChangedHandler ClipboardChanged;                       // Clipboard contents changed
         public delegate void ClipboardChangedHandler();                              // Clipboard contents changed handler
+        public event ScrollBarPositionChangedHandler ScrollBarPositionChanged;       // Scrollbar position changed
+        public delegate void ScrollBarPositionChangedHandler();                      // Scrollbar position changed handler
         private List<GMareInstance> _selectedInstances = new List<GMareInstance>();  // The currently selected instances
         private List<GMareInstance> _instanceClip = new List<GMareInstance>();       // The instance clipboard
         private Timer _stippleTimer = new Timer();                                   // Marching ants timer
@@ -67,6 +69,7 @@ namespace GMare.Controls
         private GMareBrush _brush = new GMareBrush();                                // The brush used for setting tile ids
         private GMareBrush _selection = null;                                        // A selection brush
         private GMareBrush _selectionClip = null;                                    // The selection clipboard
+        private GMareBrush _highlighter = null;                                      // The highlighter brush
         private Cursor _cursorPencil = null;                                         // The pencil cursor
         private Cursor _cursorBucket = null;                                         // The bucket cursor
         private Cursor _cursorCross = null;                                          // The selection cursor
@@ -84,14 +87,11 @@ namespace GMare.Controls
         private int _layerIndex = -1;                                                // The selected layer index
         private int _gridX = 16;                                                     // Offset for grid width
         private int _gridY = 16;                                                     // Offset for grid height
-        private int _areaX = 320;                                                    // Offset for area width
-        private int _areaY = 240;                                                    // Offset for area height
         private int _posX = 0;                                                       // Last mouse x position
         private int _posY = 0;                                                       // Last mouse y position
         private int _level = 0;                                                      // The level of the collision
         private int _backgroundWidth = 0;                                            // Width of a condensed background image
         private bool _showGrid = true;                                               // If the grid should be displayed
-        private bool _showArea = false;                                              // If the area should be displayed
         private bool _showCursor = false;                                            // If the cursor should be displayed
         private bool _showInstances = true;                                          // If instances should be displayed in layer edit mode
         private bool _showBlocks = true;                                             // If block instances should be displayed in layer edit mode
@@ -221,6 +221,15 @@ namespace GMare.Controls
         {
             get { return _brush; }
             set { _brush = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the brush highlighter
+        /// </summary>
+        public GMareBrush Highlighter
+        {
+            get { return _highlighter; }
+            set { _highlighter = value; }
         }
 
         /// <summary>
@@ -408,24 +417,6 @@ namespace GMare.Controls
         }
 
         /// <summary>
-        /// Gets or sets the horizontal area spacing
-        /// </summary>
-        public int AreaX
-        {
-            get { return _areaX; }
-            set { _areaX = value; Invalidate(); }
-        }
-
-        /// <summary>
-        /// Gets or sets the vertical area spacing
-        /// </summary>
-        public int AreaY
-        {
-            get { return _areaY; }
-            set { _areaY = value; Invalidate(); }
-        }
-
-        /// <summary>
         /// Gets the grid size
         /// </summary>
         private Size GridSize
@@ -449,15 +440,6 @@ namespace GMare.Controls
         {
             get { return _showGrid; }
             set { _showGrid = value; Invalidate(); }
-        }
-
-        /// <summary>
-        /// Gets or sets the show area property
-        /// </summary>
-        public bool ShowArea
-        {
-            get { return _showArea; }
-            set { _showArea = value; Invalidate(); }
         }
 
         /// <summary>
@@ -1919,7 +1901,8 @@ namespace GMare.Controls
             int depth = 0;
 
             // Destination rectangle
-            Rectangle position = new Rectangle(0, 0, tileSize.Width, tileSize.Height);
+            Rectangle pos = new Rectangle(0, 0, tileSize.Width, tileSize.Height);
+            List<Rectangle> highlights = new List<Rectangle>();
 
             // Source Rectangle
             Point source = Point.Empty;
@@ -1956,8 +1939,8 @@ namespace GMare.Controls
                             continue;
 
                         // Calculate destination rectangle
-                        position.X = col * tileSize.Width;
-                        position.Y = row * tileSize.Height;
+                        pos.X = col * tileSize.Width;
+                        pos.Y = row * tileSize.Height;
 
                         Rectangle viewport = ClientRectangle;
                         viewport.X = Offset.X;
@@ -1966,7 +1949,7 @@ namespace GMare.Controls
                         viewport.Height = (int)(viewport.Height / Zoom);
 
                         // If the tile is visible within the viewport, draw tile
-                        if (viewport.IntersectsWith(position) == false)
+                        if (viewport.IntersectsWith(pos) == false)
                             continue;
 
                         // Calculate source point
@@ -1977,12 +1960,18 @@ namespace GMare.Controls
 
                         // Add sprite data
                         if (source.X < backgroundSize.Width && source.Y < backgroundSize.Height)
-                            GraphicsManager.DrawTile(GraphicsManager.TileMaps[index][source.X, source.Y], position.X, position.Y, scale.X, scale.Y, 0, tile.Blend);
+                            GraphicsManager.DrawTile(GraphicsManager.TileMaps[index][source.X, source.Y], pos.X, pos.Y, scale.X, scale.Y, 0, tile.Blend);
+
+                        // If highlighting and the brush contains the tile id, add point
+                        if (_highlighter != null && _highlighter.Contains(tileId))
+                            highlights.Add(new Rectangle(pos.Location, new Size(pos.Width + 1, pos.Height + 1)));
                     }
                 }
 
                 // Draw acquired sprite data
                 GraphicsManager.DrawSpriteBatch(true);
+                GraphicsManager.DrawRectangles(highlights.ToArray(), Color.FromArgb(128, Color.Yellow), false);
+                highlights.Clear();
             }
         }
 
@@ -2122,7 +2111,7 @@ namespace GMare.Controls
         private void DrawAreaGrid()
         {
             // If the grid is not being shown, return
-            if (!_showGrid || !_showArea)
+            if (!_showGrid || !App.Room.ShowArea)
                 return;
 
             // Position variables
@@ -2131,15 +2120,15 @@ namespace GMare.Controls
             Size canvas = GetSmallestCanvas();
 
             // Calculate line amounts
-            int cols = (int)((float)canvas.Width / (float)_areaX / Zoom) + 2;
-            int rows = (int)((float)canvas.Height / (float)_areaY / Zoom) + 2;
+            int cols = (int)((float)canvas.Width / (float)App.Room.AreaX / Zoom) + 2;
+            int rows = (int)((float)canvas.Height / (float)App.Room.AreaY / Zoom) + 2;
 
             // Calculate offsets
             int offsetX = Offset.X % App.Room.Width;
             int offsetY = Offset.Y % App.Room.Height;
 
             // Calculate snap
-            Point snap = GetTranslatedSnappedPoint(new Point(Offset.X - offsetX, Offset.Y - offsetY), new Size(_areaX, _areaY));
+            Point snap = GetTranslatedSnappedPoint(new Point(Offset.X - offsetX, Offset.Y - offsetY), App.Room.AreaSize);
 
             // List of rectangles
             List<Rectangle> rects = new List<Rectangle>();
@@ -2151,11 +2140,11 @@ namespace GMare.Controls
                 for (int row = 0; row < rows; row++)
                 {
                     // Calculate coordinates
-                    x = col * _areaX + snap.X;
-                    y = row * _areaY + snap.Y;
+                    x = col * App.Room.AreaX + snap.X;
+                    y = row * App.Room.AreaY + snap.Y;
 
                     // Draw line
-                    Rectangle rect = new Rectangle(x, y, _areaX + 1, _areaY + 1);
+                    Rectangle rect = new Rectangle(x, y, App.Room.AreaX + 1, App.Room.AreaY + 1);
                     rects.Add(rect);
                     rect.Inflate(-1, -1);
                     rects.Add(rect);
@@ -2304,6 +2293,9 @@ namespace GMare.Controls
             // If the selection is empty, return
             if (_selection == null || _background.Image == null)
                 return;
+
+            // Do selection scroll
+            SelectionScroll();
 
             // Get room tilesize set source and destination points
             Size tileSize = _background.TileSize;
@@ -2827,6 +2819,72 @@ namespace GMare.Controls
                 if (text == GMare.Properties.Resources.ScaleWarning)
                     App.SetConfigBool(App.ShowScaleWarningAppKey, false);
             }
+        }
+
+        /// <summary>
+        /// Scrolls the control when selection goes outside the viewport bounds
+        /// </summary>
+        private void SelectionScroll()
+        {
+            // If not making a selection, return
+            if (!_selecting)
+                return;
+
+            // Get the snapped point of the mouse
+            Point snap = GetTranslatedSnappedPoint(PointToClient(Cursor.Position), _background.TileSize);
+
+            // If the snapped x is greater than the start x, add an extra tile width to contain the mouse cursor
+            if (snap.X >= _selection.StartX)
+                snap.X += _background.TileWidth;
+
+            // If the snapped y is greater than the start y, add an extra tile height to contain the mouse cursor
+            if (snap.Y >= _selection.StartY)
+                snap.Y += _background.TileHeight;
+
+            // Move scrollbars
+            if (snap.X >= Offset.X + (ClientSize.Width / Zoom))
+                SetScrollBar(_background.TileWidth, 0);
+
+            if (snap.X < Offset.X && snap.X >= 0)
+                SetScrollBar(-_background.TileWidth, 0);
+
+            if (snap.Y > Offset.Y + (ClientSize.Height / Zoom))
+                SetScrollBar(0, _background.TileHeight);
+
+            if (snap.Y < Offset.Y && snap.Y >= 0)
+                SetScrollBar(0, -_background.TileHeight);
+
+            // Keep in bounds
+            snap.X = snap.X < 0 ? 0 : snap.X;
+            snap.Y = snap.Y < 0 ? 0 : snap.Y;
+            snap.X = snap.X > App.Room.Width ? App.Room.Width : snap.X;
+            snap.Y = snap.Y > App.Room.Height ? App.Room.Height : snap.Y;
+
+            // Set selection end point
+            _selection.EndX = snap.X;
+            _selection.EndY = snap.Y;
+        }
+
+        /// <summary>
+        /// Sets the scroll position
+        /// </summary>
+        /// <param name="offsetX">The horizontal offset</param>
+        /// <param name="offsetY">The vertical offset</param>
+        private void SetScrollBar(int offsetX, int offsetY)
+        {
+            // Set the auto scroll position as well as the viewport offset
+            Offset = new Point(Offset.X + offsetX, Offset.Y + offsetY);
+            OnScrollBarPositionChanged();
+        }
+
+        /// <summary>
+        /// Scroll position changed event
+        /// </summary>
+        private void OnScrollBarPositionChanged()
+        {
+            // If there are listeners, trigger event
+            if (ScrollBarPositionChanged != null)
+                ScrollBarPositionChanged();
         }
 
         #endregion

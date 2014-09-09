@@ -27,6 +27,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Collections.Generic;
@@ -366,6 +367,31 @@ namespace GMare.Objects
         }
 
         /// <summary>
+        /// Gets the tile ids within the grid as a 2D array
+        /// </summary>
+        /// <returns>An array of tile ids</returns>
+        public string To2DArrayString()
+        {
+            // Create a new array of tile ids
+            StringBuilder sb = new StringBuilder();
+            string line = string.Empty;
+
+            // Iterate through tile ids
+            for (int row = 0; row < _tiles.GetLength(1); row++)
+            {
+                for (int col = 0; col < _tiles.GetLength(0); col++)
+                    line += _tiles[col, row].TileId.ToString() + " ";
+
+                // Append the line
+                sb.AppendLine(line);
+                line = string.Empty;
+            }
+
+            // Return tile ids as an array
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Creates a point from a tile id
         /// </summary>
         /// <param name="tileId">The tile id to calculate the position with</param>
@@ -572,6 +598,45 @@ namespace GMare.Objects
             brush.EndY = rectangle.Bottom;
 
             return brush;
+        }
+
+        /// <summary>
+        /// Searches the brush to see if it contains the given tile id
+        /// </summary>
+        /// <param name="tileId">The given tile id to search for</param>
+        /// <returns>If the brush contains the given tile id</returns>
+        public bool Contains(int tileId)
+        {
+            // Iterate through tile ids
+            for (int row = 0; row < _tiles.GetLength(1); row++)
+                for (int col = 0; col < _tiles.GetLength(0); col++)
+                    if (tileId == _tiles[col, row].TileId)
+                        return true;
+
+            // Tile id not found
+            return false;
+        }
+
+        /// <summary>
+        /// Searches the brush to see if it contains the given tile id
+        /// </summary>
+        /// <param name="tileId">The given tile id to search for</param>
+        /// <returns>If the brush contains the given tile id</returns>
+        public bool Same(GMareBrush brush)
+        {
+            // If the sizes don't match, they brushes do not match
+            if (brush.Tiles.GetLength(0) != _tiles.GetLength(0) || 
+                brush.Tiles.GetLength(1) != _tiles.GetLength(1))
+                return false;
+
+            // Iterate through tile ids
+            for (int row = 0; row < _tiles.GetLength(1); row++)
+                for (int col = 0; col < _tiles.GetLength(0); col++)
+                    if (brush.Tiles[col, row].TileId != _tiles[col, row].TileId)
+                        return false;
+
+            // Tiles match
+            return true;
         }
 
         #endregion
