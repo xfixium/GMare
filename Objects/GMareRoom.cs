@@ -1,4 +1,4 @@
-#region MIT
+    #region MIT
 
 // 
 // GMare.
@@ -65,12 +65,15 @@ namespace GMare.Objects
         private string _name = "New Room";                                         // A personalized string of the room
         private string _caption = "";                                              // Window caption text
         private string _creationCode = "";                                         // Room creation code
+        private int _areaX = 320;                                                  // Offset for area width
+        private int _areaY = 240;                                                  // Offset for area height
         private int _speed = 30;                                                   // Room speed
         private int _columns = 20;                                                 // The width of the room in tiles
         private int _rows = 15;                                                    // The height of the room in tiles
         private bool _persistent = false;                                          // If the room is global
         private bool _scaleWarning = true;                                         // Message on scaling
         private bool _blendWarning = true;                                         // Message on color blending
+        private bool _showArea = false;                                            // If the area should be displayed
 
         #endregion
 
@@ -288,6 +291,33 @@ namespace GMare.Objects
         }
 
         /// <summary>
+        /// Gets or sets the horizontal area spacing
+        /// </summary>
+        public int AreaX
+        {
+            get { return _areaX; }
+            set { _areaX = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the vertical area spacing
+        /// </summary>
+        public int AreaY
+        {
+            get { return _areaY; }
+            set { _areaY = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the vertical area spacing
+        /// </summary>
+        [XmlIgnore]
+        public Size AreaSize
+        {
+            get { return new Size(_areaX, _areaY); }
+        }
+
+        /// <summary>
         /// Gets or sets the speed of the room
         /// </summary>
         public int Speed
@@ -330,6 +360,15 @@ namespace GMare.Objects
         {
             get { return _blendWarning; }
             set { _blendWarning = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the show area property
+        /// </summary>
+        public bool ShowArea
+        {
+            get { return _showArea; }
+            set { _showArea = value; }
         }
 
         #endregion
@@ -2300,6 +2339,46 @@ namespace GMare.Objects
 
             // The backgrounds are identical
             return true;
+        }
+
+        /// <summary>
+        /// Gets the column and row size of the background image, takes into consideration the tile size, offset and separation values
+        /// </summary>
+        public static Size GetGridSize(Bitmap image, Size tileSize, Size separation, Size offset)
+        {
+            // If the background image is empty, return null
+            if (image == null)
+                return Size.Empty;
+
+            // Calculate row and column amounts
+            int cols = (int)Math.Floor((double)(image.Width) / (double)(tileSize.Width + separation.Width));
+            int rows = (int)Math.Floor((double)(image.Height) / (double)(tileSize.Height + separation.Height));
+            int actualCols = 0;
+            int actualRows = 0;
+
+            // Iterate through vertical tiles
+            for (int row = 0; row < rows; row++)
+            {
+                // Iterate through horizontal tiles
+                for (int col = 0; col < cols; col++)
+                {
+                    // Get position coordinates
+                    int x = (int)(double)(col * tileSize.Width + col * separation.Width) + offset.Width;
+                    int y = (int)(double)(row * tileSize.Height + row * separation.Height) + offset.Height;
+
+                    // Get the cell
+                    Rectangle cell = new Rectangle(x, y, tileSize.Width - 1, tileSize.Height - 1);
+
+                    // If the cell is not out of bounds
+                    if (row == 0 && cell.Right + 1 <= image.Width)
+                        actualCols++;
+
+                    if (col == 0 && cell.Bottom + 1 <= image.Height)
+                        actualRows++;
+                }
+            }
+
+            return new Size(actualCols, actualRows);
         }
 
         /// <summary>

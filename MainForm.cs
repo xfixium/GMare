@@ -426,7 +426,7 @@ namespace GMare
             else if (mnuPreferences.Name == name)
             {
                 // Create a new preferences dialog
-                using (PreferencesForm form = new PreferencesForm(pnlRoomEditor.ShowArea, pnlRoomEditor.AreaX, pnlRoomEditor.AreaY))
+                using (PreferencesForm form = new PreferencesForm(App.Room.ShowArea, App.Room.AreaX, App.Room.AreaY))
                 {
                     // Check if the config file exists
                     if (App.GetConfig(false) == null)
@@ -437,9 +437,9 @@ namespace GMare
                         return;
 
                     // Set the room edito area properties
-                    pnlRoomEditor.ShowArea = form.UseAreaGrid;
-                    pnlRoomEditor.AreaX = form.AreaSize.Width;
-                    pnlRoomEditor.AreaY = form.AreaSize.Height;
+                    App.Room.ShowArea = form.UseAreaGrid;
+                    App.Room.AreaX = form.AreaSize.Width;
+                    App.Room.AreaY = form.AreaSize.Height;
 
                     // If unod/redo update is required, notify the user
                     if (form.UpdateUnodRedo)
@@ -1039,6 +1039,11 @@ namespace GMare
                         App.Room.Layers[App.Room.Layers.IndexOf(form.Layer)].Replace(form.Target.ToArray(), form.Swap.ToArray());
                 }
             }
+            else if (butHighlighter.Name == name)
+            {
+                pnlBackground.Highlighter = pnlBackground.TileBrush;
+                pnlRoomEditor.Highlighter = pnlBackground.Highlighter;
+            }
 
             // Update
             SetClipboard();
@@ -1052,6 +1057,7 @@ namespace GMare
         {
             // Set room editor tile selection
             pnlRoomEditor.Tiles = pnlBackground.TileBrush;
+            pnlRoomEditor.Invalidate();
         }
 
         #endregion
@@ -1644,13 +1650,14 @@ namespace GMare
                 // Offset values for scaling
                 switch (trkRoomMagnify.Value)
                 {
-                    case 1: pnlRoomEditor.Zoom(.25f); lblRoomMagnify.Text = "25%"; break;
-                    case 2: pnlRoomEditor.Zoom(.50f); lblRoomMagnify.Text = "50%"; break;
-                    case 3: pnlRoomEditor.Zoom(1.0f); lblRoomMagnify.Text = "100%"; break;
-                    case 4: pnlRoomEditor.Zoom(2.0f); lblRoomMagnify.Text = "200%"; break;
-                    case 5: pnlRoomEditor.Zoom(3.0f); lblRoomMagnify.Text = "300%"; break;
-                    case 6: pnlRoomEditor.Zoom(4.0f); lblRoomMagnify.Text = "400%"; break;
-                    case 7: pnlRoomEditor.Zoom(5.0f); lblRoomMagnify.Text = "500%"; break;
+                    case 1: pnlRoomEditor.Zoom(.12f); lblRoomMagnify.Text = "12%"; break;
+                    case 2: pnlRoomEditor.Zoom(.25f); lblRoomMagnify.Text = "25%"; break;
+                    case 3: pnlRoomEditor.Zoom(.50f); lblRoomMagnify.Text = "50%"; break;
+                    case 4: pnlRoomEditor.Zoom(1.0f); lblRoomMagnify.Text = "100%"; break;
+                    case 5: pnlRoomEditor.Zoom(2.0f); lblRoomMagnify.Text = "200%"; break;
+                    case 6: pnlRoomEditor.Zoom(3.0f); lblRoomMagnify.Text = "300%"; break;
+                    case 7: pnlRoomEditor.Zoom(4.0f); lblRoomMagnify.Text = "400%"; break;
+                    case 8: pnlRoomEditor.Zoom(5.0f); lblRoomMagnify.Text = "500%"; break;
                 }
 
                 // Refresh mouse position after zoom
@@ -2032,6 +2039,8 @@ namespace GMare
             txtObject.Text = "<undefined>";
             txtObject.Enabled = false;
             grpRoomEditor.ShowStatusBar = App.GetConfigBool(App.ShowTipsAppKey, true);
+            pnlBackground.Highlighter = null;
+            pnlRoomEditor.Highlighter = null;
 
             // Update UI
             if (!grpRoomEditor.ShowStatusBar)
@@ -2320,6 +2329,8 @@ namespace GMare
             nudRoomRows.Value = App.Room.Rows;
             nudRoomSpeed.Value = App.Room.Speed;
             txtObject.Enabled = App.Room.Nodes == null ? false : true;
+            pnlBackground.Highlighter = null;
+            pnlRoomEditor.Highlighter = null;
 
             // Update UI
             UpdateLayerList(0);

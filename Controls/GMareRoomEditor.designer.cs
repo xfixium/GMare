@@ -30,9 +30,9 @@
         {
             this.pnlMain = new System.Windows.Forms.Panel();
             this.pnlLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.pnlRoom = new GMare.Controls.GMareRoomPanel();
             this.sbVertical = new System.Windows.Forms.VScrollBar();
             this.sbHorizontal = new System.Windows.Forms.HScrollBar();
-            this.pnlRoom = new GMare.Controls.GMareRoomPanel();
             this.pnlMain.SuspendLayout();
             this.pnlLayout.SuspendLayout();
             this.SuspendLayout();
@@ -67,24 +67,6 @@
             this.pnlLayout.Size = new System.Drawing.Size(146, 146);
             this.pnlLayout.TabIndex = 3;
             // 
-            // sbVertical
-            // 
-            this.sbVertical.Dock = System.Windows.Forms.DockStyle.Right;
-            this.sbVertical.Location = new System.Drawing.Point(129, 0);
-            this.sbVertical.Name = "sbVertical";
-            this.sbVertical.Size = new System.Drawing.Size(17, 129);
-            this.sbVertical.TabIndex = 7;
-            this.sbVertical.ValueChanged += new System.EventHandler(this.sbVertical_ValueChanged);
-            // 
-            // sbHorizontal
-            // 
-            this.sbHorizontal.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.sbHorizontal.Location = new System.Drawing.Point(0, 129);
-            this.sbHorizontal.Name = "sbHorizontal";
-            this.sbHorizontal.Size = new System.Drawing.Size(129, 17);
-            this.sbHorizontal.TabIndex = 8;
-            this.sbHorizontal.ValueChanged += new System.EventHandler(this.sbHorizontal_ValueChanged);
-            // 
             // pnlRoom
             // 
             this.pnlRoom.AltKey = false;
@@ -106,6 +88,7 @@
             this.pnlRoom.Margin = new System.Windows.Forms.Padding(0);
             this.pnlRoom.Name = "pnlRoom";
             this.pnlRoom.Offset = new System.Drawing.Point(0, 0);
+            this.pnlRoom.Opaque = false;
             this.pnlRoom.SelectedBackground = null;
             this.pnlRoom.SelectedObject = null;
             this.pnlRoom.ShiftKey = false;
@@ -123,9 +106,28 @@
             this.pnlRoom.SelectedInstanceChanged += new GMare.Controls.GMareRoomPanel.InstanceChangedHandler(this.pnlRoom_InstancesChanged);
             this.pnlRoom.RoomChanging += new GMare.Controls.GMareRoomPanel.RoomChangingHandler(this.pnlRoom_RoomChanged);
             this.pnlRoom.ClipboardChanged += new GMare.Controls.GMareRoomPanel.ClipboardChangedHandler(this.pnlRoom_ClipboardChanged);
+            this.pnlRoom.ScrollBarPositionChanged += new GMare.Controls.GMareRoomPanel.ScrollBarPositionChangedHandler(this.pnlRoom_ScrollBarPositionChanged);
             this.pnlRoom.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlRoom_MouseDown);
             this.pnlRoom.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnl_Room_MouseMove);
             this.pnlRoom.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pnl_Room_MouseUp);
+            // 
+            // sbVertical
+            // 
+            this.sbVertical.Dock = System.Windows.Forms.DockStyle.Right;
+            this.sbVertical.Location = new System.Drawing.Point(129, 0);
+            this.sbVertical.Name = "sbVertical";
+            this.sbVertical.Size = new System.Drawing.Size(17, 129);
+            this.sbVertical.TabIndex = 7;
+            this.sbVertical.ValueChanged += new System.EventHandler(this.sbVertical_ValueChanged);
+            // 
+            // sbHorizontal
+            // 
+            this.sbHorizontal.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.sbHorizontal.Location = new System.Drawing.Point(0, 129);
+            this.sbHorizontal.Name = "sbHorizontal";
+            this.sbHorizontal.Size = new System.Drawing.Size(129, 17);
+            this.sbHorizontal.TabIndex = 8;
+            this.sbHorizontal.ValueChanged += new System.EventHandler(this.sbHorizontal_ValueChanged);
             // 
             // GMareRoomEditor
             // 

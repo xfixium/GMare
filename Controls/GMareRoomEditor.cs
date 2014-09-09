@@ -197,6 +197,15 @@ namespace GMare.Controls
         }
 
         /// <summary>
+        /// Gets or sets the brush highlighter
+        /// </summary>
+        public GMareBrush Highlighter
+        {
+            get { return pnlRoom.Highlighter; }
+            set { pnlRoom.Highlighter = value; }
+        }
+
+        /// <summary>
         /// Sets the image to use as a texture
         /// </summary>
         public Bitmap Image
@@ -273,24 +282,6 @@ namespace GMare.Controls
         }
 
         /// <summary>
-        /// Gets or sets the horizontal area spacing
-        /// </summary>
-        public int AreaX
-        {
-            get { return pnlRoom.AreaX; }
-            set { pnlRoom.AreaX = value; Invalidate(); }
-        }
-
-        /// <summary>
-        /// Gets or sets the vertical area spacing
-        /// </summary>
-        public int AreaY
-        {
-            get { return pnlRoom.AreaY; }
-            set { pnlRoom.AreaY = value; Invalidate(); }
-        }
-
-        /// <summary>
         /// Gets or sets the level of the collsion
         /// </summary>
         public int Level
@@ -306,15 +297,6 @@ namespace GMare.Controls
         {
             get { return pnlRoom.ShowGrid; }
             set { pnlRoom.ShowGrid = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the show area property
-        /// </summary>
-        public bool ShowArea
-        {
-            get { return pnlRoom.ShowArea; }
-            set { pnlRoom.ShowArea = value; Invalidate(); }
         }
 
         /// <summary>
@@ -476,6 +458,29 @@ namespace GMare.Controls
         {
             // Set room offset
             pnlRoom.Offset = new Point(sbHorizontal.Value, pnlRoom.Offset.Y);
+        }
+
+        /// <summary>
+        /// Scroll bar position changed from the room editor panel
+        /// </summary>
+        private void pnlRoom_ScrollBarPositionChanged()
+        {
+            // Local variables
+            int x = pnlRoom.Offset.X;
+            int y = pnlRoom.Offset.Y;
+
+            // Stay within minimum and maximum values
+            x = x < 0 ? 0 : x;
+            y = y < 0 ? 0 : y;
+            x = x > sbHorizontal.Maximum ? sbHorizontal.Maximum : x;
+            y = y > sbVertical.Maximum ? sbVertical.Maximum : y;
+
+            // Scroll to position
+            sbHorizontal.Value = x;
+            sbVertical.Value = y;
+
+            // Set the scrollbars
+            SetScrollbars();
         }
 
         /// <summary>
