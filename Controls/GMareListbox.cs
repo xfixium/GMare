@@ -29,6 +29,8 @@ using System;
 using System.Text;
 using GDI = System.Drawing;
 using System.Windows.Forms;
+using System.Drawing.Imaging;
+using System.Drawing.Drawing2D;
 using System.Collections.Generic;
 using GameMaker.Common;
 using GameMaker.Resource;
@@ -150,8 +152,10 @@ namespace GMare.Controls
 
                     // Get the background image
                     if (background.Image != null)
-                        image = ScaleImage(GMUtilities.GetBitmap(background.Image), _cellSize.Width, _cellSize.Height);
-                    else
+                        image = ScaleBitmap(GMUtilities.GetBitmap(background.Image), _cellSize.Width, _cellSize.Height);
+                    
+                    // If the image is still empty, create blank image
+                    if (image == null)
                         image = new GDI.Bitmap(_cellSize.Width, _cellSize.Height);
 
                     return image;
@@ -393,6 +397,62 @@ namespace GMare.Controls
                     this.Items.AddRange(objList.ToArray());
                     break;
             }
+        }
+
+        /// <summary>
+        /// Scales an image and keeps the aspect ratio
+        /// </summary>
+        /// <param name="bitmap">The bitmap to scale</param>
+        /// <param name="width">The canvas width</param>
+        /// <param name="height">The canvas height</param>
+        /// <returns>A scaled bitmap with a maintained aspect ratio</returns>
+        public GDI.Bitmap ScaleBitmap(GDI.Bitmap bitmap, int width, int height)
+        {
+            // If the bitmap is empty, return null
+            if (bitmap == null)
+                return null;
+
+            GDI.Rectangle src = new GDI.Rectangle(GDI.Point.Empty, bitmap.Size);
+            GDI.Rectangle dest = GDI.Rectangle.Empty;
+
+            float ratio = 0;
+            float widthRatio = (float)width / (float)src.Width;
+            float heightRatio = (float)height / (float)src.Height;
+
+            // If the height is less than the width
+            if (heightRatio < widthRatio)
+            {
+                ratio = heightRatio;
+                dest.X = (int)((width - (src.Width * ratio)) / 2);
+            }
+            else
+            {
+                ratio = widthRatio;
+                dest.Y = (int)((height - (src.Height * ratio)) / 2);
+            }
+
+            // Set destination size
+            dest.Width = (int)(src.Width * ratio) == 0 ? 1 : (int)(src.Width * ratio);
+            dest.Height = (int)(src.Height * ratio) == 0 ? 1 : (int)(src.Height * ratio);
+
+            // Create a new scaled image
+            GDI.Bitmap scaledImage = new GDI.Bitmap(width, height, PixelFormat.Format32bppArgb);
+
+            // Create a graphics context to draw the scaled image
+            using (GDI.Graphics gfx = GDI.Graphics.FromImage(scaledImage))
+            {
+                // Set image resolution
+                scaledImage.SetResolution(gfx.DpiX, gfx.DpiY);
+                
+                // Create the scaled image
+                gfx.InterpolationMode = InterpolationMode.Low;
+                gfx.SmoothingMode = SmoothingMode.None;
+                gfx.DrawImage(bitmap, dest, src, GDI.GraphicsUnit.Pixel);
+            }
+
+            // Dispose of original bitmap, return scaled bitmap
+            bitmap.Dispose();
+            return scaledImage;
         }
 
         #endregion

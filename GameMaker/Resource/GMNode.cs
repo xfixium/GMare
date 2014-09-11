@@ -99,6 +99,220 @@ namespace GameMaker.Resource
 
         #region Read
 
+        #region Game Maker Studio
+
+        /// <summary>
+        /// Gets the given resource type's project node
+        /// </summary>
+        /// <param name="file">The path to the project file</param>
+        /// <param name="type">The resource type to search for</param>
+        /// <returns>A node of the resource type</returns>
+        public static GMNode ReadTreeNodeGMX(string file, GMResourceType type)
+        {
+            // Get all the project nodes
+            Dictionary<string, string> assets = new Dictionary<string, string>();
+            GMNode parent = ReadTreeGMX(file);
+
+            // Iterate through nodes till we find the desired type
+            foreach (GMNode node in parent.Nodes)
+                if (node.ResourceType == type)
+                    return node;
+
+            // The resource type could not be found
+            return null;
+        }
+
+        /// <summary>
+        /// Reads a project tree from a GMX project file
+        /// </summary>
+        /// <param name="file">Path to the project file</param>
+        /// <returns>A root project node</returns>
+        public static GMNode ReadTreeGMX(string file)
+        {
+            try
+            {
+                // Set the asset list
+                List<string> assets = new List<string>();
+
+                // Create the project node
+                GMNode root = new GMNode();
+
+                // Create an xml document from the file
+                XmlDocument document = new XmlDocument();
+                document.Load(file);
+
+                // Iterate through child nodes
+                foreach (XmlNode node in document.ChildNodes)
+                {
+                    // If not a valid node, continue
+                    if (!IsValidXmlNode(node))
+                        continue;
+
+                    // Read the child nodes
+                    ReadNodeGMX(node, root, GMResourceType.None, assets);
+                }
+
+                // Return the project node
+                root.Name = Path.GetFileNameWithoutExtension(file);
+                root.NodeType = GMNodeType.Root;
+                root.Tag = assets;
+                return root;
+            }
+            catch (Exception)
+            {
+                throw new Exception("There was a problem reading the project file. The project file may be corrupt, or it may be an updated version that isn't supported.");
+            }
+        }
+
+        /// <summary>
+        /// Reads nodes recursively
+        /// </summary>
+        /// <param name="xmlNode">The current xml node</param>
+        /// <param name="gmNode">The current Game Maker node</param>
+        /// <param name="type">The current resource type</param>
+        /// <param name="assets">The asset list to add any assets to</param>
+        private static void ReadNodeGMX(XmlNode xmlNode, GMNode gmNode, GMResourceType type, List<string> assets)
+        {
+            // If not a valid node, continue
+            if (!IsValidXmlNode(xmlNode))
+                return;
+
+            // Read node data
+            gmNode.NodeType = GetNodeType(xmlNode);
+            gmNode.ResourceType = gmNode.NodeType == GMNodeType.Parent ? GetResourceType(xmlNode.Name) : type;
+            gmNode.ResourceSubType = gmNode.NodeType == GMNodeType.Child && gmNode.ResourceType == GMResourceType.DataFiles ? GMResourceSubType.DataFile : GetResourceSubType(xmlNode.ParentNode.Name);
+            gmNode.FilePath = gmNode.NodeType == GMNodeType.Child ? gmNode.ResourceSubType == GMResourceSubType.DataFile ? xmlNode.ParentNode.ParentNode.ParentNode.Attributes["name"].Value : xmlNode.Value : "";
+            gmNode.Name = GetNodeName(xmlNode, gmNode);
+            gmNode.Id = gmNode.NodeType == GMNodeType.Child ? GetIdFromName(gmNode.Name) : -1;
+            gmNode.Children = xmlNode.HasChildNodes ? xmlNode.ChildNodes.Count : 0;
+            gmNode.Nodes = gmNode.Children == 0 ? null : new GMNode[gmNode.Children];
+
+            // If the node is a child and a major game resource, add to asset list
+            if (gmNode.NodeType == GMNodeType.Child && gmNode.ResourceSubType != GMResourceSubType.None)
+                assets.Add(gmNode.Name);
+
+            // If there are no children, return
+            if (gmNode.Children == 0)
+                return;
+
+            // Iterate through children
+            for (int i = 0; i < gmNode.Children; i++)
+            {
+                gmNode.Nodes[i] = new GMNode();
+                GMResourceSubType sub = GetResourceSubType(xmlNode.ChildNodes[i].Name);
+
+                // If the next node is a resource subtype node, skip it and just get its text value, else read as usual
+                if (sub != GMResourceSubType.None)
+                {
+                    // If not a constant get standard attributes
+                    gmNode.Nodes[i].Tag = GetChildNodeAttribute(xmlNode.ChildNodes[i], gmNode);
+
+                    if (sub == GMResourceSubType.DataFile)
+                        ReadNodeGMX(xmlNode.ChildNodes[i].ChildNodes[0].ChildNodes[0], gmNode.Nodes[i], gmNode.ResourceType, assets);
+                    else
+                        ReadNodeGMX(xmlNode.ChildNodes[i].ChildNodes[0], gmNode.Nodes[i], gmNode.ResourceType, assets);
+                }
+                else
+                    ReadNodeGMX(xmlNode.ChildNodes[i], gmNode.Nodes[i], gmNode.ResourceType, assets);
+            }
+        }
+
+        /// <summary>
+        /// Gets the resource type of the node
+        /// </summary>
+        /// <returns></returns>
+        private static GMResourceType GetResourceType(string name)
+        {
+            // Iterate through resource type enumerations
+            foreach (string enumeration in EnumString.GetEnumStrings(typeof(GMResourceType)))
+                if (name == enumeration)
+                    return (GMResourceType)EnumString.GetEnumFromString<GMResourceType>(name);
+
+            // No match, set to none
+            return GMResourceType.None;
+        }
+
+        /// <summary>
+        /// Gets the resource subtype of the node
+        /// </summary>
+        /// <returns></returns>
+        private static GMResourceSubType GetResourceSubType(string name)
+        {
+            // Iterate through resource subtype enumerations
+            foreach (string enumeration in EnumString.GetEnumStrings(typeof(GMResourceSubType)))
+                if (name == enumeration)
+                    return (GMResourceSubType)EnumString.GetEnumFromString<GMResourceSubType>(name);
+
+            // No match, set to none
+            return GMResourceSubType.None;
+        }
+
+        /// <summary>
+        /// Determines what kind of role the node has
+        /// </summary>
+        /// <param name="node">The given xml node to check</param>
+        /// <returns>If the node is a parent, group, or child</returns>
+        private static GMNodeType GetNodeType(XmlNode node)
+        {
+            // If the node is a text type, it carries a value so it is a child node
+            // Else if the node's parent is the asset node, it is major resource parent node
+            // Else it is a group node
+            return node.NodeType == XmlNodeType.Text ? GMNodeType.Child :
+                node.ParentNode.Name == EnumString.GetEnumString(GMResourceType.Assets) ? GMNodeType.Parent : GMNodeType.Group;
+        }
+
+        /// <summary>
+        /// Looking for text and elements only
+        /// </summary>
+        /// <param name="node">The given xml node to validify</param>
+        /// <returns>If the xml node is a valid node to use</returns>
+        private static bool IsValidXmlNode(XmlNode node)
+        {
+            return !((String.IsNullOrEmpty(node.Name) && node.NodeType != XmlNodeType.Text) ||
+                node.NodeType == XmlNodeType.Comment || node.NodeType == XmlNodeType.Whitespace ||
+                node.NodeType == XmlNodeType.EndElement);
+        }
+
+        /// <summary>
+        /// Gets the name for the GMNode based on node type
+        /// </summary>
+        /// <param name="xmlNode">The xml node to extract the name from</param>
+        /// <param name="gmNode">The Game Maker node to determine how to extract the name</param>
+        /// <returns></returns>
+        private static string GetNodeName(XmlNode xmlNode, GMNode gmNode)
+        {
+            // Get the node name based on node type
+            switch (gmNode.NodeType)
+            {
+                case GMNodeType.Child: return gmNode.ResourceType == GMResourceType.Constants ? xmlNode.ParentNode.Attributes[0].Value : 
+                    xmlNode.Value.Substring(xmlNode.Value.LastIndexOf("\\") + 1); ;
+                case GMNodeType.Group: return xmlNode.Attributes.Count > 0 ? 
+                    xmlNode.Attributes.Count > 0 && gmNode.ResourceType == GMResourceType.DataFiles ? 
+                        xmlNode.Attributes[1].Value : xmlNode.Attributes[0].Value : xmlNode.Name;
+                default: return xmlNode.Name;
+            }
+        }
+
+        /// <summary>
+        /// For now gets the first attribute node of a child node, if one exists
+        /// This is for child nodes like shaders and extensions
+        /// </summary>
+        /// <param name="xmlNode">The xml node to check</param>
+        /// <returns></returns>
+        private static object GetChildNodeAttribute(XmlNode xmlNode, GMNode gmNode)
+        {
+            // If the child node has an attribute
+            if (xmlNode.Attributes != null && xmlNode.Attributes.Count > 0)
+                if (gmNode.ResourceType == GMResourceType.Constants)
+                    return new KeyValuePair<string, string>(xmlNode.Attributes[0].Value, xmlNode.ChildNodes[0].Value);
+                else
+                    return new KeyValuePair<string, string>(xmlNode.Attributes[0].Name, xmlNode.Attributes[0].Value);
+            else
+                return null;
+        }
+
+        #endregion
+
         #region Game Maker 5 - 8.1
 
         /// <summary>
@@ -200,206 +414,6 @@ namespace GameMaker.Resource
 
         #endregion
 
-        #region Game Maker Studio
-
-        /// <summary>
-        /// Gets the given resource type's project node
-        /// </summary>
-        /// <param name="file"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static GMNode ReadTreeNodeGMX(string file, GMResourceType type)
-        {
-            // Get all the project nodes
-            Dictionary<string, string> assets = new Dictionary<string, string>();
-            GMNode parent = ReadTreeGMX(file);
-
-            // Iterate through nodes till we find the desired type
-            foreach (GMNode node in parent.Nodes)
-                if (node.ResourceType == type)
-                    return node;
-
-            // The resource type could not be found
-            return null;
-        }
-
-        /// <summary>
-        /// Reads a project tree from a GMX project file
-        /// </summary>
-        /// <param name="file">Path to the project file</param>
-        /// <returns>A root project node</returns>
-        public static GMNode ReadTreeGMX(string file)
-        {
-            // Set the asset list
-            List<string> assets = new List<string>();
-
-            // Create the project node
-            GMNode root = new GMNode();
-            
-            // Create an xml document from the file
-            XmlDocument document = new XmlDocument();
-            document.Load(file);
-
-            // Iterate through child nodes
-            foreach (XmlNode node in document.ChildNodes)
-            {
-                // If not a valid node, continue
-                if (!IsValidXmlNode(node))
-                    continue;
-
-                // Read the child nodes
-                ReadNodes(node, root, GMResourceType.None, assets);
-            }
-
-            // Return the project node
-            root.Name = Path.GetFileNameWithoutExtension(file);
-            root.NodeType = GMNodeType.Root;
-            root.Tag = assets;
-            return root;
-        }
-
-        /// <summary>
-        /// Reads nodes recursively
-        /// </summary>
-        /// <param name="xmlNode">The current xml node</param>
-        /// <param name="gmNode">The current Game Maker node</param>
-        /// <param name="type">The current resource type</param>
-        /// <param name="assets">The asset list to add any assets to</param>
-        private static void ReadNodes(XmlNode xmlNode, GMNode gmNode, GMResourceType type, List<string> assets)
-        {
-            // If not a valid node, continue
-            if (!IsValidXmlNode(xmlNode))
-                return;
-
-            // Read node data
-            gmNode.NodeType = GetNodeType(xmlNode);
-            gmNode.FilePath = gmNode.NodeType == GMNodeType.Child ? xmlNode.Value : "";
-            gmNode.ResourceType = gmNode.NodeType == GMNodeType.Parent ? GetResourceType(xmlNode.Name) : type;
-            gmNode.ResourceSubType = GetResourceSubType(xmlNode.ParentNode.Name);
-            gmNode.Name = GetNodeName(xmlNode, gmNode);
-            gmNode.Id = gmNode.NodeType == GMNodeType.Child ? GetIdFromName(gmNode.Name) : -1;
-            gmNode.Children = xmlNode.HasChildNodes ? xmlNode.ChildNodes.Count : 0;
-            gmNode.Nodes = gmNode.Children == 0 ? null : new GMNode[gmNode.Children];
-
-            // If the node is a child and a major game resource, add to asset list
-            if (gmNode.NodeType == GMNodeType.Child && gmNode.ResourceSubType != GMResourceSubType.None)
-                assets.Add(gmNode.Name);
-
-            // If there are no children, return
-            if (gmNode.Children == 0)
-                return;
-
-            // Iterate through children
-            for (int i = 0; i < gmNode.Children; i++)
-            {
-                gmNode.Nodes[i] = new GMNode();
-                GMResourceSubType sub = GetResourceSubType(xmlNode.ChildNodes[i].Name);
-
-                // If the next node is a resource subtype node, skip it and just get its text value, else read as usual
-                if (sub != GMResourceSubType.None)
-                {
-                    gmNode.Nodes[i].Tag = GetChildNodeAttribute(xmlNode.ChildNodes[i]);
-
-                    if (sub == GMResourceSubType.DataFile)
-                        ReadNodes(xmlNode.ChildNodes[i].ChildNodes[0].ChildNodes[0], gmNode.Nodes[i], gmNode.ResourceType, assets);
-                    else
-                        ReadNodes(xmlNode.ChildNodes[i].ChildNodes[0], gmNode.Nodes[i], gmNode.ResourceType, assets);
-                }
-                else
-                    ReadNodes(xmlNode.ChildNodes[i], gmNode.Nodes[i], gmNode.ResourceType, assets);
-            }
-        }
-
-        /// <summary>
-        /// Gets the resource type of the node
-        /// </summary>
-        /// <returns></returns>
-        private static GMResourceType GetResourceType(string name)
-        {
-            // Iterate through resource type enumerations
-            foreach (string enumeration in EnumString.GetEnumStrings(typeof(GMResourceType)))
-                if (name == enumeration)
-                    return (GMResourceType)EnumString.GetEnumFromString<GMResourceType>(name);
-
-            // No match, set to none
-            return GMResourceType.None;
-        }
-
-        /// <summary>
-        /// Gets the resource subtype of the node
-        /// </summary>
-        /// <returns></returns>
-        private static GMResourceSubType GetResourceSubType(string name)
-        {
-            // Iterate through resource subtype enumerations
-            foreach (string enumeration in EnumString.GetEnumStrings(typeof(GMResourceSubType)))
-                if (name == enumeration)
-                    return (GMResourceSubType)EnumString.GetEnumFromString<GMResourceSubType>(name);
-
-            // No match, set to none
-            return GMResourceSubType.None;
-        }
-
-        /// <summary>
-        /// Determines what kind of role the node has
-        /// </summary>
-        /// <param name="node">The given xml node to check</param>
-        /// <returns>If the node is a parent, group, or child</returns>
-        private static GMNodeType GetNodeType(XmlNode node)
-        {
-            // If the node is a text type, it carries a value so it is a child node
-            // Else if the node's parent is the asset node, it is major resource parent node
-            // Else it is a group node
-            return node.NodeType == XmlNodeType.Text ? GMNodeType.Child :
-                node.ParentNode.Name == EnumString.GetEnumString(GMResourceType.Assets) ? GMNodeType.Parent : GMNodeType.Group;
-        }
-
-        /// <summary>
-        /// Looking for text and elements only
-        /// </summary>
-        /// <param name="node">The given xml node to validify</param>
-        /// <returns>If the xml node is a valid node to use</returns>
-        private static bool IsValidXmlNode(XmlNode node)
-        {
-            return !((String.IsNullOrEmpty(node.Name) && node.NodeType != XmlNodeType.Text) ||
-                node.NodeType == XmlNodeType.Comment || node.NodeType == XmlNodeType.Whitespace ||
-                node.NodeType == XmlNodeType.EndElement);
-        }
-
-        /// <summary>
-        /// Gets the name for the GMNode based on node type
-        /// </summary>
-        /// <param name="xmlNode">The xml node to extract the name from</param>
-        /// <param name="gmNode">The Game Maker node to determine how to extract the name</param>
-        /// <returns></returns>
-        private static string GetNodeName(XmlNode xmlNode, GMNode gmNode)
-        {
-            // Get the node name based on node type
-            switch (gmNode.NodeType)
-            {
-                case GMNodeType.Child: return xmlNode.Value.Substring(xmlNode.Value.LastIndexOf("\\") + 1); ;
-                case GMNodeType.Group: return xmlNode.Attributes.Count > 0 ? xmlNode.Attributes[0].Value : xmlNode.Name;
-                default: return xmlNode.Name;
-            }
-        }
-
-        /// <summary>
-        /// For now gets the first attribute node of a child node, if one exists
-        /// This is for child nodes like shaders and extensions
-        /// </summary>
-        /// <param name="xmlNode">The xml node to check</param>
-        /// <returns></returns>
-        private static object GetChildNodeAttribute(XmlNode xmlNode)
-        {
-            // If the child node has an attribute
-            if (xmlNode.Attributes != null && xmlNode.Attributes.Count > 0)
-                return new KeyValuePair<string, string>(xmlNode.Attributes[0].Name, xmlNode.Attributes[0].Value);
-            else
-                return null;
-        }
-
-        #endregion
-
         #endregion
 
         #region Write
@@ -411,8 +425,7 @@ namespace GameMaker.Resource
         /// </summary>
         /// <param name="file">The file path to write to</param>
         /// <param name="project">Project reference</param>
-        /// <returns></returns>
-        public static void WriteNodesGMX(string file, ref GMProject project)
+        public static void WriteTreeGMX(string file, ref GMProject project)
         {
             // Create a file stream and xml text writer to create project tree file
             using (FileStream fs = new FileStream(file, FileMode.Create))
@@ -436,56 +449,6 @@ namespace GameMaker.Resource
                         // Iterate through parent nodes
                         foreach (GMNode node in project.ProjectTree.Nodes)
                         {
-                            // If the data files node, and it has data files
-                            if (node.ResourceType == GMResourceType.DataFiles && node.Nodes != null)
-                            {
-                                // Write data files node and attributes
-                                writer.WriteStartElement(GMXEnumString(GMResourceType.DataFiles));
-                                writer.WriteAttributeString(GMXEnumString(GMXDataFileProperty.Number), node.Nodes.Length.ToString());
-                                writer.WriteAttributeString(GMXEnumString(GMXDataFileProperty.Name), GMXEnumString(GMResourceType.DataFiles));
-
-                                // Go through data file nodes
-                                foreach (GMNode dataNode in node.Nodes)
-                                {
-                                    // Get the data file object
-                                    GMDataFile dataFile = project.DataFiles.Find(d => d.Name == dataNode.Name);
-
-                                    // If there is no datafile, continue
-                                    if (dataFile == null)
-                                        continue;
-
-                                    // Write the data file
-                                    writer.WriteStartElement(GMXEnumString(GMResourceSubType.DataFile));
-                                    XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.Name), dataFile.Name);
-                                    XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.Exists), GetGMXBool(dataFile.Exists));
-                                    XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.Size), dataFile.Size.ToString());
-                                    XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.ExportAction), dataFile.ExportAction.ToString());
-                                    XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.ExportDir), dataFile.ExportDirectory);
-                                    XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.Overwrite), GetGMXBool(dataFile.OverwriteFile));
-                                    XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.FreeData), GetGMXBool(dataFile.FreeDataMemory));
-                                    XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.RemoveEnd), GetGMXBool(dataFile.RemoveAtGameEnd));
-                                    XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.Store), GetGMXBool(dataFile.Store));
-
-                                    // Write the configs for the datafile
-                                    writer.WriteStartElement(GMXEnumString(GMResourceType.ConfigOptions));
-                                    foreach (GMConfig config in dataFile.Configs)
-                                    {
-                                        writer.WriteStartElement(GMXEnumString(GMResourceSubType.Config));
-                                        writer.WriteAttributeString(GMXEnumString(GMXDataFileProperty.Name), config.Name);
-                                        XMLWriteFullElement(writer, GMXEnumString(GMXConfigProperty.CopyToMask), config.CopyToMask.ToString());
-                                        writer.WriteEndElement();
-                                    }
-                                    writer.WriteEndElement();
-
-                                    // Finish writing the datafile
-                                    XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.Filename), dataFile.FileName);
-                                    writer.WriteEndElement();
-                                }
-                                
-                                writer.WriteEndElement();
-                                continue;
-                            }
-
                             // If the tutorial node, write out values and continue
                             if (node.ResourceType == GMResourceType.TutorialState)
                             {
@@ -499,7 +462,7 @@ namespace GameMaker.Resource
 
                             // If the parent node has children, write recursively
                             if (node.Children > 0)
-                                WriteTreeRecursiveGMX(writer, node);
+                                WriteNodeGMX(writer, node, ref project);
                             // If a default node that has no children, but that needs to be written anyways
                             else if (IsDefaultNode(node.ResourceType))
                             {
@@ -521,51 +484,112 @@ namespace GameMaker.Resource
         }
 
         /// <summary>
-        /// Reads an XML recursively
+        /// Writes object XML recursively
         /// </summary>
         /// <param name="xmlNode">The given xml node</param>
         /// <param name="node">The given GM node to set up</param>
-        private static void WriteTreeRecursiveGMX(XmlTextWriter writer, GMNode node)
+        /// <param name="project">Project reference</param>
+        private static void WriteNodeGMX(XmlTextWriter writer, GMNode node, ref GMProject project)
         {
             // If a child, write out value and return
             if (node.NodeType == GMNodeType.Child)
             {
-                // If the child has an attribute
+                // If the child has an attribute or attributes
                 if (node.Tag != null)
                 {
+                    // Get the attribute key and value
                     KeyValuePair<string, string> attribute = (KeyValuePair<string, string>)node.Tag;
-                    XMLWriteFullElement(writer, GMXEnumString(node.ResourceSubType), node.FilePath,
-                        attribute.Key, attribute.Value);
+
+                    // If a constant, use the name attribute and the constant name key, else use dattribute
+                    if (node.ResourceType == GMResourceType.Constants)
+                        XMLWriteFullElement(writer, GMXEnumString(node.ResourceSubType), node.FilePath,
+                            "name", attribute.Key);
+                    else
+                        XMLWriteFullElement(writer, GMXEnumString(node.ResourceSubType), node.FilePath,
+                            attribute.Key, attribute.Value);
                 }
                 else
-                    XMLWriteFullElement(writer, GMXEnumString(node.ResourceSubType), node.FilePath);
+                {
+                    // If the child is a datafile, write out properties, else write standard
+                    if (node.ResourceSubType == GMResourceSubType.DataFile)
+                    {
+                        // Get the data file instance
+                        GMDataFile dataFile = project.DataFiles.Find(d => d.Id == node.Id && d.Group == node.FilePath);
+
+                        // If the datafile was not found, return
+                        if (dataFile == null)
+                            return;
+
+                        // Write the data file
+                        writer.WriteStartElement(GMXEnumString(GMResourceSubType.DataFile));
+                        XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.Name), dataFile.Name);
+                        XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.Exists), GetGMXBool(dataFile.Exists));
+                        XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.Size), dataFile.Size.ToString());
+                        XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.ExportAction), dataFile.ExportAction.ToString());
+                        XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.ExportDir), dataFile.ExportDirectory);
+                        XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.Overwrite), GetGMXBool(dataFile.OverwriteFile));
+                        XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.FreeData), GetGMXBool(dataFile.FreeDataMemory));
+                        XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.RemoveEnd), GetGMXBool(dataFile.RemoveAtGameEnd));
+                        XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.Store), GetGMXBool(dataFile.Store));
+
+                        // Write the configs for the datafile
+                        writer.WriteStartElement(GMXEnumString(GMResourceType.ConfigOptions));
+                        foreach (GMConfig config in dataFile.Configs)
+                        {
+                            writer.WriteStartElement(GMXEnumString(GMResourceSubType.Config));
+                            writer.WriteAttributeString(GMXEnumString(GMXDataFileProperty.Name), config.Name);
+                            XMLWriteFullElement(writer, GMXEnumString(GMXConfigProperty.CopyToMask), config.CopyToMask.ToString());
+                            writer.WriteEndElement();
+                        }
+                        writer.WriteEndElement();
+
+                        // Finish writing the datafile
+                        XMLWriteFullElement(writer, GMXEnumString(GMXDataFileProperty.Filename), dataFile.FileName);
+                        writer.WriteEndElement();
+                    }
+                    else
+                        XMLWriteFullElement(writer, GMXEnumString(node.ResourceSubType), node.FilePath);
+                }
                 return;
             }
 
-            // Start writing the element
+            // Start writing the parent element
             writer.WriteStartElement(GMXEnumString(node.ResourceType));
 
-            // If not a parent node that has no attribute name, write the name attribute
+            // If not a parent node and has no attribute name, write the name attribute
             if (!(node.NodeType == GMNodeType.Parent && !HasNameAttribute(node.ResourceType)))
-                writer.WriteAttributeString("name", node.NodeType == GMNodeType.Group ? node.Name : GetParentName(node.ResourceType));
+            {
+                // If a constant node, write the number instead of the name
+                if (node.ResourceType == GMResourceType.Constants)
+                    writer.WriteAttributeString("number", node.Nodes.Length.ToString());
+                // If a datafile node, write the number and name attributes
+                else if (node.ResourceType == GMResourceType.DataFiles)
+                {
+                    writer.WriteAttributeString("number", project.LastDataFileId.ToString());
+                    writer.WriteAttributeString("name", node.Name);
+                }
+                // Just write the name
+                else
+                    writer.WriteAttributeString("name", node.NodeType == GMNodeType.Group ? node.Name : GetParentName(node.ResourceType));
+            }
 
             // If the node has children
             if (node.Nodes != null && node.Nodes.Length > 0)
             {
                 // Write all children
                 for (int i = 0; i < node.Nodes.Length; i++)
-                    WriteTreeRecursiveGMX(writer, node.Nodes[i]);
+                    WriteNodeGMX(writer, node.Nodes[i], ref project);
             }
 
-            // End writing the element
+            // End writing the parent element
             writer.WriteEndElement();
         }
 
         /// <summary>
-        /// If the Game Maker resource gets written to file regardless of if it has resources or not
+        /// If the Game Maker resource tag gets written to file regardless of if it has resources or not
         /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        /// <param name="type">The type to check</param>
+        /// <returns>If the given type is a default type</returns>
         private static bool IsDefaultNode(GMResourceType type)
         {
             return (type == GMResourceType.Configs || type == GMResourceType.NewExtensions ||

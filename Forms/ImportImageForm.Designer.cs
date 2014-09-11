@@ -203,7 +203,7 @@ namespace GMare.Forms
             // lblProgress
             // 
             this.lblProgress.Name = "lblProgress";
-            this.lblProgress.Size = new System.Drawing.Size(139, 19);
+            this.lblProgress.Size = new System.Drawing.Size(108, 19);
             this.lblProgress.Spring = true;
             this.lblProgress.Text = "Progress:";
             this.lblProgress.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -621,7 +621,6 @@ namespace GMare.Forms
             this.trkMagnify.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trkMagnify.ToolTipText = "Slide to set the magnification level of the graphic";
             this.trkMagnify.ToolTipTitle = "Image Magnification";
-            this.trkMagnify.Value = 1;
             this.trkMagnify.ValueChanged += new System.EventHandler(this.trkMagnify_ValueChanged);
             // 
             // tabMain
@@ -629,6 +628,7 @@ namespace GMare.Forms
             this.tabMain.BackColor = System.Drawing.Color.Transparent;
             this.tabMain.Controls.Add(this.tabTiles);
             this.tabMain.Controls.Add(this.tabImage);
+            this.tabMain.Font = new System.Drawing.Font("Segoe UI", 8.25F);
             this.tabMain.Location = new System.Drawing.Point(6, 124);
             this.tabMain.Name = "tabMain";
             this.tabMain.Scroll = false;

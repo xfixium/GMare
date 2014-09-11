@@ -249,6 +249,12 @@
     <Compile Include="Forms\MoveLayerForm.Designer.cs">
       <DependentUpon>MoveLayerForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\TilesetRefactorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TilesetRefactorForm.Designer.cs">
+      <DependentUpon>TilesetRefactorForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ViewLayerForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -432,6 +438,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MoveLayerForm.resx">
       <DependentUpon>MoveLayerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TilesetRefactorForm.resx">
+      <DependentUpon>TilesetRefactorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ViewLayerForm.resx">
       <DependentUpon>ViewLayerForm.cs</DependentUpon>
