@@ -74,13 +74,6 @@ namespace GMare.Forms
             // Set Game Maker project
             _project = project;
 
-            // If the project is empty, close dialog
-            if (_project == null)
-            {
-                Close();
-                return;
-            }
-
             // Populate the backgrounds listbox
             foreach (GMBackground background in _project.Backgrounds)
             {
@@ -241,7 +234,7 @@ namespace GMare.Forms
                         // project and it's just safer, as of now, to write only the project file and the 
                         // room vs. writing the entire project out. Luckily GM:S is modular and allows that
                         // to happen
-                        GameMaker.Resource.GMNode.WriteNodesGMX(_projectPath, ref _project);
+                        GameMaker.Resource.GMNode.WriteTreeGMX(_projectPath, ref _project);
                         GameMaker.Resource.GMRoom.WriteRoomGMX(room, Path.GetDirectoryName(_projectPath) + "\\" + "rooms");
                     }
                 }

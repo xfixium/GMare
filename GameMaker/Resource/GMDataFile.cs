@@ -43,6 +43,7 @@ namespace GameMaker.Resource
         private byte[] _data = null;
         private string _fileName = "";
         private string _exportDirectory = "";
+        private string _group = "";
         private int _size = 0;
         private int _exportAction = 2;
         private bool _freeDataMemory = true;
@@ -77,6 +78,12 @@ namespace GameMaker.Resource
         {
             get { return _fileName; }
             set { _fileName = value; }
+        }
+
+        public string Group
+        {
+            get { return _group; }
+            set { _group = value; }
         }
 
         public string ExportDirectory
@@ -139,7 +146,7 @@ namespace GameMaker.Resource
         /// Gets data files from project file
         /// </summary>
         /// <param name="path">File path to project file</param>
-        public static GMList<GMDataFile> ReadDataFilesGMX(string path)
+        public static GMList<GMDataFile> ReadDataFilesGMX(string path, out int lastDataFileId)
         {
             // Create a new list of data files
             GMList<GMDataFile> dataFiles = new GMList<GMDataFile>();
@@ -149,6 +156,10 @@ namespace GameMaker.Resource
             Dictionary<string, string> properties = new Dictionary<string, string>();
             foreach (GMXDataFileProperty property in Enum.GetValues(typeof(GMXDataFileProperty)))
                 properties.Add(GMXEnumString(property), "");
+
+            // Group this data file belongs to, needed because files can have duplicate names
+            string group = "";
+            lastDataFileId = -1;
 
             // List of configs
             List<GMConfig> configs = new List<GMConfig>();
@@ -168,6 +179,17 @@ namespace GameMaker.Resource
                     // Get the element name
                     string nodeName = reader.Name;
 
+                    // If a datafiles parent or group
+                    if (nodeName.ToLower() == GMXEnumString(GMResourceType.DataFiles))
+                    {
+                        // If the last data file id has not been set, do so now
+                        if (lastDataFileId == -1)
+                            int.TryParse(reader.GetAttribute("number"), out lastDataFileId);
+
+                        // Set the group the datafile belongs to
+                        group = reader.GetAttribute("name");
+                    }
+                    
                     // If the node is a data file, read it in
                     if (nodeName.ToLower() == GMXEnumString(GMResourceSubType.DataFile))
                     {
@@ -204,7 +226,6 @@ namespace GameMaker.Resource
 
                                             // Get the element name
                                             string nodeName3 = reader3.Name;
-
 
                                             // If the node is a data file, read it in
                                             if (nodeName3.ToLower() == GMXEnumString(GMResourceSubType.Config).ToLower())
@@ -273,8 +294,10 @@ namespace GameMaker.Resource
                             dataFile.RemoveAtGameEnd = GMXBool(properties[GMXEnumString(GMXDataFileProperty.RemoveEnd)], dataFile.RemoveAtGameEnd);
                             dataFile.Store = GMXBool(properties[GMXEnumString(GMXDataFileProperty.Store)], dataFile.Store);
                             dataFile.FileName = GMXString(properties[GMXEnumString(GMXDataFileProperty.Filename)], dataFile.FileName);
+                            dataFile.Group = group == "" ? EnumString.GetEnumString(GMResourceType.DataFiles) : group;
                             dataFile.Configs = configs.ToArray();
                             configs.Clear();
+                            group = "";
 
                             // Add data file to the list
                             dataFiles.Add(dataFile);

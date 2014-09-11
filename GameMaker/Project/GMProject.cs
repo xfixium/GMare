@@ -45,6 +45,7 @@ namespace GameMaker.Project
         public static int TileIdMin = 10000000;
         public int LastInstanceId = InstanceIdMin;
         public int LastTileId = TileIdMin;
+        public int LastDataFileId = 0;
         public List<string> Assets = new List<string>();
         public GMVersionType GameMakerVersion = GMVersionType.GameMaker50;
         public GMNode ProjectTree = new GMNode();
@@ -192,7 +193,7 @@ namespace GameMaker.Project
                 {
                     case GMResourceType.Hash: Settings.Hash = ReadHashGMX(item.Value); break;
                     case GMResourceType.Assets: ProjectTree = GMNode.ReadTreeGMX(item.Value); Assets = (List<string>)ProjectTree.Tag; break;
-                    case GMResourceType.DataFiles: DataFiles = GMDataFile.ReadDataFilesGMX(item.Value); break;
+                    case GMResourceType.DataFiles: DataFiles = GMDataFile.ReadDataFilesGMX(item.Value, out LastDataFileId); break;
                     case GMResourceType.Sprites: Sprites = GMSprite.ReadSpritesGMX(item.Value, ref Assets); break;
                     //case GMResourceType.Configs: Settings.Configs = GMSettings.GetConfigsGMX(item.Value); break;
                     //case GMResourceType.Constants: Settings.Constants = GMSettings.ReadConstantsGMX(item.Value); break;

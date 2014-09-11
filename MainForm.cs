@@ -415,8 +415,18 @@ namespace GMare
                     // If the dialog result is Ok
                     if (ofd.ShowDialog() == DialogResult.OK)
                     {
+                        var project = App.GetGMProject(ofd.FileName);
+
+                        // If the project is empty, return
+                        if (project == null || project.ProjectTree == null || project.ProjectTree.Nodes == null)
+                        {
+                            MessageBox.Show("There was a problem reading the project file. The project file may be corrupt, or it may be an updated version that isn't supported.",
+                                "GMare", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+                            return;
+                        }
+
                         // Create a new GM export dialog
-                        using (ExportGMProjectForm gmform = new ExportGMProjectForm(App.GetGMProject(ofd.FileName), ofd.FileName))
+                        using (ExportGMProjectForm gmform = new ExportGMProjectForm(project, ofd.FileName))
                         {
                             gmform.ShowDialog();
                         }
