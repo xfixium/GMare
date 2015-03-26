@@ -55,6 +55,7 @@ namespace GMare
         private GMareLayer _layer = null;               // Selected layer
         private bool _loading = false;                  // If loading a project
         private bool _ignoreCheck = false;              // If ignoring visibility check state
+        private bool _ignoreChange = false;             // If ignoring a certain change on the UI
 
         #endregion
 
@@ -71,12 +72,13 @@ namespace GMare
                 // Make a copy of the current room persistent values
                 GMareRoom room = App.Room.ClonePersistents();
 
+                // Update backgrounds, this must be called before the background is set
+                UpdateImages(value);
+
                 // Set room from undo redo, use previous values for persistent data
                 App.Room = value.Room;
                 App.Room.Objects = room.Objects;
                 App.Room.Brushes = room.Brushes;
-                App.Room.ScaleWarning = room.ScaleWarning;
-                App.Room.BlendWarning = room.BlendWarning;
 
                 // Update UI
                 UpdateLayerList(lstLayers.SelectedIndex);
@@ -92,12 +94,12 @@ namespace GMare
                 // Update UI
                 txtRoomName.Text = value.Room.Name;
                 txtRoomCaption.Text = value.Room.Caption;
-                nudRoomColumns.Value = value.Room.Columns;
-                nudRoomRows.Value = value.Room.Rows;
+                nudRoomWidth.Value = butToggleSize.Checked ? value.Room.Width / value.Room.Backgrounds[0].TileWidth : value.Room.Width;
+                nudRoomHeight.Value = butToggleSize.Checked ? value.Room.Height / value.Room.Backgrounds[0].TileHeight : value.Room.Height;
                 nudRoomSpeed.Value = value.Room.Speed;
                 butRoomPersistent.Checked = value.Room.Persistent;
+                pnlBlockEditor.UpdateBackBuffer();
 
-                UpdateImages(value);
                 UpdateTitle();
                 SetClipboard();
             }
@@ -166,8 +168,9 @@ namespace GMare
             switch (keyData)
             {
                 case Keys.A: butShowInstances.Checked = butShowInstances.Checked == true ? false : true; break;
-                case Keys.B: butBackgroundEdit_Click(butBackgroundEdit, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
+                case Keys.B: butBackgroundOption_Click(butBackgroundEdit, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
                 case Keys.C: butRoomBackColor_Click(this, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
+                case Keys.D: butEditorEffects.Checked = !butEditorEffects.Checked; break;
                 case Keys.E: butLayerOption_Click(butLayerEdit, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
                 case Keys.F: SetTileTools(butBucketFillTool); pnlRoomEditor.Invalidate(); break;
                 case Keys.G: butGrid.Checked = butGrid.Checked ? false : true; pnlRoomEditor.Invalidate(); break;
@@ -178,7 +181,7 @@ namespace GMare
                 case Keys.O: butObjectsImport_Click(butObjectsImport, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
                 case Keys.P: SetTileTools(butBrushTool); pnlRoomEditor.Invalidate(); break;
                 case Keys.Q: butShowBlocks.Checked = butShowBlocks.Checked == true ? false : true; break;
-                case Keys.R: butBackgroundEdit_Click(butReplace, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
+                case Keys.R: butBackgroundOption_Click(butReplace, EventArgs.Empty); pnlRoomEditor.Invalidate(); break;
                 case Keys.S: SetTileTools(butSelectionTool); pnlRoomEditor.Invalidate(); break;
                 case Keys.T: butRoomScript_Click(this, EventArgs.Empty); break;
                 case Keys.U: SetLayerVisibility(); break;
@@ -253,21 +256,21 @@ namespace GMare
                     pnlRoomEditor.AvoidMouseEvents = true;
                     pnlBackground.AvoidMouseEvents = true;
 
-                    // If the dialog result is Ok
-                    if (form.ShowDialog() == DialogResult.OK)
-                    {
-                        // Set project room
-                        pnlRoomEditor.Reset();
-                        App.SetProject(form.FileName);
+                    // If the dialog result is not Ok, return
+                    if (form.ShowDialog() != DialogResult.OK)
+                        return;
 
-                        // Set textures for loaded objects, update blocks and object names
-                        App.SetTextures();
-                        App.Room.UpdateBlockInstances();
-                        App.Room.UpdateInstanceObjectNames();
-                        UpdateUI();
-                        nudRoomGridX.Value = App.Room.Backgrounds[0].TileWidth;
-                        nudRoomGridY.Value = App.Room.Backgrounds[0].TileHeight;
-                    }
+                    // Set project room
+                    pnlRoomEditor.Reset();
+                    App.SetProject(form.FileName);
+
+                    // Set textures for loaded objects, update blocks and object names
+                    App.SetTextures();
+                    App.Room.UpdateBlockInstances();
+                    App.Room.UpdateInstanceObjectNames();
+                    UpdateUI();
+                    nudRoomGridX.Value = App.Room.Backgrounds[0].TileWidth;
+                    nudRoomGridY.Value = App.Room.Backgrounds[0].TileHeight;
                 }
             }
             else if (mnuSaveBackground.Name == name)
@@ -333,6 +336,9 @@ namespace GMare
                     // If the dialog result is ok, set the project room
                     if (ofd.ShowDialog() == DialogResult.OK)
                         App.SetProject(ofd.FileName);
+
+                    // Reset room
+                    pnlRoomEditor.Reset();
 
                     // If the room is still empty, create a default room
                     if (App.Room == null)
@@ -454,7 +460,7 @@ namespace GMare
                     // If unod/redo update is required, notify the user
                     if (form.UpdateUnodRedo)
                     {
-                        MessageBox.Show("Changes to the Undo/Redo maximum will take affect on restart.", "GMare", 
+                        MessageBox.Show("Changes to the Undo/Redo maximum will take affect on restart.", "GMare",
                             MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
                     }
 
@@ -478,6 +484,8 @@ namespace GMare
             }
             else if (mnuExit.Name == name)
                 this.Close();
+            else if (mnuSelectAll.Name == name)
+                pnlRoomEditor.SelectAll();
             else if (mnuUndo.Name == name)
                 butEdit_Click(butUndo, EventArgs.Empty);
             else if (mnuRedo.Name == name)
@@ -588,17 +596,33 @@ namespace GMare
         /// <summary>
         /// Persistent button checked changed
         /// </summary>
-        private void butRoomPersistent_CheckChanged(object sender)
+        private void butRoomOptions_CheckChanged(object sender)
         {
-            // If the room is empty, return
-            if (App.Room == null)
+            // If the calling object is not a numeric up down or the room is empty, return
+            if (!(sender is PyxButton) || App.Room == null)
                 return;
 
-            // Room changing
-            PushHistory();
+            // Get the calling textbox name
+            string name = (sender as PyxButton).Name;
 
-            // Set room persistence
-            App.Room.Persistent = butRoomPersistent.Checked;
+            if (butRoomPersistent.Name == name)
+            {
+                // Room changing
+                PushHistory();
+
+                // Set room persistence
+                App.Room.Persistent = butRoomPersistent.Checked;
+            }
+            else if (butToggleSize.Name == name)
+            {
+                // Change the width and height uint of measure and values
+                _ignoreChange = true;
+                nudRoomWidth.UnitOfMeasure = butToggleSize.Checked ? "tiles" : "px";
+                nudRoomHeight.UnitOfMeasure = butToggleSize.Checked ? "tiles" : "px";
+                nudRoomWidth.Value = butToggleSize.Checked ? App.Room.Columns : App.Room.Width;
+                nudRoomHeight.Value = butToggleSize.Checked ? App.Room.Rows : App.Room.Height;
+                _ignoreChange = false;
+            }
         }
 
         /// <summary>
@@ -688,20 +712,25 @@ namespace GMare
         private void nudRoom_ValueChanged(object sender, EventArgs e)
         {
             // If the calling object is not a numeric up down or the room is empty, return
-            if (!(sender is PyxNumericUpDown) || App.Room == null)
+            if (!(sender is PyxNumericUpDown || sender is GMare.Controls.PyxUnitNumericUpDown) || App.Room == null)
                 return;
 
             // Get the calling numeric up down name
-            string name = (sender as PyxNumericUpDown).Name;
-
-            // Room changing
-            PushHistory();
+            string name = (sender as Control).Name;
 
             // Do action based on numeric change
-            if (nudRoomColumns.Name == name)
-                App.Room.Columns = (int)nudRoomColumns.Value;
-            else if (nudRoomRows.Name == name)
-                App.Room.Rows = (int)nudRoomRows.Value;
+            if (nudRoomWidth.Name == name && _background != null && !_ignoreChange)
+            {
+                // Room changing
+                PushHistory();
+                App.Room.Width = butToggleSize.Checked ? (int)nudRoomWidth.Value * _background.TileWidth : (int)nudRoomWidth.Value;
+            }
+            else if (nudRoomHeight.Name == name && _background != null && !_ignoreChange)
+            {
+                // Room changing
+                PushHistory();
+                App.Room.Height = butToggleSize.Checked ? (int)nudRoomHeight.Value * _background.TileWidth : (int)nudRoomHeight.Value;
+            }
             else if (nudRoomSpeed.Name == name)
                 App.Room.Speed = (int)nudRoomSpeed.Value;
 
@@ -709,7 +738,6 @@ namespace GMare
             pnlRoomEditor.Invalidate();
             UpdateTitle();
         }
-
 
         #endregion
 
@@ -967,7 +995,7 @@ namespace GMare
         /// <summary>
         /// Background edit button click
         /// </summary>
-        private void butBackgroundEdit_Click(object sender, EventArgs e)
+        private void butBackgroundOption_Click(object sender, EventArgs e)
         {
             // If the calling object is not a button or the room is empty, return
             if (!(sender is PyxButton) || App.Room == null)
@@ -989,8 +1017,9 @@ namespace GMare
                         if (!App.Room.Backgrounds[0].Same(form.Background))
                             PushHistory();
 
-                        // Set background
+                        // Set background and resize the room if it needs it
                         App.Room.Backgrounds[0] = form.Background;
+                        App.Room.ReSize();
 
                         // Update
                         UpdateBackgrounds();
@@ -1004,6 +1033,36 @@ namespace GMare
                         // Update block instances, redraw room editor
                         App.Room.UpdateBlockInstances();
                         pnlRoomEditor.Invalidate();
+                    }
+                }
+            }
+            else if (butReorganizeTiles.Name == name)
+            {
+                // If the room or background is empty return
+                if (App.Room == null || App.Room.Backgrounds[0] == null || App.Room.Backgrounds[0].Image == null)
+                    return;
+
+                // Create a new background form
+                using (TilesetRefactorForm form = new TilesetRefactorForm())
+                {
+                    // If dialog result was Ok
+                    if (form.ShowDialog() == DialogResult.OK && form.Changed)
+                    {
+                        // Room changing
+                        PushHistory();
+
+                        // Set the background
+                        App.Room.Backgrounds[0].Image.Dispose();
+                        App.Room.Backgrounds[0] = form.Background;
+
+                        // Update room tiles based on background changes
+                        foreach (GMareLayer layer in App.Room.Layers)
+                            layer.Replace(form.Targets, form.Replacements, true);
+
+                        // Update images and blocks
+                        App.Room.ReplaceBlockTileIds(form.Targets, form.Replacements);
+                        App.Room.UpdateBlockInstances();
+                        UpdateImages(null);
                     }
                 }
             }
@@ -1044,9 +1103,13 @@ namespace GMare
                     // If swaping tiles on all layers, else the selected layer
                     if (form.Layer == null)
                         foreach (GMareLayer temp in App.Room.Layers)
-                            temp.Replace(form.Target.ToArray(), form.Swap.ToArray());
+                            temp.Replace(form.Target.ToArray(), form.Swap.ToArray(), false);
                     else
-                        App.Room.Layers[App.Room.Layers.IndexOf(form.Layer)].Replace(form.Target.ToArray(), form.Swap.ToArray());
+                        App.Room.Layers[App.Room.Layers.IndexOf(form.Layer)].Replace(form.Target.ToArray(), form.Swap.ToArray(), false);
+
+                    // Update block instances
+                    App.Room.UpdateBlockInstances();
+                    pnlRoomEditor.Invalidate();
                 }
             }
             else if (butHighlighter.Name == name)
@@ -1068,6 +1131,14 @@ namespace GMare
             // Set room editor tile selection
             pnlRoomEditor.Tiles = pnlBackground.TileBrush;
             pnlRoomEditor.Invalidate();
+        }
+
+        /// <summary>
+        /// Background grid check changed
+        /// </summary>
+        private void butBackgroundGrid_CheckChanged(object sender)
+        {
+            pnlBackground.ShowGrid = butBackgroundGrid.Checked;
         }
 
         #endregion
@@ -1204,6 +1275,16 @@ namespace GMare
 
             // Set clipboard UI
             SetClipboard();
+        }
+
+        /// <summary>
+        /// Instance list double click
+        /// </summary>
+        private void lstInstances_DoubleClick(object sender, EventArgs e)
+        {
+            // Call the script editor
+            if (lstInstances.SelectedItem != null)
+                pnlRoomEditor.InstanceCode();
         }
 
         #endregion
@@ -1449,7 +1530,7 @@ namespace GMare
         /// <summary>
         /// Room grid button click
         /// </summary>
-        private void butRoomOptions_CheckChanged(object sender)
+        private void butRoomEditorOptions_CheckChanged(object sender)
         {
             // If the calling object is not a button or the room is empty, return
             if (!(sender is PyxButton) || App.Room == null)
@@ -1830,6 +1911,9 @@ namespace GMare
             // Set paste tools enabled/disabled
             mnuPaste.Enabled = paste;
             butPaste.Enabled = paste;
+
+            // Always allow select all
+            mnuSelectAll.Enabled = true;
         }
 
         /// <summary>
@@ -2041,8 +2125,8 @@ namespace GMare
             butRoomPersistent.Checked = App.Room.Persistent;
             txtRoomName.Text = App.Room.Name;
             txtRoomCaption.Text = App.Room.Caption;
-            nudRoomColumns.Value = App.Room.Columns;
-            nudRoomRows.Value = App.Room.Rows;
+            nudRoomWidth.Value = App.Room.Width;
+            nudRoomHeight.Value = App.Room.Height;
             nudRoomSpeed.Value = App.Room.Speed;
             pnlBlockEditor.SelectedBackground = _background;
             pnlRoomEditor.EditMode = tabMain.SelectedTab == tabTiles ? EditType.Layers : EditType.Objects;
@@ -2114,6 +2198,7 @@ namespace GMare
 
             // Update rendering
             lstLayers.Invalidate();
+            pnlRoomEditor.Invalidate();
         }
 
         #endregion
@@ -2126,7 +2211,7 @@ namespace GMare
         private void UpdateTitle()
         {
             // Set window title
-            this.Text = "GMare" + " [" + App.Room.Name + "] " + "Size: " + App.Room.Width + " X " + App.Room.Height;
+            this.Text = "GMare" + " [" + App.Room.Name + "] " + App.Room.Width + " X " + App.Room.Height + " Columns: " + App.Room.Columns + " Rows: " + App.Room.Rows;
         }
 
         /// <summary>
@@ -2238,6 +2323,7 @@ namespace GMare
 
             // Set room editor tile selection
             pnlRoomEditor.Tiles = pnlBackground.TileBrush;
+            _background = pnlRoomEditor.SelectedBackground;
         }
 
         /// <summary>
@@ -2251,8 +2337,9 @@ namespace GMare
             pnlBackground.SnapSize = _background.TileSize;
 
             // Set UI
-            mnuExportImage.Enabled = _background.Image == null ? false : true;
-            mnuSaveBackground.Enabled = _background.Image == null ? false : true;
+            mnuExportImage.Enabled =
+            mnuSaveBackground.Enabled =
+            butReorganizeTiles.Enabled = !(_background.Image == null);
         }
 
         /// <summary>
@@ -2335,8 +2422,10 @@ namespace GMare
             butRoomPersistent.Checked = App.Room.Persistent;
             txtRoomName.Text = App.Room.Name;
             txtRoomCaption.Text = App.Room.Caption;
-            nudRoomColumns.Value = App.Room.Columns;
-            nudRoomRows.Value = App.Room.Rows;
+            _ignoreChange = true;
+            nudRoomWidth.Value = butToggleSize.Checked ? App.Room.Width / App.Room.Backgrounds[0].TileWidth : App.Room.Width;
+            nudRoomHeight.Value = butToggleSize.Checked ? App.Room.Height / App.Room.Backgrounds[0].TileHeight : App.Room.Height;
+            _ignoreChange = false;
             nudRoomSpeed.Value = App.Room.Speed;
             txtObject.Enabled = App.Room.Nodes == null ? false : true;
             pnlBackground.Highlighter = null;

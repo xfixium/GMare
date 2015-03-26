@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GMareRoomPanel));
             this.mnuSelectionOptions = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mnuSelectionSelectAll = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuSelectionCut = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuSelectionCopy = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuSelectionPaste = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,12 +45,13 @@
             this.mnuSelectionDeselect = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuSelectionDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuInstanceOptions = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.mnuSearchObjects = new System.Windows.Forms.ToolStripMenuItem();
-            this.mnuSetAsObject = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuInstanceSearchObjects = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuInstanceSetAsObject = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuSeparator01 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuInstanceReplace = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuInstanceReplaceAll = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuSeperator03 = new System.Windows.Forms.ToolStripSeparator();
+            this.mnuInstanceSelectAll = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuInstanceCut = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuInstanceCopy = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuInstancePaste = new System.Windows.Forms.ToolStripMenuItem();
@@ -78,6 +80,7 @@
             // mnuSelectionOptions
             // 
             this.mnuSelectionOptions.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuSelectionSelectAll,
             this.mnuSelectionCut,
             this.mnuSelectionCopy,
             this.mnuSelectionPaste,
@@ -91,14 +94,22 @@
             this.mnuSelectionDeselect,
             this.mnuSelectionDelete});
             this.mnuSelectionOptions.Name = "cms_SelectionOptions";
-            this.mnuSelectionOptions.Size = new System.Drawing.Size(282, 236);
+            this.mnuSelectionOptions.Size = new System.Drawing.Size(274, 258);
+            // 
+            // mnuSelectionSelectAll
+            // 
+            this.mnuSelectionSelectAll.Image = global::GMare.Properties.Resources.selection_empty;
+            this.mnuSelectionSelectAll.Name = "mnuSelectionSelectAll";
+            this.mnuSelectionSelectAll.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+            this.mnuSelectionSelectAll.Size = new System.Drawing.Size(273, 22);
+            this.mnuSelectionSelectAll.Text = "Select All";
             // 
             // mnuSelectionCut
             // 
             this.mnuSelectionCut.Image = global::GMare.Properties.Resources.clipboard_cut;
             this.mnuSelectionCut.Name = "mnuSelectionCut";
             this.mnuSelectionCut.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.mnuSelectionCut.Size = new System.Drawing.Size(281, 22);
+            this.mnuSelectionCut.Size = new System.Drawing.Size(273, 22);
             this.mnuSelectionCut.Text = "Cut";
             // 
             // mnuSelectionCopy
@@ -106,7 +117,7 @@
             this.mnuSelectionCopy.Image = global::GMare.Properties.Resources.clipboard_copy;
             this.mnuSelectionCopy.Name = "mnuSelectionCopy";
             this.mnuSelectionCopy.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.mnuSelectionCopy.Size = new System.Drawing.Size(281, 22);
+            this.mnuSelectionCopy.Size = new System.Drawing.Size(273, 22);
             this.mnuSelectionCopy.Text = "Copy";
             // 
             // mnuSelectionPaste
@@ -114,20 +125,20 @@
             this.mnuSelectionPaste.Image = global::GMare.Properties.Resources.clipboard_paste;
             this.mnuSelectionPaste.Name = "mnuSelectionPaste";
             this.mnuSelectionPaste.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this.mnuSelectionPaste.Size = new System.Drawing.Size(281, 22);
+            this.mnuSelectionPaste.Size = new System.Drawing.Size(273, 22);
             this.mnuSelectionPaste.Text = "Paste";
             // 
             // mnuSeperator01
             // 
             this.mnuSeperator01.Name = "mnuSeperator01";
-            this.mnuSeperator01.Size = new System.Drawing.Size(278, 6);
+            this.mnuSeperator01.Size = new System.Drawing.Size(270, 6);
             // 
             // mnuSelectionFlipHorizontal
             // 
             this.mnuSelectionFlipHorizontal.Image = global::GMare.Properties.Resources.flip_horizontal;
             this.mnuSelectionFlipHorizontal.Name = "mnuSelectionFlipHorizontal";
             this.mnuSelectionFlipHorizontal.ShortcutKeyDisplayString = "Left Arrow";
-            this.mnuSelectionFlipHorizontal.Size = new System.Drawing.Size(281, 22);
+            this.mnuSelectionFlipHorizontal.Size = new System.Drawing.Size(273, 22);
             this.mnuSelectionFlipHorizontal.Text = "Flip Selection Horizontally";
             // 
             // mnuSelectionFlipVertical
@@ -135,40 +146,40 @@
             this.mnuSelectionFlipVertical.Image = global::GMare.Properties.Resources.flip_vertical;
             this.mnuSelectionFlipVertical.Name = "mnuSelectionFlipVertical";
             this.mnuSelectionFlipVertical.ShortcutKeyDisplayString = "Right Arrow";
-            this.mnuSelectionFlipVertical.Size = new System.Drawing.Size(281, 22);
+            this.mnuSelectionFlipVertical.Size = new System.Drawing.Size(273, 22);
             this.mnuSelectionFlipVertical.Text = "Flip Selection Vertically";
             // 
             // mnuSelectionColor
             // 
             this.mnuSelectionColor.Image = global::GMare.Properties.Resources.color_swatch;
             this.mnuSelectionColor.Name = "mnuSelectionColor";
-            this.mnuSelectionColor.Size = new System.Drawing.Size(281, 22);
+            this.mnuSelectionColor.Size = new System.Drawing.Size(273, 22);
             this.mnuSelectionColor.Text = "Change Blend Color";
             // 
             // mnuSeperator02
             // 
             this.mnuSeperator02.Name = "mnuSeperator02";
-            this.mnuSeperator02.Size = new System.Drawing.Size(278, 6);
+            this.mnuSeperator02.Size = new System.Drawing.Size(270, 6);
             // 
             // mnuSelectionBrush
             // 
             this.mnuSelectionBrush.Image = global::GMare.Properties.Resources.brush_fill;
             this.mnuSelectionBrush.Name = "mnuSelectionBrush";
-            this.mnuSelectionBrush.Size = new System.Drawing.Size(281, 22);
+            this.mnuSelectionBrush.Size = new System.Drawing.Size(273, 22);
             this.mnuSelectionBrush.Text = "Brush From Selection";
             // 
             // mnuSelectionAddBrush
             // 
             this.mnuSelectionAddBrush.Image = global::GMare.Properties.Resources.brush_add;
             this.mnuSelectionAddBrush.Name = "mnuSelectionAddBrush";
-            this.mnuSelectionAddBrush.Size = new System.Drawing.Size(281, 22);
+            this.mnuSelectionAddBrush.Size = new System.Drawing.Size(273, 22);
             this.mnuSelectionAddBrush.Text = "Save Brush From Selection";
             // 
             // mnuSelectionDeselect
             // 
             this.mnuSelectionDeselect.Image = global::GMare.Properties.Resources.selection_empty;
             this.mnuSelectionDeselect.Name = "mnuSelectionDeselect";
-            this.mnuSelectionDeselect.Size = new System.Drawing.Size(281, 22);
+            this.mnuSelectionDeselect.Size = new System.Drawing.Size(273, 22);
             this.mnuSelectionDeselect.Text = "Deselect";
             // 
             // mnuSelectionDelete
@@ -176,18 +187,19 @@
             this.mnuSelectionDelete.Image = global::GMare.Properties.Resources.bin;
             this.mnuSelectionDelete.Name = "mnuSelectionDelete";
             this.mnuSelectionDelete.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.mnuSelectionDelete.Size = new System.Drawing.Size(281, 22);
+            this.mnuSelectionDelete.Size = new System.Drawing.Size(273, 22);
             this.mnuSelectionDelete.Text = "Delete";
             // 
             // mnuInstanceOptions
             // 
             this.mnuInstanceOptions.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mnuSearchObjects,
-            this.mnuSetAsObject,
+            this.mnuInstanceSearchObjects,
+            this.mnuInstanceSetAsObject,
             this.mnuSeparator01,
             this.mnuInstanceReplace,
             this.mnuInstanceReplaceAll,
             this.mnuSeperator03,
+            this.mnuInstanceSelectAll,
             this.mnuInstanceCut,
             this.mnuInstanceCopy,
             this.mnuInstancePaste,
@@ -202,23 +214,23 @@
             this.mnuInstanceDeleteAll,
             this.mnuInstanceClear});
             this.mnuInstanceOptions.Name = "cms_InstanceOptions";
-            this.mnuInstanceOptions.Size = new System.Drawing.Size(192, 358);
+            this.mnuInstanceOptions.Size = new System.Drawing.Size(192, 380);
             this.mnuInstanceOptions.Opening += new System.ComponentModel.CancelEventHandler(this.mnuInstanceOptions_Opening);
             // 
-            // mnuSearchObjects
+            // mnuInstanceSearchObjects
             // 
-            this.mnuSearchObjects.Image = global::GMare.Properties.Resources.magnifier;
-            this.mnuSearchObjects.Name = "mnuSearchObjects";
-            this.mnuSearchObjects.ShortcutKeyDisplayString = "Z";
-            this.mnuSearchObjects.Size = new System.Drawing.Size(191, 22);
-            this.mnuSearchObjects.Text = "Search Objects";
+            this.mnuInstanceSearchObjects.Image = global::GMare.Properties.Resources.magnifier;
+            this.mnuInstanceSearchObjects.Name = "mnuInstanceSearchObjects";
+            this.mnuInstanceSearchObjects.ShortcutKeyDisplayString = "Z";
+            this.mnuInstanceSearchObjects.Size = new System.Drawing.Size(191, 22);
+            this.mnuInstanceSearchObjects.Text = "Search Objects";
             // 
-            // mnuSetAsObject
+            // mnuInstanceSetAsObject
             // 
-            this.mnuSetAsObject.Image = global::GMare.Properties.Resources.instance;
-            this.mnuSetAsObject.Name = "mnuSetAsObject";
-            this.mnuSetAsObject.Size = new System.Drawing.Size(191, 22);
-            this.mnuSetAsObject.Text = "Set As Selected Object";
+            this.mnuInstanceSetAsObject.Image = global::GMare.Properties.Resources.instance;
+            this.mnuInstanceSetAsObject.Name = "mnuInstanceSetAsObject";
+            this.mnuInstanceSetAsObject.Size = new System.Drawing.Size(191, 22);
+            this.mnuInstanceSetAsObject.Text = "Set As Selected Object";
             // 
             // mnuSeparator01
             // 
@@ -243,6 +255,14 @@
             // 
             this.mnuSeperator03.Name = "mnuSeperator03";
             this.mnuSeperator03.Size = new System.Drawing.Size(188, 6);
+            // 
+            // mnuInstanceSelectAll
+            // 
+            this.mnuInstanceSelectAll.Image = global::GMare.Properties.Resources.selection_empty;
+            this.mnuInstanceSelectAll.Name = "mnuInstanceSelectAll";
+            this.mnuInstanceSelectAll.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+            this.mnuInstanceSelectAll.Size = new System.Drawing.Size(191, 22);
+            this.mnuInstanceSelectAll.Text = "Select All";
             // 
             // mnuInstanceCut
             // 
@@ -436,8 +456,10 @@
         private System.Windows.Forms.ToolStripMenuItem mnuInstanceReplaceAll;
         private System.Windows.Forms.ToolStripSeparator mnuSeperator03;
         private System.Windows.Forms.ToolStripMenuItem mnuInstancePosition;
-        private System.Windows.Forms.ToolStripMenuItem mnuSearchObjects;
-        private System.Windows.Forms.ToolStripMenuItem mnuSetAsObject;
+        private System.Windows.Forms.ToolStripMenuItem mnuInstanceSearchObjects;
+        private System.Windows.Forms.ToolStripMenuItem mnuInstanceSetAsObject;
         private System.Windows.Forms.ToolStripSeparator mnuSeparator01;
+        private System.Windows.Forms.ToolStripMenuItem mnuInstanceSelectAll;
+        private System.Windows.Forms.ToolStripMenuItem mnuSelectionSelectAll;
     }
 }

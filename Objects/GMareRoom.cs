@@ -1,4 +1,4 @@
-    #region MIT
+#region MIT
 
 // 
 // GMare.
@@ -62,6 +62,7 @@ namespace GMare.Objects
         private GMNode[] _nodes = null;                                            // An array of object nodes
         private int[] _customColors = null;                                        // An array of custom colors
         private Color _backColor = Color.Silver;                                   // Backcolor of the room
+        private string _version = "";                                              // File version identifier
         private string _name = "New Room";                                         // A personalized string of the room
         private string _caption = "";                                              // Window caption text
         private string _creationCode = "";                                         // Room creation code
@@ -70,6 +71,10 @@ namespace GMare.Objects
         private int _speed = 30;                                                   // Room speed
         private int _columns = 20;                                                 // The width of the room in tiles
         private int _rows = 15;                                                    // The height of the room in tiles
+        private int _width = 320;                                                  // The width of the room in pixels
+        private int _height = 240;                                                 // The height of the room in pixels
+        private int _tileWidth = 16;                                               // Width of a single tile
+        private int _tileHeight = 16;                                              // Height of a single tile
         private bool _persistent = false;                                          // If the room is global
         private bool _scaleWarning = true;                                         // Message on scaling
         private bool _blendWarning = true;                                         // Message on color blending
@@ -190,6 +195,15 @@ namespace GMare.Objects
         }
 
         /// <summary>
+        /// Gets or sets the file version identifier
+        /// </summary>
+        public string Version
+        {
+            get { return _version; }
+            set { _version = value; }
+        }
+
+        /// <summary>
         /// Gets or sets the personalized name for the room
         /// </summary>
         public string Name
@@ -219,44 +233,59 @@ namespace GMare.Objects
         /// <summary>
         /// Gets the width of the room
         /// </summary>
-
+        [XmlIgnore]
         public int Width
         {
-            get { return _columns * _backgrounds[0].TileWidth; }
-        }
-
-        /// <summary>
-        /// Gets the height of the room
-        /// </summary>
-
-        public int Height
-        {
-            get { return _rows * _backgrounds[0].TileHeight; }
-        }
-
-        /// <summary>
-        /// Gets or sets the columns of the room
-        /// </summary>
-        [XmlIgnore]
-
-        public int Columns
-        {
-            get { return _columns; }
+            get { return _width; }
             set
             {
-                // Resize the tile columns
-                ResizeWidth(value);
-
-                // Set new value
-                _columns = value;
+                _width = value;
+                int columns = (int)Math.Ceiling((decimal)((decimal)_width / _backgrounds[0].TileWidth));
+                ResizeColumns(columns);
+                _columns = columns;
             }
         }
 
         /// <summary>
         /// XML will trigger a resize when deserializing, necessary to avoid it
         /// </summary>
-        [XmlElement("Columns")]
-        public int XMLColumns
+        [XmlElement("Width")]
+        public int XMLWidth
+        {
+            get { return _width; }
+            set { _width = value; }
+        }
+
+        /// <summary>
+        /// Gets the height of the room
+        /// </summary>
+        [XmlIgnore]
+        public int Height
+        {
+            get { return _height; }
+            set
+            {
+                _height = value;
+                int row = (int)Math.Ceiling((decimal)((decimal)_height / _backgrounds[0].TileHeight));
+                ResizeRows(row);
+                _rows = row;
+            }
+        }
+
+        /// <summary>
+        /// XML will trigger a resize when deserializing, necessary to avoid it
+        /// </summary>
+        [XmlElement("Height")]
+        public int XMLHeight
+        {
+            get { return _height; }
+            set { _height = value; }
+        }
+
+        /// <summary>
+        /// Gets the columns of the room
+        /// </summary>
+        public int Columns
         {
             get { return _columns; }
             set { _columns = value; }
@@ -265,26 +294,7 @@ namespace GMare.Objects
         /// <summary>
         /// Gets or sets the rows of the room
         /// </summary>
-        [XmlIgnore]
-
         public int Rows
-        {
-            get { return _rows; }
-            set
-            {
-                // Resize the tile rows
-                ResizeHeight(value);
-
-                // Set new value
-                _rows = value;
-            }
-        }
-
-        /// <summary>
-        /// XML will trigger a resize when deserializing, necessary to avoid it
-        /// </summary>
-        [XmlElement("Rows")]
-        public int XMLRows
         {
             get { return _rows; }
             set { _rows = value; }
@@ -309,6 +319,24 @@ namespace GMare.Objects
         }
 
         /// <summary>
+        /// Gets or sets the tile width size
+        /// </summary>
+        public int TileWidth
+        {
+            get { return _tileWidth; }
+            set { _tileWidth = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the tile height size
+        /// </summary>
+        public int TileHeight
+        {
+            get { return _tileHeight; }
+            set { _tileHeight = value; }
+        }
+
+        /// <summary>
         /// Gets or sets the vertical area spacing
         /// </summary>
         [XmlIgnore]
@@ -329,10 +357,9 @@ namespace GMare.Objects
         /// <summary>
         /// Gets the room size
         /// </summary>
-
         public Size RoomSize
         {
-            get { return new Size(Width, Height); }
+            get { return new Size(_width, _height); }
         }
 
         /// <summary>
@@ -378,19 +405,19 @@ namespace GMare.Objects
         /// <summary>
         /// Constructs a new room
         /// </summary>
-        public GMareRoom(int columns, int rows, int tileWidth, int tileHeight)
+        public GMareRoom(int width, int height, int tileWidth, int tileHeight)
         {
-            // Set Properties, to auto set actual width and height
-            Columns = columns;
-            Rows = rows;
-
             // Set fields
             _backgrounds.Add(new GMareBackground());
             _backgrounds[0].TileWidth = tileWidth;
             _backgrounds[0].TileHeight = tileHeight;
 
+            // Set Properties, to auto set actual width and height
+            Width = width;
+            Height = height;
+
             // Create a new layer
-            _layers.Add(new GMareLayer("Layer", 0, GMareLayer.GetEmptyLayer(columns, rows)));
+            _layers.Add(new GMareLayer("Layer", 0, GMareLayer.GetEmptyLayer(_columns, _rows)));
         }
 
         /// <summary>
@@ -404,16 +431,16 @@ namespace GMare.Objects
         /// <summary>
         /// Constructs a new room
         /// </summary>
-        private GMareRoom(int columns, int rows, int tileWidth, int tileHeight, bool noLayer)
+        private GMareRoom(int width, int height, int tileWidth, int tileHeight, bool noLayer)
         {
-            // Set Properties, to auto set actual width and height
-            Columns = columns;
-            Rows = rows;
-
             // Set fields
             _backgrounds.Add(new GMareBackground());
             _backgrounds[0].TileWidth = tileWidth;
             _backgrounds[0].TileHeight = tileHeight;
+
+            // Set Properties, to auto set actual width and height
+            Width = width;
+            Height = height;
         }
 
         #endregion
@@ -567,7 +594,7 @@ namespace GMare.Objects
         public GMareRoom ClonePersistents()
         {
             // Create a new room
-            GMareRoom room = new GMareRoom(_columns, _rows, _backgrounds[0].TileWidth, _backgrounds[0].TileHeight);
+            GMareRoom room = new GMareRoom(_width, _height, _backgrounds[0].TileWidth, _backgrounds[0].TileHeight);
 
             // Iterate through objects
             foreach (GMareObject obj in _objects)
@@ -586,9 +613,9 @@ namespace GMare.Objects
         }
 
         /// <summary>
-        /// Resizes all the layers to the new room width
+        /// Resizes all the layers to column count
         /// </summary>
-        private void ResizeWidth(int columns)
+        private void ResizeColumns(int columns)
         {
             // If the sizes are the same, return
             if (columns == (_layers.Count < 1 ? _columns : _layers[0].Tiles.GetLength(0)))
@@ -618,9 +645,9 @@ namespace GMare.Objects
         }
 
         /// <summary>
-        /// Resizes all the layers to the new room height
+        /// Resizes all the layers to row count
         /// </summary>
-        private void ResizeHeight(int rows)
+        private void ResizeRows(int rows)
         {
             // If the sizes are the same, return
             if (rows == (_layers.Count < 1 ? _rows : _layers[0].Tiles.GetLength(1)))
@@ -816,7 +843,7 @@ namespace GMare.Objects
                                 dest.Y = row * tileSize.Height;
 
                                 // Calculate source point
-                                source.Location = GMareBrush.TileIdToPosition(tileId, background.Width, tileSize);
+                                source.Location = GMareBrush.TileIdToSourcePosition(tileId, background.Width, tileSize);
 
                                 // Get tile
                                 Bitmap temp = Graphics.PixelMap.PixelDataToBitmap(Graphics.PixelMap.GetPixels(background, source));
@@ -887,6 +914,20 @@ namespace GMare.Objects
 
             // Return the image
             return image;
+        }
+
+        /// <summary>
+        /// Resizes the room based on columns and rows, used after changing the background
+        /// </summary>
+        public void ReSize()
+        {
+            // If the background is empty, return
+            if (_backgrounds[0] == null)
+                return;
+
+            // Set the room size based on the background
+            Width = _columns * _backgrounds[0].TileWidth;
+            Height = _rows * _backgrounds[0].TileHeight;
         }
 
         #endregion
@@ -1243,6 +1284,51 @@ namespace GMare.Objects
 
             // Update room
             UpdateBlockInstances();
+        }
+
+        /// <summary>
+        /// Replaces the target tile grid tile ids with the desired tile grid ids
+        /// </summary>
+        /// <param name="targets">The target tile grid to swap</param>
+        /// <param name="replacements">The replacement tile grid to replace the target</param>
+        public void ReplaceBlockTileIds(int[] targets, int[] replacements)
+        {
+            // If the source and target sizes are not the same return
+            if (targets.Length != replacements.Length)
+                return;
+
+            // NOTE: This method avoids potenial problems with multiple tile id swapping.
+            // If, lets say, the first tile id 6 is replaced with 8, that could lead to issues
+            // because if an 8 is replaced at a later position, it would replace those former 6s
+            // out with an unexpected value
+
+            // Create a new list of point lists
+            List<List<int>> lists = new List<List<int>>();
+
+            // Iterate through tile ids in target array
+            foreach (int id in targets)
+            {
+                // Create a new point list
+                List<int> indexes = new List<int>();
+
+                for (int i = 0; i < _blocks.Count; i++)
+                    if (_blocks[i].TileId == id && !(_blocks[i].TileId == -1 && id == -1))
+                        indexes.Add(i);
+
+                // Add point list
+                lists.Add(indexes);
+            }
+
+            // Iterate through instance lists, replace tile id
+            for (int i = 0; i < lists.Count; i++)
+                foreach (int index in lists[i])
+                    _blocks[index].TileId = replacements[i];
+
+            // Iterate through tiles that are beyond the target tiles and make them empty
+            for (int i = 0; i < _blocks.Count; i++)
+                if (_blocks[i].TileId >= targets.Length)
+                    _blocks.RemoveAt(i);
+                    
         }
 
         #endregion
@@ -1675,7 +1761,8 @@ namespace GMare.Objects
         /// </summary>
         /// <param name="targets">The target tile grid to swap</param>
         /// <param name="replacements">The replacement tile grid to replace the target</param>
-        public void Replace(int[] targets, int[] replacements)
+        /// <param name="clear">If clearing all the tiles after the selction</param>
+        public void Replace(int[] targets, int[] replacements, bool clear)
         {
             // If the source and target sizes are not the same return
             if (targets.Length != replacements.Length)
@@ -1709,6 +1796,13 @@ namespace GMare.Objects
             for (int i = 0; i < lists.Count; i++)
                 foreach (Point point in lists[i])
                     _tiles[point.X, point.Y].TileId = replacements[i];
+
+            // If clearing tiles that are beyond the target tiles
+            if (clear)
+                for (int row = 0; row < _tiles.GetLength(1); row++)
+                    for (int col = 0; col < _tiles.GetLength(0); col++)
+                        if (_tiles[col, row].TileId >= targets.Length)
+                            _tiles[col, row].TileId = -1;
         }
 
         /// <summary>
@@ -1921,7 +2015,7 @@ namespace GMare.Objects
                     dest.Y = row * tileSize.Height;
 
                     // Calculate source point
-                    source.Location = GMareBrush.TileIdToPosition(tileId, backgroundImage.Width, tileSize);
+                    source.Location = GMareBrush.TileIdToSourcePosition(tileId, backgroundImage.Width, tileSize);
 
                     // Get tile
                     Bitmap temp = Graphics.PixelMap.PixelDataToBitmap(Graphics.PixelMap.GetPixels(backgroundImage, source));
@@ -2228,6 +2322,14 @@ namespace GMare.Objects
         }
 
         /// <summary>
+        /// Gets the background offset
+        /// </summary>
+        public Point Offset
+        {
+            get { return new Point(_offsetX, _offsetY); }
+        }
+
+        /// <summary>
         ///  Gets or sets tile offset horizontally
         /// </summary>
         public int OffsetX
@@ -2243,6 +2345,14 @@ namespace GMare.Objects
         {
             get { return _offsetY; }
             set { _offsetY = value; }
+        }
+
+        /// <summary>
+        /// Gets the background separation
+        /// </summary>
+        public Size Separation
+        {
+            get { return new Size(_separationX, _separationY); }
         }
 
         /// <summary>
@@ -2288,6 +2398,8 @@ namespace GMare.Objects
         {
             GMareBackground background = (GMareBackground)this.MemberwiseClone();
             background.Image = _image == null ? null : _image.Clone();
+            background.TileWidth = _tileWidth;
+            background._tileHeight = _tileHeight;
             return background;
         }
 

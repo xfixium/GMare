@@ -50,6 +50,7 @@
             this.mnuPreferences = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuExit = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuEdit = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuSelectAll = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuUndo = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuRedo = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuSep04 = new System.Windows.Forms.ToolStripSeparator();
@@ -70,6 +71,8 @@
             this.butRedo = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butUndo = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.grpRoom = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTabbedGroupBox();
+            this.lblSize = new System.Windows.Forms.Label();
+            this.butToggleSize = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butRoomScript = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butRoomPersistent = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butRoomBackColor = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
@@ -79,10 +82,8 @@
             this.lblRoomCaption = new System.Windows.Forms.Label();
             this.lblRoomSpeed = new System.Windows.Forms.Label();
             this.txtRoomCaption = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTextBox();
-            this.nudRoomRows = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
-            this.lblRoomColumns = new System.Windows.Forms.Label();
-            this.lblRoomRows = new System.Windows.Forms.Label();
-            this.nudRoomColumns = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
+            this.nudRoomHeight = new GMare.Controls.PyxUnitNumericUpDown();
+            this.nudRoomWidth = new GMare.Controls.PyxUnitNumericUpDown();
             this.pnlBottom = new System.Windows.Forms.Panel();
             this.pnlRight = new System.Windows.Forms.Panel();
             this.pnlRoom = new System.Windows.Forms.Panel();
@@ -107,6 +108,8 @@
             this.tabTiles = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTabPage();
             this.grpTiles = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxGroupBox();
             this.pnlBackgroundTools = new System.Windows.Forms.Panel();
+            this.butBackgroundGrid = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
+            this.butReorganizeTiles = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butHighlighter = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butBackgroundEdit = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
             this.butBrushTool = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton();
@@ -171,13 +174,14 @@
             this.sslActual = new System.Windows.Forms.ToolStripStatusLabel();
             this.sslSnapped = new System.Windows.Forms.ToolStripStatusLabel();
             this.mnuObjects = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.pyxUnitNumericUpDown1 = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxUnitNumericUpDown();
+            this.pyxUnitNumericUpDown2 = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxUnitNumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
             this.mnuMain.SuspendLayout();
             this.pnlTop.SuspendLayout();
             this.grpEdit.SuspendLayout();
             this.grpRoom.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRoomSpeed)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudRoomRows)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudRoomColumns)).BeginInit();
             this.pnlBottom.SuspendLayout();
             this.pnlRight.SuspendLayout();
             this.pnlRoom.SuspendLayout();
@@ -206,7 +210,7 @@
             this.mnuHelp});
             this.mnuMain.Location = new System.Drawing.Point(0, 0);
             this.mnuMain.Name = "mnuMain";
-            this.mnuMain.Size = new System.Drawing.Size(786, 24);
+            this.mnuMain.Size = new System.Drawing.Size(806, 24);
             this.mnuMain.TabIndex = 0;
             this.mnuMain.Text = "menuStrip1";
             this.mnuMain.Click += new System.EventHandler(this.mnuMain_Click);
@@ -369,6 +373,7 @@
             // mnuEdit
             // 
             this.mnuEdit.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuSelectAll,
             this.mnuUndo,
             this.mnuRedo,
             this.mnuSep04,
@@ -381,12 +386,21 @@
             this.mnuEdit.Size = new System.Drawing.Size(39, 20);
             this.mnuEdit.Text = "&Edit";
             // 
+            // mnuSelectAll
+            // 
+            this.mnuSelectAll.Image = global::GMare.Properties.Resources.selection_empty;
+            this.mnuSelectAll.Name = "mnuSelectAll";
+            this.mnuSelectAll.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+            this.mnuSelectAll.Size = new System.Drawing.Size(164, 22);
+            this.mnuSelectAll.Text = "Select All";
+            this.mnuSelectAll.Click += new System.EventHandler(this.mnuMenuItem_Click);
+            // 
             // mnuUndo
             // 
             this.mnuUndo.Image = global::GMare.Properties.Resources.arrow_undo;
             this.mnuUndo.Name = "mnuUndo";
             this.mnuUndo.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-            this.mnuUndo.Size = new System.Drawing.Size(144, 22);
+            this.mnuUndo.Size = new System.Drawing.Size(164, 22);
             this.mnuUndo.Text = "Undo";
             this.mnuUndo.Click += new System.EventHandler(this.mnuMenuItem_Click);
             // 
@@ -395,21 +409,21 @@
             this.mnuRedo.Image = global::GMare.Properties.Resources.arrow_redo;
             this.mnuRedo.Name = "mnuRedo";
             this.mnuRedo.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
-            this.mnuRedo.Size = new System.Drawing.Size(144, 22);
+            this.mnuRedo.Size = new System.Drawing.Size(164, 22);
             this.mnuRedo.Text = "Redo";
             this.mnuRedo.Click += new System.EventHandler(this.mnuMenuItem_Click);
             // 
             // mnuSep04
             // 
             this.mnuSep04.Name = "mnuSep04";
-            this.mnuSep04.Size = new System.Drawing.Size(141, 6);
+            this.mnuSep04.Size = new System.Drawing.Size(161, 6);
             // 
             // mnuCut
             // 
             this.mnuCut.Image = global::GMare.Properties.Resources.clipboard_cut;
             this.mnuCut.Name = "mnuCut";
             this.mnuCut.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.mnuCut.Size = new System.Drawing.Size(144, 22);
+            this.mnuCut.Size = new System.Drawing.Size(164, 22);
             this.mnuCut.Text = "Cut";
             this.mnuCut.Click += new System.EventHandler(this.mnuMenuItem_Click);
             // 
@@ -418,7 +432,7 @@
             this.mnuCopy.Image = global::GMare.Properties.Resources.clipboard_copy;
             this.mnuCopy.Name = "mnuCopy";
             this.mnuCopy.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.mnuCopy.Size = new System.Drawing.Size(144, 22);
+            this.mnuCopy.Size = new System.Drawing.Size(164, 22);
             this.mnuCopy.Text = "Copy";
             this.mnuCopy.Click += new System.EventHandler(this.mnuMenuItem_Click);
             // 
@@ -427,21 +441,21 @@
             this.mnuPaste.Image = global::GMare.Properties.Resources.clipboard_paste;
             this.mnuPaste.Name = "mnuPaste";
             this.mnuPaste.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this.mnuPaste.Size = new System.Drawing.Size(144, 22);
+            this.mnuPaste.Size = new System.Drawing.Size(164, 22);
             this.mnuPaste.Text = "Paste";
             this.mnuPaste.Click += new System.EventHandler(this.mnuMenuItem_Click);
             // 
             // mnuSep05
             // 
             this.mnuSep05.Name = "mnuSep05";
-            this.mnuSep05.Size = new System.Drawing.Size(141, 6);
+            this.mnuSep05.Size = new System.Drawing.Size(161, 6);
             // 
             // mnuDelete
             // 
             this.mnuDelete.Image = global::GMare.Properties.Resources.button_decline;
             this.mnuDelete.Name = "mnuDelete";
             this.mnuDelete.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.mnuDelete.Size = new System.Drawing.Size(144, 22);
+            this.mnuDelete.Size = new System.Drawing.Size(164, 22);
             this.mnuDelete.Text = "Delete";
             this.mnuDelete.Click += new System.EventHandler(this.mnuMenuItem_Click);
             // 
@@ -477,7 +491,7 @@
             this.pnlTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlTop.Location = new System.Drawing.Point(0, 24);
             this.pnlTop.Name = "pnlTop";
-            this.pnlTop.Size = new System.Drawing.Size(786, 48);
+            this.pnlTop.Size = new System.Drawing.Size(806, 48);
             this.pnlTop.TabIndex = 0;
             // 
             // grpEdit
@@ -640,6 +654,8 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.grpRoom.BackColor = System.Drawing.Color.Transparent;
             this.grpRoom.CenterStatus = false;
+            this.grpRoom.Controls.Add(this.lblSize);
+            this.grpRoom.Controls.Add(this.butToggleSize);
             this.grpRoom.Controls.Add(this.butRoomScript);
             this.grpRoom.Controls.Add(this.butRoomPersistent);
             this.grpRoom.Controls.Add(this.butRoomBackColor);
@@ -649,21 +665,50 @@
             this.grpRoom.Controls.Add(this.lblRoomCaption);
             this.grpRoom.Controls.Add(this.lblRoomSpeed);
             this.grpRoom.Controls.Add(this.txtRoomCaption);
-            this.grpRoom.Controls.Add(this.nudRoomRows);
-            this.grpRoom.Controls.Add(this.lblRoomColumns);
-            this.grpRoom.Controls.Add(this.lblRoomRows);
-            this.grpRoom.Controls.Add(this.nudRoomColumns);
+            this.grpRoom.Controls.Add(this.nudRoomHeight);
+            this.grpRoom.Controls.Add(this.nudRoomWidth);
             this.grpRoom.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.grpRoom.Location = new System.Drawing.Point(170, 4);
             this.grpRoom.MinimumSize = new System.Drawing.Size(24, 0);
             this.grpRoom.Name = "grpRoom";
             this.grpRoom.Padding = new System.Windows.Forms.Padding(10, 12, 10, 30);
             this.grpRoom.ShowStatusBar = false;
-            this.grpRoom.Size = new System.Drawing.Size(612, 43);
+            this.grpRoom.Size = new System.Drawing.Size(632, 43);
             this.grpRoom.StatusBarHeight = 16;
             this.grpRoom.StatusBarText = "Status:";
             this.grpRoom.TabIndex = 1;
             this.grpRoom.TabStop = false;
+            // 
+            // lblSize
+            // 
+            this.lblSize.AutoSize = true;
+            this.lblSize.Location = new System.Drawing.Point(372, 16);
+            this.lblSize.Name = "lblSize";
+            this.lblSize.Size = new System.Drawing.Size(30, 13);
+            this.lblSize.TabIndex = 8;
+            this.lblSize.Text = "Size:";
+            // 
+            // butToggleSize
+            // 
+            this.butToggleSize.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.PushButton;
+            this.butToggleSize.Checked = false;
+            this.butToggleSize.FlatStyled = false;
+            this.butToggleSize.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.butToggleSize.Image = global::GMare.Properties.Resources.ruler;
+            this.butToggleSize.ImageXOffset = 0;
+            this.butToggleSize.ImageYOffset = 0;
+            this.butToggleSize.Location = new System.Drawing.Point(348, 10);
+            this.butToggleSize.Name = "butToggleSize";
+            this.butToggleSize.PushButtonImage = null;
+            this.butToggleSize.Size = new System.Drawing.Size(24, 24);
+            this.butToggleSize.TabIndex = 7;
+            this.butToggleSize.TextXOffset = 0;
+            this.butToggleSize.TextYOffset = 0;
+            this.butToggleSize.ToolTipText = "Toggles between using tile or \r\npixel values for the room size";
+            this.butToggleSize.ToolTipTitle = "Toggle Size Mode";
+            this.butToggleSize.UseDropShadow = true;
+            this.butToggleSize.UseVisualStyleBackColor = true;
+            this.butToggleSize.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
             // 
             // butRoomScript
             // 
@@ -707,7 +752,7 @@
             this.butRoomPersistent.ToolTipTitle = "Check/Uncheck Room Persistent (W)";
             this.butRoomPersistent.UseDropShadow = true;
             this.butRoomPersistent.UseVisualStyleBackColor = true;
-            this.butRoomPersistent.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomPersistent_CheckChanged);
+            this.butRoomPersistent.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
             // 
             // butRoomBackColor
             // 
@@ -744,7 +789,7 @@
             // 
             this.txtRoomName.Location = new System.Drawing.Point(124, 12);
             this.txtRoomName.Name = "txtRoomName";
-            this.txtRoomName.Size = new System.Drawing.Size(76, 20);
+            this.txtRoomName.Size = new System.Drawing.Size(84, 20);
             this.txtRoomName.TabIndex = 4;
             this.txtRoomName.ToolTipText = "The name used for this room when exported";
             this.txtRoomName.ToolTipTitle = "Room Name";
@@ -754,7 +799,7 @@
             // nudRoomSpeed
             // 
             this.nudRoomSpeed.IgnoreHeight = true;
-            this.nudRoomSpeed.Location = new System.Drawing.Point(560, 13);
+            this.nudRoomSpeed.Location = new System.Drawing.Point(580, 13);
             this.nudRoomSpeed.Maximum = new decimal(new int[] {
             9999,
             0,
@@ -780,7 +825,7 @@
             // lblRoomCaption
             // 
             this.lblRoomCaption.AutoSize = true;
-            this.lblRoomCaption.Location = new System.Drawing.Point(204, 16);
+            this.lblRoomCaption.Location = new System.Drawing.Point(212, 16);
             this.lblRoomCaption.Name = "lblRoomCaption";
             this.lblRoomCaption.Size = new System.Drawing.Size(46, 13);
             this.lblRoomCaption.TabIndex = 5;
@@ -789,7 +834,7 @@
             // lblRoomSpeed
             // 
             this.lblRoomSpeed.AutoSize = true;
-            this.lblRoomSpeed.Location = new System.Drawing.Point(516, 16);
+            this.lblRoomSpeed.Location = new System.Drawing.Point(536, 16);
             this.lblRoomSpeed.Name = "lblRoomSpeed";
             this.lblRoomSpeed.Size = new System.Drawing.Size(41, 13);
             this.lblRoomSpeed.TabIndex = 11;
@@ -797,84 +842,84 @@
             // 
             // txtRoomCaption
             // 
-            this.txtRoomCaption.Location = new System.Drawing.Point(252, 12);
+            this.txtRoomCaption.Location = new System.Drawing.Point(260, 12);
             this.txtRoomCaption.Name = "txtRoomCaption";
-            this.txtRoomCaption.Size = new System.Drawing.Size(80, 20);
+            this.txtRoomCaption.Size = new System.Drawing.Size(84, 20);
             this.txtRoomCaption.TabIndex = 6;
             this.txtRoomCaption.ToolTipText = "The text used on the game window";
             this.txtRoomCaption.ToolTipTitle = "Room Caption";
             this.txtRoomCaption.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtRoomText_KeyDown);
             this.txtRoomCaption.Leave += new System.EventHandler(this.txtRoomText_Leave);
             // 
-            // nudRoomRows
+            // nudRoomHeight
             // 
-            this.nudRoomRows.IgnoreHeight = true;
-            this.nudRoomRows.Location = new System.Drawing.Point(472, 13);
-            this.nudRoomRows.Maximum = new decimal(new int[] {
-            500,
-            0,
-            0,
-            0});
-            this.nudRoomRows.Minimum = new decimal(new int[] {
+            this.nudRoomHeight.BackColor = System.Drawing.SystemColors.Window;
+            this.nudRoomHeight.DecimalPlaces = 0;
+            this.nudRoomHeight.Increment = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.nudRoomRows.Name = "nudRoomRows";
-            this.nudRoomRows.Size = new System.Drawing.Size(40, 20);
-            this.nudRoomRows.TabIndex = 10;
-            this.nudRoomRows.ToolTipText = "The height of the room in tiles";
-            this.nudRoomRows.ToolTipTitle = "Room Rows";
-            this.nudRoomRows.Value = new decimal(new int[] {
-            15,
+            this.nudRoomHeight.Location = new System.Drawing.Point(472, 12);
+            this.nudRoomHeight.Maximum = new decimal(new int[] {
+            999999,
             0,
             0,
             0});
-            this.nudRoomRows.ValueChanged += new System.EventHandler(this.nudRoom_ValueChanged);
-            // 
-            // lblRoomColumns
-            // 
-            this.lblRoomColumns.AutoSize = true;
-            this.lblRoomColumns.Location = new System.Drawing.Point(336, 16);
-            this.lblRoomColumns.Name = "lblRoomColumns";
-            this.lblRoomColumns.Size = new System.Drawing.Size(50, 13);
-            this.lblRoomColumns.TabIndex = 7;
-            this.lblRoomColumns.Text = "Columns:";
-            // 
-            // lblRoomRows
-            // 
-            this.lblRoomRows.AutoSize = true;
-            this.lblRoomRows.Location = new System.Drawing.Point(432, 16);
-            this.lblRoomRows.Name = "lblRoomRows";
-            this.lblRoomRows.Size = new System.Drawing.Size(37, 13);
-            this.lblRoomRows.TabIndex = 9;
-            this.lblRoomRows.Text = "Rows:";
-            // 
-            // nudRoomColumns
-            // 
-            this.nudRoomColumns.IgnoreHeight = true;
-            this.nudRoomColumns.Location = new System.Drawing.Point(388, 13);
-            this.nudRoomColumns.Maximum = new decimal(new int[] {
-            500,
-            0,
-            0,
-            0});
-            this.nudRoomColumns.Minimum = new decimal(new int[] {
+            this.nudRoomHeight.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.nudRoomColumns.Name = "nudRoomColumns";
-            this.nudRoomColumns.Size = new System.Drawing.Size(40, 20);
-            this.nudRoomColumns.TabIndex = 8;
-            this.nudRoomColumns.ToolTipText = "The width of the room in tiles";
-            this.nudRoomColumns.ToolTipTitle = "Room Columns";
-            this.nudRoomColumns.Value = new decimal(new int[] {
-            20,
+            this.nudRoomHeight.Name = "nudRoomHeight";
+            this.nudRoomHeight.Size = new System.Drawing.Size(64, 20);
+            this.nudRoomHeight.TabIndex = 10;
+            this.nudRoomHeight.ToolTipText = "The height of the room, defined \r\nin either tiles or pixels";
+            this.nudRoomHeight.ToolTipTitle = "Room Height";
+            this.nudRoomHeight.UnitOfMeasure = "px";
+            this.nudRoomHeight.UseNumericPostfix = false;
+            this.nudRoomHeight.UseUnitOfMeasure = true;
+            this.nudRoomHeight.Value = new decimal(new int[] {
+            240,
             0,
             0,
             0});
-            this.nudRoomColumns.ValueChanged += new System.EventHandler(this.nudRoom_ValueChanged);
+            this.nudRoomHeight.ValueChanged += new GMare.Controls.PyxUnitNumericUpDown.ValueChangedHandler(this.nudRoom_ValueChanged);
+            // 
+            // nudRoomWidth
+            // 
+            this.nudRoomWidth.BackColor = System.Drawing.SystemColors.Window;
+            this.nudRoomWidth.DecimalPlaces = 0;
+            this.nudRoomWidth.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nudRoomWidth.Location = new System.Drawing.Point(404, 12);
+            this.nudRoomWidth.Maximum = new decimal(new int[] {
+            999999,
+            0,
+            0,
+            0});
+            this.nudRoomWidth.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nudRoomWidth.Name = "nudRoomWidth";
+            this.nudRoomWidth.Size = new System.Drawing.Size(64, 20);
+            this.nudRoomWidth.TabIndex = 9;
+            this.nudRoomWidth.ToolTipText = "The width of the room, defined \r\nin either tiles or pixels";
+            this.nudRoomWidth.ToolTipTitle = "Room Width";
+            this.nudRoomWidth.UnitOfMeasure = "px";
+            this.nudRoomWidth.UseNumericPostfix = false;
+            this.nudRoomWidth.UseUnitOfMeasure = true;
+            this.nudRoomWidth.Value = new decimal(new int[] {
+            320,
+            0,
+            0,
+            0});
+            this.nudRoomWidth.ValueChanged += new GMare.Controls.PyxUnitNumericUpDown.ValueChangedHandler(this.nudRoom_ValueChanged);
             // 
             // pnlBottom
             // 
@@ -884,7 +929,7 @@
             this.pnlBottom.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlBottom.Location = new System.Drawing.Point(0, 72);
             this.pnlBottom.Name = "pnlBottom";
-            this.pnlBottom.Size = new System.Drawing.Size(786, 443);
+            this.pnlBottom.Size = new System.Drawing.Size(806, 443);
             this.pnlBottom.TabIndex = 5;
             // 
             // pnlRight
@@ -895,7 +940,7 @@
             this.pnlRight.Location = new System.Drawing.Point(308, 0);
             this.pnlRight.Name = "pnlRight";
             this.pnlRight.Padding = new System.Windows.Forms.Padding(0, 4, 4, 4);
-            this.pnlRight.Size = new System.Drawing.Size(478, 443);
+            this.pnlRight.Size = new System.Drawing.Size(498, 443);
             this.pnlRight.TabIndex = 4;
             // 
             // pnlRoom
@@ -915,7 +960,7 @@
             this.pnlRoom.Controls.Add(this.pnlRoomMagnify);
             this.pnlRoom.Location = new System.Drawing.Point(12, 32);
             this.pnlRoom.Name = "pnlRoom";
-            this.pnlRoom.Size = new System.Drawing.Size(454, 28);
+            this.pnlRoom.Size = new System.Drawing.Size(476, 28);
             this.pnlRoom.TabIndex = 14;
             // 
             // butGrid
@@ -938,7 +983,7 @@
             this.butGrid.ToolTipTitle = "Show/Hide Grid (G)";
             this.butGrid.UseDropShadow = true;
             this.butGrid.UseVisualStyleBackColor = true;
-            this.butGrid.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
+            this.butGrid.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomEditorOptions_CheckChanged);
             // 
             // butInvertGridColor
             // 
@@ -960,7 +1005,7 @@
             this.butInvertGridColor.ToolTipTitle = "Toggle Grid Color";
             this.butInvertGridColor.UseDropShadow = true;
             this.butInvertGridColor.UseVisualStyleBackColor = true;
-            this.butInvertGridColor.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
+            this.butInvertGridColor.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomEditorOptions_CheckChanged);
             // 
             // lblRoomGridY
             // 
@@ -991,7 +1036,7 @@
             this.butGridIso.ToolTipTitle = "Show/Hide Isometric Grid (I)";
             this.butGridIso.UseDropShadow = true;
             this.butGridIso.UseVisualStyleBackColor = true;
-            this.butGridIso.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
+            this.butGridIso.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomEditorOptions_CheckChanged);
             // 
             // nudRoomGridX
             // 
@@ -1039,7 +1084,7 @@
             this.butGridSnap.ToolTipTitle = "Snap/UnSnap To Grid (N)";
             this.butGridSnap.UseDropShadow = true;
             this.butGridSnap.UseVisualStyleBackColor = true;
-            this.butGridSnap.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
+            this.butGridSnap.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomEditorOptions_CheckChanged);
             // 
             // nudRoomGridY
             // 
@@ -1087,7 +1132,7 @@
             this.butShowBlocks.ToolTipTitle = "Show/Hide Block Instances (Q)";
             this.butShowBlocks.UseDropShadow = true;
             this.butShowBlocks.UseVisualStyleBackColor = true;
-            this.butShowBlocks.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
+            this.butShowBlocks.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomEditorOptions_CheckChanged);
             // 
             // lblRoomGridX
             // 
@@ -1118,7 +1163,7 @@
             this.butShowInstances.ToolTipTitle = "Show/Hide Instances (A)";
             this.butShowInstances.UseDropShadow = true;
             this.butShowInstances.UseVisualStyleBackColor = true;
-            this.butShowInstances.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomOptions_CheckChanged);
+            this.butShowInstances.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butRoomEditorOptions_CheckChanged);
             // 
             // lblRoomMagnify
             // 
@@ -1167,7 +1212,7 @@
             this.grpRoomEditor.Name = "grpRoomEditor";
             this.grpRoomEditor.Padding = new System.Windows.Forms.Padding(10, 12, 10, 0);
             this.grpRoomEditor.ShowStatusBar = true;
-            this.grpRoomEditor.Size = new System.Drawing.Size(474, 435);
+            this.grpRoomEditor.Size = new System.Drawing.Size(494, 435);
             this.grpRoomEditor.StatusBarHeight = 24;
             this.grpRoomEditor.StatusBarText = "";
             this.grpRoomEditor.TabIndex = 4;
@@ -1199,7 +1244,7 @@
             this.pnlRoomEditor.ShowBlocks = true;
             this.pnlRoomEditor.ShowGrid = true;
             this.pnlRoomEditor.ShowInstances = true;
-            this.pnlRoomEditor.Size = new System.Drawing.Size(450, 350);
+            this.pnlRoomEditor.Size = new System.Drawing.Size(470, 350);
             this.pnlRoomEditor.Snap = true;
             this.pnlRoomEditor.TabIndex = 12;
             this.pnlRoomEditor.Tiles = null;
@@ -1284,6 +1329,8 @@
             // 
             // pnlBackgroundTools
             // 
+            this.pnlBackgroundTools.Controls.Add(this.butBackgroundGrid);
+            this.pnlBackgroundTools.Controls.Add(this.butReorganizeTiles);
             this.pnlBackgroundTools.Controls.Add(this.butHighlighter);
             this.pnlBackgroundTools.Controls.Add(this.butBackgroundEdit);
             this.pnlBackgroundTools.Controls.Add(this.butBrushTool);
@@ -1299,27 +1346,71 @@
             this.pnlBackgroundTools.Size = new System.Drawing.Size(262, 31);
             this.pnlBackgroundTools.TabIndex = 0;
             // 
+            // butBackgroundGrid
+            // 
+            this.butBackgroundGrid.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.PushButton;
+            this.butBackgroundGrid.Checked = false;
+            this.butBackgroundGrid.FlatStyled = false;
+            this.butBackgroundGrid.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.butBackgroundGrid.Image = ((System.Drawing.Image)(resources.GetObject("butBackgroundGrid.Image")));
+            this.butBackgroundGrid.ImageXOffset = 1;
+            this.butBackgroundGrid.ImageYOffset = 0;
+            this.butBackgroundGrid.Location = new System.Drawing.Point(144, 4);
+            this.butBackgroundGrid.Name = "butBackgroundGrid";
+            this.butBackgroundGrid.PushButtonImage = null;
+            this.butBackgroundGrid.Size = new System.Drawing.Size(23, 24);
+            this.butBackgroundGrid.TabIndex = 17;
+            this.butBackgroundGrid.TextXOffset = 0;
+            this.butBackgroundGrid.TextYOffset = 0;
+            this.butBackgroundGrid.ToolTipText = "Show or hide the background grid";
+            this.butBackgroundGrid.ToolTipTitle = "Show/Hide Background Grid";
+            this.butBackgroundGrid.UseDropShadow = true;
+            this.butBackgroundGrid.UseVisualStyleBackColor = true;
+            this.butBackgroundGrid.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butBackgroundGrid_CheckChanged);
+            // 
+            // butReorganizeTiles
+            // 
+            this.butReorganizeTiles.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.Button;
+            this.butReorganizeTiles.Checked = false;
+            this.butReorganizeTiles.FlatStyled = false;
+            this.butReorganizeTiles.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.butReorganizeTiles.Image = global::GMare.Properties.Resources.background_reorganize;
+            this.butReorganizeTiles.ImageXOffset = 0;
+            this.butReorganizeTiles.ImageYOffset = 0;
+            this.butReorganizeTiles.Location = new System.Drawing.Point(0, 28);
+            this.butReorganizeTiles.Name = "butReorganizeTiles";
+            this.butReorganizeTiles.PushButtonImage = null;
+            this.butReorganizeTiles.Size = new System.Drawing.Size(24, 24);
+            this.butReorganizeTiles.TabIndex = 16;
+            this.butReorganizeTiles.TextXOffset = 0;
+            this.butReorganizeTiles.TextYOffset = 0;
+            this.butReorganizeTiles.ToolTipText = "Rearrange the background tiles\r\nto create a new background";
+            this.butReorganizeTiles.ToolTipTitle = "Reorganize Tiles";
+            this.butReorganizeTiles.UseDropShadow = true;
+            this.butReorganizeTiles.UseVisualStyleBackColor = true;
+            this.butReorganizeTiles.Click += new System.EventHandler(this.butBackgroundOption_Click);
+            // 
             // butHighlighter
             // 
             this.butHighlighter.ButtonType = Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.ButtonModeType.Button;
             this.butHighlighter.Checked = false;
             this.butHighlighter.FlatStyled = false;
             this.butHighlighter.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.butHighlighter.Image = global::GMare.Properties.Resources.highlighter_color;
+            this.butHighlighter.Image = global::GMare.Properties.Resources.highlighter;
             this.butHighlighter.ImageXOffset = 0;
             this.butHighlighter.ImageYOffset = 1;
-            this.butHighlighter.Location = new System.Drawing.Point(122, 4);
+            this.butHighlighter.Location = new System.Drawing.Point(120, 4);
             this.butHighlighter.Name = "butHighlighter";
             this.butHighlighter.PushButtonImage = null;
             this.butHighlighter.Size = new System.Drawing.Size(24, 24);
-            this.butHighlighter.TabIndex = 8;
+            this.butHighlighter.TabIndex = 5;
             this.butHighlighter.TextXOffset = 0;
             this.butHighlighter.TextYOffset = 0;
             this.butHighlighter.ToolTipText = "Highlights the selected tiles";
             this.butHighlighter.ToolTipTitle = "Highlighter";
             this.butHighlighter.UseDropShadow = true;
             this.butHighlighter.UseVisualStyleBackColor = true;
-            this.butHighlighter.Click += new System.EventHandler(this.butBackgroundEdit_Click);
+            this.butHighlighter.Click += new System.EventHandler(this.butBackgroundOption_Click);
             // 
             // butBackgroundEdit
             // 
@@ -1330,7 +1421,7 @@
             this.butBackgroundEdit.Image = global::GMare.Properties.Resources.background;
             this.butBackgroundEdit.ImageXOffset = 0;
             this.butBackgroundEdit.ImageYOffset = 0;
-            this.butBackgroundEdit.Location = new System.Drawing.Point(2, 4);
+            this.butBackgroundEdit.Location = new System.Drawing.Point(0, 4);
             this.butBackgroundEdit.Name = "butBackgroundEdit";
             this.butBackgroundEdit.PushButtonImage = null;
             this.butBackgroundEdit.Size = new System.Drawing.Size(24, 24);
@@ -1341,7 +1432,7 @@
             this.butBackgroundEdit.ToolTipTitle = "Edit Background (B)";
             this.butBackgroundEdit.UseDropShadow = true;
             this.butBackgroundEdit.UseVisualStyleBackColor = true;
-            this.butBackgroundEdit.Click += new System.EventHandler(this.butBackgroundEdit_Click);
+            this.butBackgroundEdit.Click += new System.EventHandler(this.butBackgroundOption_Click);
             // 
             // butBrushTool
             // 
@@ -1352,7 +1443,7 @@
             this.butBrushTool.Image = global::GMare.Properties.Resources.brush;
             this.butBrushTool.ImageXOffset = 0;
             this.butBrushTool.ImageYOffset = 0;
-            this.butBrushTool.Location = new System.Drawing.Point(26, 4);
+            this.butBrushTool.Location = new System.Drawing.Point(24, 4);
             this.butBrushTool.Name = "butBrushTool";
             this.butBrushTool.PushButtonImage = null;
             this.butBrushTool.Size = new System.Drawing.Size(24, 24);
@@ -1363,7 +1454,7 @@
             this.butBrushTool.ToolTipTitle = "Tile Paint Tool (P)";
             this.butBrushTool.UseDropShadow = true;
             this.butBrushTool.UseVisualStyleBackColor = true;
-            this.butBrushTool.Click += new System.EventHandler(this.butBackgroundEdit_Click);
+            this.butBrushTool.Click += new System.EventHandler(this.butBackgroundOption_Click);
             // 
             // lblBackgroundMagnify
             // 
@@ -1383,7 +1474,7 @@
             this.butBucketFillTool.Image = global::GMare.Properties.Resources.tool_fill;
             this.butBucketFillTool.ImageXOffset = 0;
             this.butBucketFillTool.ImageYOffset = 0;
-            this.butBucketFillTool.Location = new System.Drawing.Point(50, 4);
+            this.butBucketFillTool.Location = new System.Drawing.Point(48, 4);
             this.butBucketFillTool.Name = "butBucketFillTool";
             this.butBucketFillTool.PushButtonImage = null;
             this.butBucketFillTool.Size = new System.Drawing.Size(24, 24);
@@ -1394,13 +1485,13 @@
             this.butBucketFillTool.ToolTipTitle = "Bucket Fill Tool (F)";
             this.butBucketFillTool.UseDropShadow = true;
             this.butBucketFillTool.UseVisualStyleBackColor = true;
-            this.butBucketFillTool.Click += new System.EventHandler(this.butBackgroundEdit_Click);
+            this.butBucketFillTool.Click += new System.EventHandler(this.butBackgroundOption_Click);
             // 
             // pnlBackgroundMagnify
             // 
             this.pnlBackgroundMagnify.BackgroundImage = global::GMare.Properties.Resources.magnifier;
             this.pnlBackgroundMagnify.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.pnlBackgroundMagnify.Location = new System.Drawing.Point(148, 4);
+            this.pnlBackgroundMagnify.Location = new System.Drawing.Point(168, 4);
             this.pnlBackgroundMagnify.Name = "pnlBackgroundMagnify";
             this.pnlBackgroundMagnify.Size = new System.Drawing.Size(24, 24);
             this.pnlBackgroundMagnify.TabIndex = 5;
@@ -1414,7 +1505,7 @@
             this.butSelectionTool.Image = global::GMare.Properties.Resources.tool_selection;
             this.butSelectionTool.ImageXOffset = 0;
             this.butSelectionTool.ImageYOffset = 0;
-            this.butSelectionTool.Location = new System.Drawing.Point(74, 4);
+            this.butSelectionTool.Location = new System.Drawing.Point(72, 4);
             this.butSelectionTool.Name = "butSelectionTool";
             this.butSelectionTool.PushButtonImage = null;
             this.butSelectionTool.Size = new System.Drawing.Size(24, 24);
@@ -1425,17 +1516,17 @@
             this.butSelectionTool.ToolTipTitle = "Selection Tool (S)";
             this.butSelectionTool.UseDropShadow = true;
             this.butSelectionTool.UseVisualStyleBackColor = true;
-            this.butSelectionTool.Click += new System.EventHandler(this.butBackgroundEdit_Click);
+            this.butSelectionTool.Click += new System.EventHandler(this.butBackgroundOption_Click);
             // 
             // trkBackgroundMagnify
             // 
             this.trkBackgroundMagnify.BackColor = System.Drawing.Color.Transparent;
             this.trkBackgroundMagnify.LargeChange = 1;
-            this.trkBackgroundMagnify.Location = new System.Drawing.Point(168, 6);
+            this.trkBackgroundMagnify.Location = new System.Drawing.Point(186, 6);
             this.trkBackgroundMagnify.Maximum = 5;
             this.trkBackgroundMagnify.Minimum = 1;
             this.trkBackgroundMagnify.Name = "trkBackgroundMagnify";
-            this.trkBackgroundMagnify.Size = new System.Drawing.Size(66, 20);
+            this.trkBackgroundMagnify.Size = new System.Drawing.Size(46, 20);
             this.trkBackgroundMagnify.TabIndex = 6;
             this.trkBackgroundMagnify.TabStop = true;
             this.trkBackgroundMagnify.TickStyle = System.Windows.Forms.TickStyle.None;
@@ -1452,7 +1543,7 @@
             this.butReplace.Image = global::GMare.Properties.Resources.arrow_switch;
             this.butReplace.ImageXOffset = 1;
             this.butReplace.ImageYOffset = 1;
-            this.butReplace.Location = new System.Drawing.Point(98, 4);
+            this.butReplace.Location = new System.Drawing.Point(96, 4);
             this.butReplace.Name = "butReplace";
             this.butReplace.PushButtonImage = null;
             this.butReplace.Size = new System.Drawing.Size(24, 24);
@@ -1463,7 +1554,7 @@
             this.butReplace.ToolTipTitle = "Tile Replacement (R)";
             this.butReplace.UseDropShadow = true;
             this.butReplace.UseVisualStyleBackColor = true;
-            this.butReplace.Click += new System.EventHandler(this.butBackgroundEdit_Click);
+            this.butReplace.Click += new System.EventHandler(this.butBackgroundOption_Click);
             // 
             // pnlBackground
             // 
@@ -1471,18 +1562,20 @@
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlBackground.AutoScroll = true;
-            this.pnlBackground.AutoScrollMinSize = new System.Drawing.Size(256, 170);
+            this.pnlBackground.AutoScrollMinSize = new System.Drawing.Size(256, 176);
             this.pnlBackground.AvoidMouseEvents = false;
             this.pnlBackground.BackColor = System.Drawing.Color.White;
             this.pnlBackground.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pnlBackground.CheckerColor = System.Drawing.Color.Silver;
             this.pnlBackground.CheckerSize = new System.Drawing.Size(16, 16);
+            this.pnlBackground.Highlighter = null;
             this.pnlBackground.Image = null;
             this.pnlBackground.ImageScale = 1;
-            this.pnlBackground.Location = new System.Drawing.Point(11, 60);
+            this.pnlBackground.Location = new System.Drawing.Point(11, 56);
             this.pnlBackground.Name = "pnlBackground";
             this.pnlBackground.SelectMode = GMare.Controls.GMareBackgroundPanel.SelectType.Normal;
-            this.pnlBackground.Size = new System.Drawing.Size(260, 174);
+            this.pnlBackground.ShowGrid = false;
+            this.pnlBackground.Size = new System.Drawing.Size(260, 180);
             this.pnlBackground.SnapSize = new System.Drawing.Size(8, 8);
             this.pnlBackground.TabIndex = 1;
             this.pnlBackground.TileBrush = null;
@@ -1544,7 +1637,7 @@
             this.butEditorEffects.TextXOffset = 0;
             this.butEditorEffects.TextYOffset = 0;
             this.butEditorEffects.ToolTipText = "Enables or disables the room editor \r\nlayer and instance drawing effects";
-            this.butEditorEffects.ToolTipTitle = "Enable/Disable Editor Effects";
+            this.butEditorEffects.ToolTipTitle = "Enable/Disable Editor Effects (D)";
             this.butEditorEffects.UseDropShadow = true;
             this.butEditorEffects.UseVisualStyleBackColor = true;
             this.butEditorEffects.CheckChanged += new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton.CheckChangedEventHandler(this.butEditorEffects_CheckChanged);
@@ -1745,7 +1838,7 @@
             this.tabObjects.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabObjects.Location = new System.Drawing.Point(3, 28);
             this.tabObjects.Name = "tabObjects";
-            this.tabObjects.Size = new System.Drawing.Size(294, 402);
+            this.tabObjects.Size = new System.Drawing.Size(294, 404);
             this.tabObjects.TabIndex = 1;
             this.tabObjects.Text = "Objects";
             // 
@@ -1802,7 +1895,7 @@
             this.tabInstancesMain.SelectedIndex = 0;
             this.tabInstancesMain.SelectedTab = this.tabInstances;
             this.tabInstancesMain.SelectTabMargin = 2;
-            this.tabInstancesMain.Size = new System.Drawing.Size(286, 360);
+            this.tabInstancesMain.Size = new System.Drawing.Size(286, 362);
             this.tabInstancesMain.TabDock = System.Windows.Forms.DockStyle.Top;
             this.tabInstancesMain.TabIndent = 8;
             this.tabInstancesMain.TabIndex = 4;
@@ -1814,7 +1907,7 @@
             this.tabInstances.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabInstances.Location = new System.Drawing.Point(3, 28);
             this.tabInstances.Name = "tabInstances";
-            this.tabInstances.Size = new System.Drawing.Size(280, 329);
+            this.tabInstances.Size = new System.Drawing.Size(280, 331);
             this.tabInstances.TabIndex = 0;
             this.tabInstances.Text = "Instances";
             // 
@@ -1841,13 +1934,14 @@
             this.lstInstances.Name = "lstInstances";
             this.lstInstances.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.lstInstances.ShowBlocks = true;
-            this.lstInstances.Size = new System.Drawing.Size(260, 312);
+            this.lstInstances.Size = new System.Drawing.Size(260, 314);
             this.lstInstances.TabIndex = 0;
             this.lstInstances.TextOffsetX = 2;
             this.lstInstances.TextOffsetY = 0;
             this.lstInstances.ToolTipText = "";
             this.lstInstances.ToolTipTitle = "";
             this.lstInstances.SelectedIndexChanged += new System.EventHandler(this.lstInstances_SelectedIndexChanged);
+            this.lstInstances.DoubleClick += new System.EventHandler(this.lstInstances_DoubleClick);
             // 
             // mnuInstances
             // 
@@ -2178,7 +2272,7 @@
             this.sslSnapped});
             this.ssMain.Location = new System.Drawing.Point(0, 515);
             this.ssMain.Name = "ssMain";
-            this.ssMain.Size = new System.Drawing.Size(786, 24);
+            this.ssMain.Size = new System.Drawing.Size(806, 24);
             this.ssMain.TabIndex = 5;
             this.ssMain.Text = "statusStrip1";
             // 
@@ -2210,17 +2304,94 @@
             this.mnuObjects.Name = "mnuInstances";
             this.mnuObjects.Size = new System.Drawing.Size(61, 4);
             // 
+            // pyxUnitNumericUpDown1
+            // 
+            this.pyxUnitNumericUpDown1.BackColor = System.Drawing.SystemColors.Window;
+            this.pyxUnitNumericUpDown1.DecimalPlaces = 0;
+            this.pyxUnitNumericUpDown1.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.pyxUnitNumericUpDown1.Location = new System.Drawing.Point(0, 0);
+            this.pyxUnitNumericUpDown1.Maximum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.pyxUnitNumericUpDown1.Minimum = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            this.pyxUnitNumericUpDown1.Name = "pyxUnitNumericUpDown1";
+            this.pyxUnitNumericUpDown1.Size = new System.Drawing.Size(107, 20);
+            this.pyxUnitNumericUpDown1.TabIndex = 0;
+            this.pyxUnitNumericUpDown1.ToolTipText = "";
+            this.pyxUnitNumericUpDown1.ToolTipTitle = "";
+            this.pyxUnitNumericUpDown1.UnitOfMeasure = "Unit";
+            this.pyxUnitNumericUpDown1.UseNumericPostfix = false;
+            this.pyxUnitNumericUpDown1.UseUnitOfMeasure = true;
+            this.pyxUnitNumericUpDown1.Value = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            // 
+            // pyxUnitNumericUpDown2
+            // 
+            this.pyxUnitNumericUpDown2.BackColor = System.Drawing.SystemColors.Window;
+            this.pyxUnitNumericUpDown2.DecimalPlaces = 0;
+            this.pyxUnitNumericUpDown2.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.pyxUnitNumericUpDown2.Location = new System.Drawing.Point(0, 0);
+            this.pyxUnitNumericUpDown2.Maximum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.pyxUnitNumericUpDown2.Minimum = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            this.pyxUnitNumericUpDown2.Name = "pyxUnitNumericUpDown2";
+            this.pyxUnitNumericUpDown2.Size = new System.Drawing.Size(107, 20);
+            this.pyxUnitNumericUpDown2.TabIndex = 0;
+            this.pyxUnitNumericUpDown2.ToolTipText = "";
+            this.pyxUnitNumericUpDown2.ToolTipTitle = "";
+            this.pyxUnitNumericUpDown2.UnitOfMeasure = "Unit";
+            this.pyxUnitNumericUpDown2.UseNumericPostfix = false;
+            this.pyxUnitNumericUpDown2.UseUnitOfMeasure = true;
+            this.pyxUnitNumericUpDown2.Value = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(372, 16);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(30, 13);
+            this.label1.TabIndex = 14;
+            this.label1.Text = "Size:";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.ClientSize = new System.Drawing.Size(786, 539);
+            this.ClientSize = new System.Drawing.Size(806, 539);
             this.Controls.Add(this.pnlBottom);
             this.Controls.Add(this.pnlTop);
             this.Controls.Add(this.mnuMain);
             this.Controls.Add(this.ssMain);
-            this.MinimumSize = new System.Drawing.Size(802, 577);
+            this.MinimumSize = new System.Drawing.Size(822, 577);
             this.Name = "MainForm";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -2232,8 +2403,6 @@
             this.grpRoom.ResumeLayout(false);
             this.grpRoom.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRoomSpeed)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudRoomRows)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudRoomColumns)).EndInit();
             this.pnlBottom.ResumeLayout(false);
             this.pnlRight.ResumeLayout(false);
             this.pnlRoom.ResumeLayout(false);
@@ -2345,10 +2514,8 @@
         private System.Windows.Forms.Label lblRoomCaption;
         private System.Windows.Forms.Label lblRoomSpeed;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTextBox txtRoomCaption;
-        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown nudRoomRows;
-        private System.Windows.Forms.Label lblRoomColumns;
-        private System.Windows.Forms.Label lblRoomRows;
-        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown nudRoomColumns;
+        private GMare.Controls.PyxUnitNumericUpDown nudRoomHeight;
+        private GMare.Controls.PyxUnitNumericUpDown nudRoomWidth;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butGridSnap;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butGridIso;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butRoomScript;
@@ -2405,6 +2572,14 @@
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butEditorEffects;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butGrid;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butHighlighter;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxUnitNumericUpDown pyxUnitNumericUpDown1;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxUnitNumericUpDown pyxUnitNumericUpDown2;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butToggleSize;
+        private System.Windows.Forms.Label lblSize;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ToolStripMenuItem mnuSelectAll;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butReorganizeTiles;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxButton butBackgroundGrid;
     }
 }
 

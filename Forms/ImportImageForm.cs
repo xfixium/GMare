@@ -294,7 +294,7 @@ namespace GMare.Forms
             // Set room
             _newRoom.Name = txtName.Text;
             _newRoom.Backgrounds[0].Image = new Graphics.PixelMap(pnlTileset.GetImage());
-            _newRoom.Layers[0].Replace(targets, replacements);
+            _newRoom.Layers[0].Replace(targets, replacements, false);
 
             // Set dialog result
             DialogResult = DialogResult.OK;
@@ -321,6 +321,7 @@ namespace GMare.Forms
             BackgroundWorker bw = sender as BackgroundWorker;
 
             // Get neccessary data
+            GMareRoom room = new GMareRoom();
             Size tileSize = new Size((int)nudTileX.Value, (int)nudTileY.Value);
             Size seperation = new Size((int)nudSeperationX.Value, (int)nudSeperationY.Value);
             Point offset = new Point((int)nudOffsetX.Value, (int)nudOffsetY.Value);
@@ -432,12 +433,13 @@ namespace GMare.Forms
             pnlTileset.Tiles = tiles;
 
             // Set room properties
-            _newRoom.Backgrounds[0].TileWidth = tileSize.Width;
-            _newRoom.Backgrounds[0].TileHeight = tileSize.Height;
-            _newRoom.Columns = cols;
-            _newRoom.Rows = rows;
-            _newRoom.Layers.Clear();
-            _newRoom.Layers.Add(layer);
+            room.Backgrounds[0].TileWidth = tileSize.Width;
+            room.Backgrounds[0].TileHeight = tileSize.Height;
+            room.Width = cols * tileSize.Width;
+            room.Height = rows * tileSize.Width;
+            room.Layers.Clear();
+            room.Layers.Add(layer);
+            e.Result = room;
         }
 
         /// <summary>
@@ -465,6 +467,9 @@ namespace GMare.Forms
 
             // Check for ok button enable
             CheckAccept();
+
+            // Set the room
+            _newRoom = e.Result as GMareRoom;
         }
 
         #endregion

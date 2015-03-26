@@ -542,6 +542,14 @@ namespace GMare.Controls
         /// </summary>
         private void pnlRoom_MouseDown(object sender, MouseEventArgs e)
         {
+            // If the middle mouse button is pressed, enable panning
+            if (e.Button == MouseButtons.Middle)
+            {
+                _handTool = true;
+                pnlRoom.Panning = true;
+                pnlRoom.HandKey = true;
+            }
+
             // If the hand tool is ready to be used
             if (_handTool == true)
             {
@@ -591,6 +599,14 @@ namespace GMare.Controls
         /// </summary>
         private void pnl_Room_MouseUp(object sender, MouseEventArgs e)
         {
+            // If the middle mouse button is pressed, disable panning
+            if (e.Button == MouseButtons.Middle)
+            {
+                _handTool = false;
+                pnlRoom.Panning = false;
+                pnlRoom.HandKey = false;
+            }
+
             // If previously dragging
             if (_dragging == true)
             {
@@ -636,7 +652,7 @@ namespace GMare.Controls
             // If the offset does not make the maximum less than zero, set its value
             if ((App.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom)) > 0)
             {
-                sbHorizontal.Maximum = App.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom) - 1;
+                sbHorizontal.Maximum = App.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom);
 
                 // If the horizontal maximum is a negative number
                 if (this.sbHorizontal.Maximum / thumb < 0)
@@ -662,7 +678,7 @@ namespace GMare.Controls
             // If the offset does not make the maximum less than zero, set its value
             if ((App.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom)) > 0)
             {
-                sbVertical.Maximum = App.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom) - 1;
+                sbVertical.Maximum = App.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom);
 
                 // If the vertical maximum is a negative number
                 if (sbVertical.Maximum / thumb < 0)
@@ -720,6 +736,19 @@ namespace GMare.Controls
                 return;
 
             pnlRoom.mnuInstanceReplaceAll_Click(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Select all
+        /// </summary>
+        public void SelectAll()
+        {
+            // Do action based on edit mode
+            switch (EditMode)
+            {
+                case EditType.Layers: ToolMode = ToolType.Selection; pnlRoom.mnuSelectionSelectAll_Click(this, EventArgs.Empty); break;
+                case EditType.Objects: pnlRoom.mnuInstanceSelectAll_Click(this, EventArgs.Empty); break;
+            }
         }
 
         /// <summary>

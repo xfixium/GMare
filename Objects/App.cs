@@ -33,6 +33,7 @@ using System.Configuration;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using GameMaker.Common;
 using GameMaker.Project;
 using GameMaker.Resource;
@@ -54,12 +55,14 @@ namespace GMare.Objects
         public static string ShowScaleWarningAppKey = "ShowScaleWarning";              // Scale warning app.config settings key
         public static string ShowBlendWarningAppKey = "ShowBlendWarning";              // Blend color warning app.config settings key
         public static string ShowTipsAppKey = "ShowTips";                              // If showing tips app.config settings key
+        public static string ShowLayerCursorTipAppKey = "ShowLayerCursorTip";          // If showing the layer mouse tip app.config settings key
         public static int UndoRedoMaximumAppDefault = 15;                              // Undo/Redo maximum default value
         public static float LowerLayerBrightnessAppDefault = -0.4f;                    // Lower layer brightness default value
         public static float UpperLayerTransparencyAppDefault = 0.4f;                   // Upper layer transparency default value
         public static bool ShowScaleWarningAppDefault = false;                         // Scale warning default value
         public static bool ShowBlendWarningAppDefault = false;                         // Blend color warning default value
         public static bool ShowTipsAppDefault = true;                                  // If showing tips default value
+        public static bool ShowLayerCursorTipAppDefault = true;                        // If showing the layer mouse tip
 
         #endregion
 
@@ -229,6 +232,9 @@ namespace GMare.Objects
                 }
             }
 
+            // Set file version
+            Room.Version = Application.ProductVersion;
+
             // Create a new stream writer, write project xml
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(file))
             {
@@ -266,22 +272,30 @@ namespace GMare.Objects
                 }
             }
 
+            // If a room already exists, dispose of it
+            if (Room != null)
+                Room.Dispose();
+
             // Create a new stream reader, read in standard xml project file
             using (StreamReader sr = new StreamReader(file))
             {
-                XmlSerializer writer = new XmlSerializer(typeof(GMareRoom));
-                Room = (GMareRoom)writer.Deserialize(sr);
+                XmlSerializer reader = new XmlSerializer(typeof(GMareRoom));
+                Room = (GMareRoom)reader.Deserialize(sr);
             }
 
             // If the room was not loaded successfully, inform the user
             if (Room == null)
             {
-                MessageBox.Show("There was a problem loading the project data. The file may be invalid or corrupt.", "GMare", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+                MessageBox.Show("There was a problem loading the project data. The file may be invalid or corrupt.", "GMare", MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
                 return;
             }
 
             // Remove default background
             Room.Backgrounds.RemoveAt(0);
+
+            // Correct values for earlier versions
+            CorrectValues(Room);
 
             // Set edit room and save path, update the UI
             App.SavePath = file;
@@ -314,12 +328,16 @@ namespace GMare.Objects
             // If the room was not loaded successfully, inform the user
             if (room == null)
             {
-                MessageBox.Show("There was a problem loading the project data. The file may be invalid or corrupt.", "GMare", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+                MessageBox.Show("There was a problem loading the project data. The file may be invalid or corrupt.", "GMare", MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
                 return null;
             }
 
             // Remove default background
             room.Backgrounds.RemoveAt(0);
+
+            // Correct values for earlier versions
+            CorrectValues(room);
 
             // Return the opened room
             return room;
@@ -513,6 +531,90 @@ namespace GMare.Objects
             // Remove all instances that have an empty id
             App.Room.Instances.RemoveAll(i => i.ObjectId == -1);
             App.Room.Blocks.RemoveAll(b => b.ObjectId == -1);
+        }
+
+        /// <summary>
+        /// Checks to see if the given version is older or newer than the current one
+        /// </summary>
+        /// <param name="target">The version to check</param>
+        /// <param name="source">The version that is the source</param>
+        /// <returns>The result of the version comparison</returns>
+        private static VersionResultType VersionCompare(string target, string source)
+        {
+            try
+            {
+                // Compare versions
+                Version version1 = new Version(target);
+                Version version2 = new Version(source);
+                int result = version1.CompareTo(version2);
+
+                // Return the result
+                if (result > 0)
+                    return VersionResultType.Greater;
+                else if (result < 0)
+                    return VersionResultType.Less;
+                else
+                    return VersionResultType.Equal;
+            }
+            catch
+            {
+                return VersionResultType.Less;
+            }
+        }
+
+        /// <summary>
+        /// Corrects previous version values if necessary
+        /// </summary>
+        public static void CorrectValues(GMareRoom room)
+        {
+            // If the room is empty return
+            if (room == null)
+                return;
+
+            // Correct values for versions under 1.0.0.14
+            if (VersionCompare(room.Version, "1.0.0.14") == VersionResultType.Less)
+            {
+                // Set instance color blend to white
+                foreach (GMareInstance instance in room.Instances)
+                    instance.UBlendColor = 4294967295;
+
+                // Set width and height based on old column and row values
+                room.Width = room.Backgrounds.Count == 0 ? 16 : room.Columns * room.Backgrounds[0].TileWidth;
+                room.Height = room.Backgrounds.Count == 0 ? 16 : room.Rows * room.Backgrounds[0].TileHeight;
+            }
+        }
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr CreateIconIndirect(ref IconInfo icon);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetIconInfo(IntPtr hIcon, ref IconInfo pIconInfo);
+
+        public struct IconInfo
+        {
+            public bool fIcon;
+            public int xHotspot;
+            public int yHotspot;
+            public IntPtr hbmMask;
+            public IntPtr hbmColor;
+        }
+
+        public static Cursor CreateCursor(Bitmap bmp, int xHotSpot, int yHotSpot)
+        {
+            try
+            {
+                IconInfo tmp = new IconInfo();
+                GetIconInfo(bmp.GetHicon(), ref tmp);
+                tmp.xHotspot = xHotSpot;
+                tmp.yHotspot = yHotSpot;
+                tmp.fIcon = false;
+                return new Cursor(CreateIconIndirect(ref tmp));
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         #endregion

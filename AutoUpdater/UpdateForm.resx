@@ -123,13 +123,13 @@
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="webBrowser.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
+    <value>-2, -2</value>
   </data>
   <data name="webBrowser.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 2, 2, 2</value>
   </data>
   <data name="webBrowser.Size" type="System.Drawing.Size, System.Drawing">
-    <value>540, 364</value>
+    <value>622, 364</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="webBrowser.TabIndex" type="System.Int32, mscorlib">
@@ -238,7 +238,7 @@
     <value>1</value>
   </data>
   <data name="buttonUpdate.Location" type="System.Drawing.Point, System.Drawing">
-    <value>400, 444</value>
+    <value>480, 444</value>
   </data>
   <data name="buttonUpdate.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 2, 2, 2</value>
@@ -271,7 +271,7 @@
     <value>4</value>
   </data>
   <data name="buttonRemindLater.Location" type="System.Drawing.Point, System.Drawing">
-    <value>243, 444</value>
+    <value>323, 444</value>
   </data>
   <data name="buttonRemindLater.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 2, 2, 2</value>
@@ -336,11 +336,14 @@
   <data name="&gt;&gt;buttonSkip.ZOrder" xml:space="preserve">
     <value>5</value>
   </data>
+  <data name="pyxPanel1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
   <data name="pyxPanel1.Location" type="System.Drawing.Point, System.Drawing">
     <value>8, 68</value>
   </data>
   <data name="pyxPanel1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>544, 368</value>
+    <value>626, 368</value>
   </data>
   <data name="pyxPanel1.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -364,7 +367,7 @@
     <value>7, 15</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>560, 480</value>
+    <value>642, 480</value>
   </data>
   <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
     <value>Segoe UI, 12px</value>

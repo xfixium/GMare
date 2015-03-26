@@ -206,6 +206,18 @@
         tFCQdV0pk72TSCQzUin1VaGQRERrhe3ZADpOWy0A/gB6Tg0k0JOySwAAAABJRU5ErkJggg==
 </value>
   </data>
+  <data name="butBackgroundGrid.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        vAAADrwBlbxySQAAAWhJREFUOE+dkD1Lw2AUhbOqP6Dg1lE6uAhSEBwEQTDgYIQOXTpEjUQkEoSUUpz8
+        LYqKWERQ/BikRarixz8QEZOAIE2bhqZ5fc+NUSpFEi8cDu+9zzmBCAulkiiVy3JSISdg5ovFRfaPQY4K
+        5gxjKeCL80c7tsAjRwWzuq74QUAHzMVT6Je/PNqDA48cFcxo2orX7bKTe5udch3dWt86e+h94w4OPHJU
+        MK2qquv77PjOoi8A/MvBgUeOCqYUZdXpdNhh3WKVm5+v9RPu4MAjRwWTsrz24Xls/zr8wsGXV+pmj0d7
+        cOCRo4KJQkF7b7fZTtVku1DNYns1k4MmD4WON/a4gwOPHBWM5/PrtuvSAbN99UYevfvtwSNHBWO5nG62
+        WgTEFXjkqGBUkjZem006YOI4eOSoYEQUjRfHoUNcgUeOClLZ7KbJ/+pzoxFb4JGjgoF0enkok9lKKuSo
+        gM8gV4prOIHA85wgfALAZ7HH2RruVQAAAABJRU5ErkJggg==
+</value>
+  </data>
   <data name="lstLayers.CheckBoxUnCheckedImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAABl0RVh0U29m

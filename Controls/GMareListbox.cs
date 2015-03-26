@@ -163,6 +163,11 @@ namespace GMare.Controls
                 case ListboxType.Instances:
                     // Get the instance from the list, also get the parent object of the instance
                     GMareInstance instance = Items[e.Index] as GMareInstance;
+
+                    // If there is no instance or room, return null
+                    if (instance == null || App.Room == null)
+                        return null;
+
                     GMareObject gmObject = App.Room.Objects.Find(o => instance.ObjectId == o.Resource.Id);
 
                     // If the instance or object or object image is empty, return default glyph

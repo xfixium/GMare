@@ -110,9 +110,9 @@ namespace GMare.Forms
             // 
             this.tsslTransparentColor.AutoSize = false;
             this.tsslTransparentColor.BackColor = System.Drawing.Color.Transparent;
-            this.tsslTransparentColor.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top)
-                        | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)
-                        | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.tsslTransparentColor.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
             this.tsslTransparentColor.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.tsslTransparentColor.Name = "tsslTransparentColor";
             this.tsslTransparentColor.Size = new System.Drawing.Size(17, 18);
@@ -516,7 +516,6 @@ namespace GMare.Forms
             this.trkMagnify.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trkMagnify.ToolTipText = "Slide to set the magnification level of the graphic";
             this.trkMagnify.ToolTipTitle = "Image Magnification";
-            this.trkMagnify.Value = 1;
             this.trkMagnify.ValueChanged += new System.EventHandler(this.trkMagnify_ValueChanged);
             // 
             // lblName

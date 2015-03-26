@@ -92,7 +92,7 @@ namespace GMare.Forms
                         continue;
 
                     // Calculate source point
-                    Rectangle source = new Rectangle(GMareBrush.TileIdToPosition(brush.Tiles[col, row].TileId, background.Width, tileSize), tileSize);
+                    Rectangle source = new Rectangle(GMareBrush.TileIdToSourcePosition(brush.Tiles[col, row].TileId, background.Width, tileSize), tileSize);
                     Rectangle dest = new Rectangle(new Point(col * tileSize.Width, row * tileSize.Height), tileSize);
 
                     // Get tile

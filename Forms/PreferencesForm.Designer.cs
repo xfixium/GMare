@@ -44,6 +44,7 @@
             this.nudGridWidth = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
             this.nudGridHeight = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
             this.lblGridWidth = new System.Windows.Forms.Label();
+            this.chkShowLayerCursorTip = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxCheckBox();
             this.grpMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudUpperLayerTransparency)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLowerLayerBrightness)).BeginInit();
@@ -57,6 +58,7 @@
             // 
             this.grpMain.BackColor = System.Drawing.Color.Transparent;
             this.grpMain.CenterStatus = false;
+            this.grpMain.Controls.Add(this.chkShowLayerCursorTip);
             this.grpMain.Controls.Add(this.chkShowTips);
             this.grpMain.Controls.Add(this.nudUpperLayerTransparency);
             this.grpMain.Controls.Add(this.lblUpperLayerTransparency);
@@ -70,7 +72,7 @@
             this.grpMain.Name = "grpMain";
             this.grpMain.Padding = new System.Windows.Forms.Padding(10, 12, 10, 30);
             this.grpMain.ShowStatusBar = false;
-            this.grpMain.Size = new System.Drawing.Size(232, 112);
+            this.grpMain.Size = new System.Drawing.Size(232, 132);
             this.grpMain.StatusBarHeight = 24;
             this.grpMain.StatusBarText = "Status:";
             this.grpMain.TabIndex = 0;
@@ -208,7 +210,7 @@
             this.butCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.butCancel.ImageXOffset = 0;
             this.butCancel.ImageYOffset = 0;
-            this.butCancel.Location = new System.Drawing.Point(160, 204);
+            this.butCancel.Location = new System.Drawing.Point(160, 224);
             this.butCancel.Name = "butCancel";
             this.butCancel.PushButtonImage = null;
             this.butCancel.Size = new System.Drawing.Size(76, 24);
@@ -230,7 +232,7 @@
             this.butOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.butOk.ImageXOffset = 0;
             this.butOk.ImageYOffset = 0;
-            this.butOk.Location = new System.Drawing.Point(80, 204);
+            this.butOk.Location = new System.Drawing.Point(80, 224);
             this.butOk.Name = "butOk";
             this.butOk.PushButtonImage = null;
             this.butOk.Size = new System.Drawing.Size(76, 24);
@@ -254,7 +256,7 @@
             this.grpAreaGrid.Controls.Add(this.nudGridWidth);
             this.grpAreaGrid.Controls.Add(this.nudGridHeight);
             this.grpAreaGrid.Controls.Add(this.lblGridWidth);
-            this.grpAreaGrid.Location = new System.Drawing.Point(4, 120);
+            this.grpAreaGrid.Location = new System.Drawing.Point(4, 140);
             this.grpAreaGrid.MinimumSize = new System.Drawing.Size(99, 0);
             this.grpAreaGrid.Name = "grpAreaGrid";
             this.grpAreaGrid.Padding = new System.Windows.Forms.Padding(10, 12, 10, 30);
@@ -345,11 +347,25 @@
             this.lblGridWidth.TabIndex = 0;
             this.lblGridWidth.Text = "Width:";
             // 
+            // chkShowLayerCursorTip
+            // 
+            this.chkShowLayerCursorTip.AutoSize = true;
+            this.chkShowLayerCursorTip.Checked = true;
+            this.chkShowLayerCursorTip.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkShowLayerCursorTip.Location = new System.Drawing.Point(12, 108);
+            this.chkShowLayerCursorTip.Name = "chkShowLayerCursorTip";
+            this.chkShowLayerCursorTip.Size = new System.Drawing.Size(178, 17);
+            this.chkShowLayerCursorTip.TabIndex = 7;
+            this.chkShowLayerCursorTip.Text = "Show Selected Layer Cursor Tip";
+            this.chkShowLayerCursorTip.ToolTipCaption = "";
+            this.chkShowLayerCursorTip.ToolTipText = "";
+            this.chkShowLayerCursorTip.UseVisualStyleBackColor = true;
+            // 
             // PreferencesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(242, 234);
+            this.ClientSize = new System.Drawing.Size(242, 255);
             this.Controls.Add(this.grpAreaGrid);
             this.Controls.Add(this.butCancel);
             this.Controls.Add(this.butOk);
@@ -393,5 +409,6 @@
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown nudGridHeight;
         private System.Windows.Forms.Label lblGridWidth;
         private System.Windows.Forms.Label lblGridSize;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxCheckBox chkShowLayerCursorTip;
     }
 }

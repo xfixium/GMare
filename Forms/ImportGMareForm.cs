@@ -39,7 +39,6 @@ namespace GMare.Forms
         #region Fields
 
         private GMareRoom _import = null;  // Room to import
-        private GMareRoom _room = null;    // Imported room
 
         #endregion
 
@@ -126,8 +125,8 @@ namespace GMare.Forms
             // If importing size, set to new one
             if (chkSize.Checked)
             {
-                App.Room.Columns = _import.Columns;
-                App.Room.Rows = _import.Rows;
+                App.Room.Width = _import.Width;
+                App.Room.Height = _import.Height;
             }
 
             // If importing persistence, set to new one

@@ -246,7 +246,7 @@ namespace GMare.Objects
         /// </summary>
         public int Width
         {
-            get { return ToRectangle().Width; }
+            get { return ToTargetRectangle().Width; }
         }
 
         /// <summary>
@@ -254,7 +254,35 @@ namespace GMare.Objects
         /// </summary>
         public int Height
         {
-            get { return ToRectangle().Height; }
+            get { return ToTargetRectangle().Height; }
+        }
+
+        /// <summary>
+        /// The tile size of a single tile
+        /// </summary>
+        public Size TileSize
+        {
+            get { return new Size(Width / Columns, Height / Rows); }
+        }
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Constructs a new brush
+        /// </summary>
+        public GMareBrush()
+        {
+        }
+
+        /// <summary>
+        /// Constructs a new brush with the given tiles
+        /// </summary>
+        /// <param name="tiles">Given tiles</param>
+        public GMareBrush(GMareTile[,] tiles)
+        {
+            _tiles = tiles;
         }
 
         #endregion
@@ -284,7 +312,7 @@ namespace GMare.Objects
         /// Gets a rectangle representation of the tile sector
         /// </summary>
         /// <returns>A rectangle version of the tile sector</returns>
-        public Rectangle ToRectangle()
+        public Rectangle ToTargetRectangle()
         {
             // Create the sector points
             int x1 = 0;
@@ -322,6 +350,20 @@ namespace GMare.Objects
 
             // Create new rectangle based on sector points
             return new Rectangle(x1, y1, x2 - x1, y2 - y1);
+        }
+
+        /// <summary>
+        /// Gets a target rectangle based on the selected tile
+        /// </summary>
+        /// <param name="column">The column position of the tile</param>
+        /// <param name="row">The row position of the tile</param>
+        /// <returns>A target rectangle of the selected tile</returns>
+        public Rectangle TileToTargetRectangle(int column, int row)
+        {
+            Rectangle rect = new Rectangle(Point.Empty, TileSize);
+            rect.X = column * rect.Width + _startX;
+            rect.Y = row * rect.Height + _startY;
+            return rect;
         }
 
         /// <summary>
@@ -397,8 +439,8 @@ namespace GMare.Objects
         /// <param name="tileId">The tile id to calculate the position with</param>
         /// <param name="width">The width of the source tileset</param>
         /// <param name="tileSize">The size of one tile</param>
-        /// <returns>The tile id's position</returns>
-        public static Point TileIdToPosition(int tileId, int width, Size tileSize)
+        /// <returns>The tile id's position on the source tileset</returns>
+        public static Point TileIdToSourcePosition(int tileId, int width, Size tileSize)
         {
             // Calculate the number of columns the tileset has
             int cols = width / tileSize.Width;
@@ -412,13 +454,13 @@ namespace GMare.Objects
         }
 
         /// <summary>
-        /// Creates a tiled point from a tile id
+        /// Creates a tiled point from a tile id in columns and rows
         /// </summary>
         /// <param name="tileId">The tile id to calculate the position with</param>
         /// <param name="width">The width of the source tileset</param>
         /// <param name="tileSize">The size of one tile</param>
-        /// <returns>The tile id's position</returns>
-        public static Point TileIdToSector(int tileId, int width, Size tileSize)
+        /// <returns>The tile id's grid position on the tileset</returns>
+        public static Point TileIdToSourceGridPosition(int tileId, int width, Size tileSize)
         {
             // Calculate the number of columns the tileset has
             int cols = width / tileSize.Width;
@@ -438,8 +480,8 @@ namespace GMare.Objects
         /// <param name="y">The y coordinate to calculate</param>
         /// <param name="width">The width of the source tileset</param>
         /// <param name="tileSize">The tile size of a single tile</param>
-        /// <returns>A tile id.</returns>
-        public static int PositionToTileId(int x, int y, int width, Size tileSize)
+        /// <returns>A tile id on the source tileset</returns>
+        public static int PositionToSourceTileId(int x, int y, int width, Size tileSize)
         {
             // Calculate number of columns
             int cols = width / tileSize.Width;
@@ -487,7 +529,7 @@ namespace GMare.Objects
 
                     // Create new tile
                     GMareTile tile = new GMareTile();
-                    tile.TileId = PositionToTileId(x, y, width, tileSize);
+                    tile.TileId = PositionToSourceTileId(x, y, width, tileSize);
 
                     // Set tile
                     tiles[col, row] = tile;
@@ -496,6 +538,56 @@ namespace GMare.Objects
 
             // Return the array of tile ids
             return tiles;
+        }
+
+        /// <summary>
+        /// Converts a rectangle to a array of new tiles
+        /// </summary>
+        /// <param name="rectangle">The source rectangle to copy tiles from</param>
+        /// <param name="width">The width of the source tileset</param>
+        /// <returns>A new tile brush</returns>
+        public static GMareBrush RectangleToTileBrush(Rectangle rectangle, int width, Size tileSize)
+        {
+            GMareBrush brush = new GMareBrush();
+
+            // Position variables
+            int x = 0;
+            int y = 0;
+
+            // Calculate columns and rows
+            int cols = rectangle.Width / tileSize.Width;
+            int rows = rectangle.Height / tileSize.Height;
+
+            // Create a new tile id array
+            GMareTile[,] tiles = new GMareTile[cols, rows];
+
+            // Iterate through columns
+            for (int col = 0; col < cols; col++)
+            {
+                // Iterate through rows
+                for (int row = 0; row < rows; row++)
+                {
+                    // Calculate tile position.
+                    x = (col * tileSize.Width) + rectangle.X;
+                    y = (row * tileSize.Height) + rectangle.Y;
+
+                    // Create new tile
+                    GMareTile tile = new GMareTile();
+                    tile.TileId = PositionToSourceTileId(x, y, width, tileSize);
+
+                    // Set tile
+                    tiles[col, row] = tile;
+                }
+            }
+
+            // Set brush properties
+            brush.Tiles = tiles;
+            brush.StartX = rectangle.X;
+            brush.StartY = rectangle.Y;
+            brush.EndX = rectangle.Right;
+            brush.EndY = rectangle.Bottom;
+
+            return brush;
         }
 
         /// <summary>
@@ -548,56 +640,6 @@ namespace GMare.Objects
 
             // Reference new one
             _tiles = tiles;
-        }
-
-        /// <summary>
-        /// Converts a rectangle to a array of new tiles
-        /// </summary>
-        /// <param name="rectangle">The source rectangle to copy tiles from</param>
-        /// <param name="width">The width of the source tileset</param>
-        /// <returns>A new tile brush</returns>
-        public static GMareBrush RectangleToTileBrush(Rectangle rectangle, int width, Size tileSize)
-        {
-            GMareBrush brush = new GMareBrush();
-
-            // Position variables
-            int x = 0;
-            int y = 0;
-
-            // Calculate columns and rows
-            int cols = rectangle.Width / tileSize.Width;
-            int rows = rectangle.Height / tileSize.Height;
-
-            // Create a new tile id array
-            GMareTile[,] tiles = new GMareTile[cols, rows];
-
-            // Iterate through columns
-            for (int col = 0; col < cols; col++)
-            {
-                // Iterate through rows
-                for (int row = 0; row < rows; row++)
-                {
-                    // Calculate tile position.
-                    x = (col * tileSize.Width) + rectangle.X;
-                    y = (row * tileSize.Height) + rectangle.Y;
-
-                    // Create new tile
-                    GMareTile tile = new GMareTile();
-                    tile.TileId = PositionToTileId(x, y, width, tileSize);
-
-                    // Set tile
-                    tiles[col, row] = tile;
-                }
-            }
-
-            // Set brush properties
-            brush.Tiles = tiles;
-            brush.StartX = rectangle.X;
-            brush.StartY = rectangle.Y;
-            brush.EndX = rectangle.Right;
-            brush.EndY = rectangle.Bottom;
-
-            return brush;
         }
 
         /// <summary>
