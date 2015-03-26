@@ -20,37 +20,35 @@ namespace GMare.Graphics
     {
         #region Fields
 
-        private readonly Control _control = null;               // Windows control.
-        private IntPtr _deviceContext = IntPtr.Zero;            // Device context.
-        private IntPtr _renderingContext = IntPtr.Zero;         // Rendering context.
-        private IntPtr _currentRenderingContext = IntPtr.Zero;  // Current rendering context.
+        private readonly Control _control = null;               // Windows control
+        private IntPtr _deviceContext = IntPtr.Zero;            // Device context
+        private IntPtr _renderingContext = IntPtr.Zero;         // Rendering context
+        private IntPtr _currentRenderingContext = IntPtr.Zero;  // Current rendering context
+        private bool _refresh = true;                           // If the control needs to invalidate the first time
 
         #endregion
 
         #region Constructor
 
         /// <summary>
-        /// Constructs a new canvas.
+        /// Constructs a new canvas
         /// </summary>
-        /// <param name="control">Control to render to.</param>
+        /// <param name="control">Control to render to</param>
         public GraphicsCanvas(System.Windows.Forms.Control control)
         {
-            // Set control canvas.
+            // Set control canvas
             _control = control;
 
-            // Setup windows components and show it.
+            // Setup windows components and show it
             _control.Disposed += new EventHandler(Disposed);
 
-            // Set OpenGL.
+            // Set OpenGL
             OpenGL.glShadeModel(GLShadeModel.Flat);
             OpenGL.glHint(GLHint.PerspectiveCorrection, GLQuality.Fastest);
             OpenGL.glCullFace(GLPolygonFaces.Back);
             OpenGL.glDisable(GLOption.Lighting);
             OpenGL.glDisable(GLOption.DepthTest);
             OpenGL.glDisable(GLOption.Dither);
-
-            // Begin scene rendering.
-            BeginScene();
         }
 
         #endregion
@@ -58,23 +56,29 @@ namespace GMare.Graphics
         #region Methods
 
         /// <summary>
-        /// Setup OpenGL.
+        /// Setup OpenGL
         /// </summary>
         public void SetOpenGL()
         {
-            // If there is no rendering context or device context.
+            // Default to alpha blending
+            OpenGL.glEnable(GLOption.Blend);
+            OpenGL.glEnable(GLOption.AlphaTest);
+            OpenGL.glAlphaFunc(GLAlphaFunc.Greater, 0f);
+            OpenGL.glBlendFunc(GLBlendSrc.SrcAlpha, GLBlendDest.OneMinusSrcAlpha);
+
+            // If there is no rendering context or device context
             if (_deviceContext == IntPtr.Zero || _renderingContext == IntPtr.Zero)
             {
-                // Make current.
+                // Make current
                 OpenGL.wglMakeCurrent(IntPtr.Zero, IntPtr.Zero);
 
-                // Create a buffer descriptor.
+                // Create a buffer descriptor
                 OpenGL.PIXELFORMATDESCRIPTOR pfd = new OpenGL.PIXELFORMATDESCRIPTOR();
                 pfd.nSize = (short)Marshal.SizeOf(pfd);
                 pfd.nVersion = 1;
                 pfd.dwFlags = OpenGL.PFD_DRAW_TO_WINDOW | OpenGL.PFD_SUPPORT_OPENGL | OpenGL.PFD_DOUBLEBUFFER;
                 pfd.iPixelType = OpenGL.PFD_TYPE_RGBA;
-                pfd.cColorBits = 24;
+                pfd.cColorBits = 32;
                 pfd.cRedBits = 0;
                 pfd.cRedShift = 0;
                 pfd.cGreenBits = 0;
@@ -97,27 +101,27 @@ namespace GMare.Graphics
                 pfd.dwVisibleMask = 0;
                 pfd.dwDamageMask = 0;
 
-                // Grab the device context.
+                // Grab the device context
                 _deviceContext = OpenGL.GetDC(_control.Handle);
 
                 if (_deviceContext == IntPtr.Zero)
                     throw new Exception("An error occured while attempting to allocate device context for OpenGL canvas.");
 
-                // Choose our pixel format.
+                // Choose our pixel format
                 int pixelFormat = OpenGL.ChoosePixelFormat(_deviceContext, ref pfd);
 
                 if (pixelFormat == 0)
                     throw new Exception("An error occured while attempting to choose pixel format for OpenGL canvas.");
 
-                // Set our pixel format.
+                // Set our pixel format
                 if (OpenGL.SetPixelFormat(_deviceContext, pixelFormat, ref pfd) == 0)
                     throw new Exception("An error occured while attempting to set pixel format for OpenGL canvas.");
 
-                // Grab our rendering context.
+                // Grab our rendering context
                 _renderingContext = OpenGL.wglCreateContext(_deviceContext);
 
                 if (_renderingContext == IntPtr.Zero)
-                    throw new Exception("An error occured while attempting to allocate rendering context for OpenGL canvas (win32 error code: " + Marshal.GetLastWin32Error() + ").");
+                    throw new Exception("An error occured while attempting to allocate rendering context for OpenGL canvas (win32 error code: " + OpenGL.glGetError().ToString() + ", " + Marshal.GetLastWin32Error().ToString() + ").");
             }
 
             // If the current context is not the rendering context.
@@ -132,14 +136,14 @@ namespace GMare.Graphics
         }
 
         /// <summary>
-        /// Begins rendering the scene to this canvas.
+        /// Begins rendering the scene to this canvas
         /// </summary>
         public void BeginScene()
         {
-            // Set up OpenL.
+            // Set up OpenGL
             SetOpenGL();
 
-            // Set view.
+            // Set view
             OpenGL.glMatrixMode(GLMatrixMode.Projection);
             OpenGL.glLoadIdentity();
             OpenGL.glOrtho(0, _control.ClientSize.Width, _control.ClientSize.Height, 0, -1.0f, 0.0f);
@@ -152,35 +156,42 @@ namespace GMare.Graphics
         }
 
         /// <summary>
-        /// Presents the screen to the front buffer.
+        /// Presents the screen to the front buffer
         /// </summary>
         public void EndScene()
         {
-            // If the device context and rendering context pointers exist.
+            // If the device context and rendering context pointers exist
             if (_deviceContext != IntPtr.Zero && _renderingContext != IntPtr.Zero)
             {
-                // Flip to screen.
+                // Flip to screen
                 OpenGL.wglSwapBuffers(_deviceContext);
 
-                // Avoids crashes on super fast rendering.
+                // Avoids crashes on super fast rendering
                 OpenGL.glFlush();
+
+                // If the control needs a push to invalidate
+                if (_refresh)
+                {
+                    _refresh = false;
+                    _control.Invalidate();
+                }
             }
         }
 
         /// <summary>
-        ///	Called when the user disposes this control.
+        ///	Called when the user disposes this control
         /// </summary>
         void Disposed(object sender, EventArgs e)
         {
-            // Call the graphics manager's dispose.
+            // Call the graphics manager's dispose
             GraphicsManager.Dispose();
 
             if (_deviceContext != IntPtr.Zero && _renderingContext != IntPtr.Zero)
             {
-                // Delete the rendering context.
+                // Delete the rendering context
                 OpenGL.wglDeleteContext(_renderingContext);
 
-                // Release the device context.
+                // Release the device context
                 OpenGL.ReleaseDC(_control.Handle, _deviceContext);
 
                 _renderingContext = IntPtr.Zero;

@@ -55,8 +55,8 @@ namespace GMare.Controls
 
         public event PanelChangedHandler PanelChanged;     // Selected instance changed event
         public delegate void PanelChangedHandler();        // Selected instance changed event handler
-        private Bitmap _tileSelection = null;              // Tile selection bitmap
         private List<Bitmap> _tiles = null;                // Collection of tile images
+        private Bitmap _tileSelection = null;              // Tile selection bitmap
         private GMareBrush _targets = null;                // The target tiles
         private GMareBrush _swaps = null;                  // The swapping tiles
         private ColorMatrix _matrix = null;                // Grid color matrix
@@ -262,7 +262,7 @@ namespace GMare.Controls
                 Point position = new Point(-AutoScrollPosition.X, -AutoScrollPosition.Y);
 
                 // Calculate rectangle with scroll offset
-                Rectangle rect = _targets.ToRectangle();
+                Rectangle rect = _targets.ToTargetRectangle();
                 rect.X -= (int)(position.X / Zoom);
                 rect.Y -= (int)(position.Y / Zoom);
 
@@ -313,7 +313,7 @@ namespace GMare.Controls
             if (e.Button == MouseButtons.Left && _tiles != null)
             {
                 // If cursor is within selection
-                if (_targets != null && _targets.ToRectangle().Contains(snap) == true)
+                if (_targets != null && _targets.ToTargetRectangle().Contains(snap) == true)
                 {
                     // Selection clicked
                     _moving = true;
@@ -351,7 +351,7 @@ namespace GMare.Controls
             if (e.Button == MouseButtons.Right)
             {
                 // Empty selection
-                if (_targets == null || _targets.ToRectangle().Contains(snap) == false)
+                if (_targets == null || _targets.ToTargetRectangle().Contains(snap) == false)
                     return;
 
                 // Show options menu
@@ -374,7 +374,7 @@ namespace GMare.Controls
             Point snap = GetSnappedPoint(e.Location);
 
             // If a selection exists, and within it's bounds
-            if (_targets != null && _targets.ToRectangle().Contains(snap) == true && _dragging == false)
+            if (_targets != null && _targets.ToTargetRectangle().Contains(snap) == true && _dragging == false)
                 this.Cursor = this.Cursor == Cursors.SizeAll ? this.Cursor : Cursors.SizeAll;
             else
                 this.Cursor = this.Cursor == Cursors.Arrow ? this.Cursor : Cursors.Arrow;
@@ -458,7 +458,7 @@ namespace GMare.Controls
                 _dragging = false;
 
                 // Get an array of tile ids
-                _targets.Tiles = GMareBrush.RectangleToTiles(_targets.ToRectangle(), TilesetWidth, SnapSize);
+                _targets.Tiles = GMareBrush.RectangleToTiles(_targets.ToTargetRectangle(), TilesetWidth, SnapSize);
 
                 // Get target tiles
                 int[] tiles = _targets.ToArray();
@@ -476,7 +476,7 @@ namespace GMare.Controls
                 }
 
                 // Set tile selection graphic
-                _tileSelection = GetImage().Clone(_targets.ToRectangle(), PixelFormat.Format32bppArgb);
+                _tileSelection = GetImage().Clone(_targets.ToTargetRectangle(), PixelFormat.Format32bppArgb);
 
                 // Create a copy of the selection for swapping
                 _swaps = _targets.Clone();
@@ -489,7 +489,7 @@ namespace GMare.Controls
                 _moving = false;
 
                 // Check tileset bounds
-                if (new Rectangle(0, 0, TilesetWidth, TilesetHeight).Contains(_targets.ToRectangle()) == false)
+                if (new Rectangle(0, 0, TilesetWidth, TilesetHeight).Contains(_targets.ToTargetRectangle()) == false)
                 {
                     // Reset to original selection, and return
                     _targets = _swaps;
@@ -499,7 +499,7 @@ namespace GMare.Controls
                 }
 
                 // Get an array of selected tile ids
-                _targets.Tiles = GMareBrush.RectangleToTiles(_targets.ToRectangle(), TilesetWidth, SnapSize);
+                _targets.Tiles = GMareBrush.RectangleToTiles(_targets.ToTargetRectangle(), TilesetWidth, SnapSize);
 
                 // Get new target tiles
                 int[] tiles = _targets.ToArray();
@@ -537,7 +537,7 @@ namespace GMare.Controls
             Point snap = GetSnappedPoint(PointToClient(Cursor.Position));
 
             // Empty selection
-            if (_targets == null || _targets.ToRectangle().Contains(snap) == false)
+            if (_targets == null || _targets.ToTargetRectangle().Contains(snap) == false)
                 return;
 
             // Do action based on context action

@@ -107,41 +107,25 @@ namespace GMare.Objects
     }
 
     /// <summary>
-    /// Describes different data node types
+    /// Version compare result types
     /// </summary>
-    public enum DataNodeType
+    public enum VersionResultType
     {
-        Parent,
-        PropertyEnforced,
-        PropertyRoomName,
-        PropertyRoomCaption,
-        PropertyRoomCode,
-        PropertyRoomSpeed,
-        PropertyRoomPersistent,
-        PropertyRoomColor,
-        PropertyRoomWidth,
-        PropertyRoomHeight,
-        PropertyRoomColumns,
-        PropertyRoomRows,
-        PropertyBackgroundTileWidth,
-        PropertyBackgroundTileHeight,
-        PropertyBackgroundSeparationX,
-        PropertyBackgroundSeparationY,
-        PropertyBackgroundOffsetX,
-        PropertyBackgroundOffsetY,
-        PropertyBackgroundWidth,
-        PropertyBackgroundHeight,
-        PropertyBackgroundColumns,
-        PropertyBackgroundRows,
-        PropertyLayerName,
-        PropertyLayerDepth,
-        PropertyTileId,
-        PropertyTileColor,
-        PropertyTileScaleX,
-        PropertyTileScaleY,
-        PropertyInstanceObjectId,
-        PropertyInstanceCode,
-        PropertyInstanceX,
-        PropertyInstanceY
+        Greater,
+        Less,
+        Equal
+    }
+
+    /// <summary>
+    /// Custom cursor types
+    /// </summary>
+    public enum CursorType
+    {
+        Pencil,
+        Bucket,
+        Cross,
+        HandOpen,
+        HandClosed,
+        Eraser
     }
 }

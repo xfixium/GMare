@@ -275,7 +275,7 @@ namespace GMare.Forms
                                 continue;
 
                             // Create a new rectangle that represents the source rectangle
-                            Point point = GMareBrush.TileIdToPosition(layer.Tiles[col, row].TileId, roomWidth, roomTileSize);
+                            Point point = GMareBrush.TileIdToSourcePosition(layer.Tiles[col, row].TileId, roomWidth, roomTileSize);
 
                             // Set tile data text based on desired array type
                             switch (arrayType)
@@ -310,7 +310,7 @@ namespace GMare.Forms
 
                             // Create a new rectangle that represents the source rectangle
                             Rectangle rect = new Rectangle();
-                            rect.Location = GMareBrush.TileIdToPosition(layer.Tiles[col, row].TileId, roomWidth, roomTileSize);
+                            rect.Location = GMareBrush.TileIdToSourcePosition(layer.Tiles[col, row].TileId, roomWidth, roomTileSize);
                             rect.Size = roomTileSize;
 
                             // Set tile data text based on desired array type

@@ -135,6 +135,18 @@
     <Compile Include="Controls\GMareTileConversionPanel.Designer.cs">
       <DependentUpon>GMareTileConversionPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\PyxUnitNumericUpDown.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\PyxUnitNumericUpDown.designer.cs">
+      <DependentUpon>PyxUnitNumericUpDown.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\GMareTilesetRefactorEditor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\GMareTilesetRefactorEditor.Designer.cs">
+      <DependentUpon>GMareTilesetRefactorEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\AboutForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -381,6 +393,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\GMareTileEditor.resx">
       <DependentUpon>GMareTileEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\PyxUnitNumericUpDown.resx">
+      <DependentUpon>PyxUnitNumericUpDown.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\GMareTilesetRefactorEditor.resx">
+      <DependentUpon>GMareTilesetRefactorEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
@@ -853,6 +871,33 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\highlighter-color.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\switch.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ruler.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\image-map1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cursor_brush.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cursor_closed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cursor_fill.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cursor_open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cursor_seletion.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cursor_eraser.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

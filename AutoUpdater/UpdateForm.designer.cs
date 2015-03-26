@@ -94,11 +94,11 @@ namespace AutoUpdaterDotNET
             // 
             // pyxPanel1
             // 
+            resources.ApplyResources(this.pyxPanel1, "pyxPanel1");
             this.pyxPanel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pyxPanel1.CheckerColor = System.Drawing.Color.Silver;
             this.pyxPanel1.CheckerSize = new System.Drawing.Size(16, 16);
             this.pyxPanel1.Controls.Add(this.webBrowser);
-            resources.ApplyResources(this.pyxPanel1, "pyxPanel1");
             this.pyxPanel1.Name = "pyxPanel1";
             this.pyxPanel1.Title = "";
             this.pyxPanel1.ToolTipText = "";

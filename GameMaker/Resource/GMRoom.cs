@@ -1330,7 +1330,7 @@ namespace GameMaker.Resource
         private int _x = 0;
         private int _y = 0;
         private int _objectId = -1;
-        private int _blendColor = 0;
+        private int _blendColor = 16777215;
         private bool _locked = false;
 
         #endregion
@@ -1414,7 +1414,7 @@ namespace GameMaker.Resource
         private string _backgroundName = "";
         private double _scaleX = 1;
         private double _scaleY = 1;
-        private int _blendColor = 0;
+        private int _blendColor = 16777215;
         private uint _uBlendColor = 4294967295;
         private int _x = 0;
         private int _y = 0;

@@ -618,45 +618,45 @@ namespace GMare.Graphics
         }
 
         /// <summary>
-        /// Deletes all textures from memory.
+        /// Deletes all textures from memory
         /// </summary>
         public static void DeleteTextures()
         {
-            // Iterate through textures, and dispose of them.
+            // Iterate through textures, and dispose of them
             foreach (ResTexture texture in _sprites.Values)
                 texture.Dispose();
 
-            // Clear all texture elements.
+            // Clear all texture elements
             _sprites.Clear();
         }
 
         /// <summary>
-        /// Deletes a texture from memory by id.
+        /// Deletes a texture from memory by id
         /// </summary>
         public static void DeleteTexture(int id)
         {
-            // Dispose of desired texture.
+            // Dispose of desired texture
             _sprites[id].Dispose();
             _sprites.Remove(id);
         }
 
         /// <summary>
-        /// Deletes all the tilemap textures.
+        /// Deletes all the tilemap textures
         /// </summary>
         public static void DeleteTilemaps()
         {
-            // If the tile map is not empty.
-            if (_tileMaps != null)
-            {
-                // Iterate through textures, and dispose of them.
-                for (int i = 0; i < _tileMaps.Count; i++)
-                    for (int x = 0; x < _tileMaps[i].GetLength(0); x++)
-                        for (int y = 0; y < _tileMaps[i].GetLength(1); y++)
-                            _tileMaps[i][x, y].Dispose();
+            // If the tile map is empty, return
+            if (_tileMaps == null)
+                return;
 
-                // Clear elements.
-                _tileMaps.Clear();
-            }
+            // Iterate through textures, and dispose of them
+            for (int i = 0; i < _tileMaps.Count; i++)
+                for (int x = 0; x < _tileMaps[i].GetLength(0); x++)
+                    for (int y = 0; y < _tileMaps[i].GetLength(1); y++)
+                        _tileMaps[i][x, y].Dispose();
+
+            // Clear elements
+            _tileMaps.Clear();
         }
 
         /// <summary>

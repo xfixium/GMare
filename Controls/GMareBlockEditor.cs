@@ -115,7 +115,7 @@ namespace GMare.Controls
                     continue;
 
                 // Get drawing point
-                Point point = GMareBrush.TileIdToPosition(inst.TileId, Image.Width, tileSize);
+                Point point = GMareBrush.TileIdToSourcePosition(inst.TileId, Image.Width, tileSize);
                 point.X += 1;
                 point.Y += 1;
 
@@ -154,7 +154,7 @@ namespace GMare.Controls
             tileSize.Width += 1;
             tileSize.Height += 1;
 
-            int tileId = GMareBrush.PositionToTileId(snap.X, snap.Y, Image.Width, tileSize);
+            int tileId = GMareBrush.PositionToSourceTileId(snap.X, snap.Y, Image.Width, tileSize);
 
             // If left click and not an empty tile id, set object, if right click, erase
             if (e.Button == MouseButtons.Left && _objectId != -1)

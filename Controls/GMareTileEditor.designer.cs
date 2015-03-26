@@ -25,6 +25,18 @@ namespace GMare.Controls
                 }
             }
 
+            // If the tileset is not empty, dispose
+            if (_tileSelection != null)
+                _tileSelection.Dispose();
+
+            // If the image attributes are not empty, dispose
+            if (_atts != null)
+                _atts.Dispose();
+
+            // If the marching ants timer is not empty, dispose
+            if (_antsTimer != null)
+                _antsTimer.Dispose();
+
             if (disposing && (components != null))
             {
                 components.Dispose();

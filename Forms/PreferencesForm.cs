@@ -30,6 +30,7 @@ using System.IO;
 using System.Drawing;
 using System.Configuration;
 using System.Windows.Forms;
+using System.Collections.Generic;
 using GMare.Objects;
 
 namespace GMare.Forms
@@ -41,12 +42,13 @@ namespace GMare.Forms
     {
         #region Fields
 
-        private int _undoRedoMaximum = 0;      // The maximum amount allowed to undo/redo
-        private float _brightness = 0;         // The brightness of lower layers
-        private float _transparency = 0;       // The transparency of higher layers
-        private bool _updateTextures = false;  // If texture updates are required
-        private bool _updateUndoRedo = false;  // If undo/redo maximum update is required
-        private bool _showTips = true;         // If showing GMare tips
+        private int _undoRedoMaximum = 0;         // The maximum amount allowed to undo/redo
+        private float _brightness = 0;            // The brightness of lower layers
+        private float _transparency = 0;          // The transparency of higher layers
+        private bool _updateTextures = false;     // If texture updates are required
+        private bool _updateUndoRedo = false;     // If undo/redo maximum update is required
+        private bool _showTips = true;            // If showing GMare tips
+        private bool _showLayerCursorTip = true;  // If showing layer cursor tip
 
         #endregion
 
@@ -100,12 +102,14 @@ namespace GMare.Forms
             _brightness = App.GetConfigFloat(App.LowerLayerBrightnessAppKey, App.LowerLayerBrightnessAppDefault);
             _transparency = App.GetConfigFloat(App.UpperLayerTransparencyAppKey, App.UpperLayerTransparencyAppDefault);
             _showTips = App.GetConfigBool(App.ShowTipsAppKey, App.ShowTipsAppDefault);
+            _showLayerCursorTip = App.GetConfigBool(App.ShowLayerCursorTipAppKey, App.ShowLayerCursorTipAppDefault);
 
             // Set UI
             nudMaximumUndoRedo.Value = _undoRedoMaximum;
             nudLowerLayerBrightness.Value = (decimal)_brightness;
             nudUpperLayerTransparency.Value = (decimal)_transparency;
             chkShowTips.Checked = _showTips;
+            chkShowLayerCursorTip.Checked = _showLayerCursorTip;
             grpAreaGrid.Checked = useAreaGrid;
             nudGridWidth.Value = areaWidth;
             nudGridHeight.Value = areaHeight;
@@ -145,11 +149,40 @@ namespace GMare.Forms
 
             try
             {
-                // Set the config with user values
-                config.AppSettings.Settings[App.UndoRedoMaximumAppKey].Value = nudMaximumUndoRedo.Value.ToString();
-                config.AppSettings.Settings[App.LowerLayerBrightnessAppKey].Value = nudLowerLayerBrightness.Value.ToString();
-                config.AppSettings.Settings[App.UpperLayerTransparencyAppKey].Value = nudUpperLayerTransparency.Value.ToString();
-                config.AppSettings.Settings[App.ShowTipsAppKey].Value = chkShowTips.Checked.ToString();
+                // The list of existing keys
+                List<string> keys = new List<string>(config.AppSettings.Settings.AllKeys);
+
+                // Undeo/Redo maximum
+                if (keys.Contains(App.UndoRedoMaximumAppKey))
+                    config.AppSettings.Settings[App.UndoRedoMaximumAppKey].Value = nudMaximumUndoRedo.Value.ToString();
+                else
+                    config.AppSettings.Settings.Add(App.UndoRedoMaximumAppKey, nudMaximumUndoRedo.Value.ToString());
+
+                // Lower layer brightness
+                if (keys.Contains(App.LowerLayerBrightnessAppKey))
+                    config.AppSettings.Settings[App.LowerLayerBrightnessAppKey].Value = nudLowerLayerBrightness.Value.ToString();
+                else
+                    config.AppSettings.Settings.Add(App.LowerLayerBrightnessAppKey, nudLowerLayerBrightness.Value.ToString());
+
+                // Upper layer transparency
+                if (keys.Contains(App.UpperLayerTransparencyAppKey))
+                    config.AppSettings.Settings[App.UpperLayerTransparencyAppKey].Value = nudUpperLayerTransparency.Value.ToString();
+                else
+                    config.AppSettings.Settings.Add(App.UpperLayerTransparencyAppKey, nudUpperLayerTransparency.Value.ToString());
+
+                // Show GMare tips
+                if (keys.Contains(App.ShowTipsAppKey))
+                    config.AppSettings.Settings[App.ShowTipsAppKey].Value = chkShowTips.Checked.ToString();
+                else
+                    config.AppSettings.Settings.Add(App.ShowLayerCursorTipAppKey, chkShowTips.Checked.ToString());
+
+                // Show layer cursor tip
+                if (keys.Contains(App.ShowLayerCursorTipAppKey))
+                    config.AppSettings.Settings[App.ShowLayerCursorTipAppKey].Value = chkShowLayerCursorTip.Checked.ToString();
+                else
+                    config.AppSettings.Settings.Add(App.ShowLayerCursorTipAppKey, chkShowLayerCursorTip.Checked.ToString());
+                
+                // Save the config
                 config.Save();
             }
             catch (Exception)

@@ -60,6 +60,7 @@ namespace GMare.Controls
         private Rectangle _selection = new Rectangle();      // Selection rectangle
         private Point _origin = Point.Empty;                 // Origin point of the selection
         private bool _avoidMouseEvents = false;              // If avoiding mouse events
+        private bool _showGrid = false;                      // If displaying the tile grid
 
         #endregion
 
@@ -86,7 +87,7 @@ namespace GMare.Controls
 
                 // If tiles, set selection rectangle
                 if (_tileBrush != null)
-                    _selection = _tileBrush.ToRectangle();
+                    _selection = _tileBrush.ToTargetRectangle();
 
                 UpdateBackBuffer();
             }
@@ -113,6 +114,12 @@ namespace GMare.Controls
         {
             get { return _avoidMouseEvents; }
             set { _avoidMouseEvents = value; }
+        }
+
+        public bool ShowGrid
+        {
+            get { return _showGrid; }
+            set { _showGrid = value; UpdateBackBuffer(); }
         }
 
         #endregion
@@ -145,6 +152,7 @@ namespace GMare.Controls
         {
             // Draw highlights and selection rectangle
             DrawHighlights(gfx);
+            DrawGrid(gfx);
             DrawSelection(gfx);
         }
 
@@ -330,7 +338,7 @@ namespace GMare.Controls
                         cell.Y = (int)(row * SnapSize.Height);
 
                         // If the highlight brush does not contain the iterated tile id, continue
-                        if (!_highlighter.Contains(GMareBrush.PositionToTileId(cell.X, cell.Y, Image.Width, SnapSize)))
+                        if (!_highlighter.Contains(GMareBrush.PositionToSourceTileId(cell.X, cell.Y, Image.Width, SnapSize)))
                             continue;
 
                         // Draw highlight
@@ -367,6 +375,42 @@ namespace GMare.Controls
             // Dispose
             black.Dispose();
             white.Dispose();
+        }
+
+        /// <summary>
+        /// Draws a grid based on grid size
+        /// </summary>
+        private void DrawGrid(System.Drawing.Graphics gfx)
+        {
+            // If not drawing the tile grid, return
+            if (!_showGrid)
+                return;
+
+            // Calculate row and column amounts
+            int cols = (int)Math.Floor((double)(Image.Width) / (double)(SnapSize.Width));
+            int rows = (int)Math.Floor((double)(Image.Height) / (double)(SnapSize.Height));
+
+            // Create a rectangle
+            Rectangle cell = new Rectangle(0, 0, SnapSize.Width, SnapSize.Height);
+
+            // Draw the tile grid
+            using (Pen gridPen = new Pen(Color.FromArgb(128, Color.Black)))
+            {
+                // Iterate through vertical tiles
+                for (int row = 0; row < rows; row++)
+                {
+                    // Iterate through horizontal tiles
+                    for (int col = 0; col < cols; col++)
+                    {
+                        // Get position coordinates
+                        cell.X = (int)(col * SnapSize.Width);
+                        cell.Y = (int)(row * SnapSize.Height);
+
+                        // Draw highlight
+                        gfx.DrawRectangle(gridPen, cell);
+                    }
+                }
+            }
         }
 
         /// <summary>
