@@ -56,7 +56,8 @@ namespace GMare.Graphics
         private static Color _blendColor = Color.White;                                           // Renderer's blend color.
         private static Rectangle _viewport = Rectangle.Empty;                                     // Canvas viewport.
         private static Rectangle _scissor = Rectangle.Empty;                                      // Canvas scissor.
-        private static float _screenScale = 1.0f;                                                 // Canvas scale.
+        private static float _screenScaleX = 1.0f;                                                // Canvas scale.
+        private static float _screenScaleY = 1.0f;                                                // Canvas scale.
         private static int _offsetX = 0;                                                          // Canvas horizontal drawing offset.
         private static int _offsetY = 0;                                                          // Canvas vertical drawing offset.
         private static bool _initialized = false;                                                 // Whether the renderer has been initialized. 
@@ -171,10 +172,19 @@ namespace GMare.Graphics
         /// <summary>
         /// Gets or sets the canvas scaling.
         /// </summary>
-        public static float ScreenScale
+        public static float ScreenScaleX
         {
-            get { return _screenScale; }
-            set { _screenScale = value; }
+            get { return _screenScaleX; }
+            set { _screenScaleX = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the canvas scaling.
+        /// </summary>
+        public static float ScreenScaleY
+        {
+            get { return _screenScaleY; }
+            set { _screenScaleY = value; }
         }
 
         /// <summary>
@@ -311,8 +321,11 @@ namespace GMare.Graphics
             // Enable line stipple
             OpenGL.glEnable(GLOption.LineStipple);
 
+            // Use smaller scale
+            float scale = _screenScaleX > _screenScaleY ? _screenScaleY : _screenScaleX;
+
             // Set stipple pattern
-            OpenGL.glLineStipple(factor * (int)_screenScale, pattern);
+            OpenGL.glLineStipple(factor * (int)scale, pattern);
 
             // Draw lines
             DrawLineBatch();
@@ -362,8 +375,11 @@ namespace GMare.Graphics
             // Enable line stipple.
             OpenGL.glEnable(GLOption.LineStipple);
 
+            // Use smaller scale
+            float scale = _screenScaleX > _screenScaleY ? _screenScaleY : _screenScaleX;
+
             // Set stipple pattern.
-            OpenGL.glLineStipple(factor * (int)_screenScale, pattern);
+            OpenGL.glLineStipple(factor * (int)scale, pattern);
 
             // Draw the rectangle.
             DrawRectangle(rectangle, color, true);

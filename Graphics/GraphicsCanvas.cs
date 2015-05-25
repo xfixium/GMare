@@ -150,9 +150,9 @@ namespace GMare.Graphics
             OpenGL.glMatrixMode(GLMatrixMode.ModelView);
             OpenGL.glLoadIdentity();
             OpenGL.glTranslated(0.375, 0.375, 0);
-            OpenGL.glScalef(GraphicsManager.ScreenScale, GraphicsManager.ScreenScale, 0);
+            OpenGL.glScalef(GraphicsManager.ScreenScaleX, GraphicsManager.ScreenScaleY, 0);
             OpenGL.glViewport(0, 0, _control.ClientSize.Width, _control.ClientSize.Height);
-            OpenGL.glLineWidth(GraphicsManager.ScreenScale);
+            OpenGL.glLineWidth(GraphicsManager.ScreenScaleX < GraphicsManager.ScreenScaleY ? GraphicsManager.ScreenScaleY : GraphicsManager.ScreenScaleX);
         }
 
         /// <summary>

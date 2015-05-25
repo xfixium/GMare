@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.grpMain = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxTabbedGroupBox();
+            this.chkShowLayerCursorTip = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxCheckBox();
             this.chkShowTips = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxCheckBox();
             this.nudUpperLayerTransparency = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
             this.lblUpperLayerTransparency = new System.Windows.Forms.Label();
@@ -44,7 +45,10 @@
             this.nudGridWidth = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
             this.nudGridHeight = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
             this.lblGridWidth = new System.Windows.Forms.Label();
-            this.chkShowLayerCursorTip = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxCheckBox();
+            this.nudHorizontalMagnificationMultiplier = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
+            this.lblHorizontalMagnificationMultiplier = new System.Windows.Forms.Label();
+            this.nudVerticalMagnificationMultiplier = new Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown();
+            this.lblVerticalMagnificationMultiplier = new System.Windows.Forms.Label();
             this.grpMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudUpperLayerTransparency)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLowerLayerBrightness)).BeginInit();
@@ -52,12 +56,18 @@
             this.grpAreaGrid.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudGridWidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGridHeight)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudHorizontalMagnificationMultiplier)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudVerticalMagnificationMultiplier)).BeginInit();
             this.SuspendLayout();
             // 
             // grpMain
             // 
             this.grpMain.BackColor = System.Drawing.Color.Transparent;
             this.grpMain.CenterStatus = false;
+            this.grpMain.Controls.Add(this.nudVerticalMagnificationMultiplier);
+            this.grpMain.Controls.Add(this.lblVerticalMagnificationMultiplier);
+            this.grpMain.Controls.Add(this.nudHorizontalMagnificationMultiplier);
+            this.grpMain.Controls.Add(this.lblHorizontalMagnificationMultiplier);
             this.grpMain.Controls.Add(this.chkShowLayerCursorTip);
             this.grpMain.Controls.Add(this.chkShowTips);
             this.grpMain.Controls.Add(this.nudUpperLayerTransparency);
@@ -72,18 +82,32 @@
             this.grpMain.Name = "grpMain";
             this.grpMain.Padding = new System.Windows.Forms.Padding(10, 12, 10, 30);
             this.grpMain.ShowStatusBar = false;
-            this.grpMain.Size = new System.Drawing.Size(232, 132);
+            this.grpMain.Size = new System.Drawing.Size(232, 180);
             this.grpMain.StatusBarHeight = 24;
             this.grpMain.StatusBarText = "Status:";
             this.grpMain.TabIndex = 0;
             this.grpMain.TabStop = false;
+            // 
+            // chkShowLayerCursorTip
+            // 
+            this.chkShowLayerCursorTip.AutoSize = true;
+            this.chkShowLayerCursorTip.Checked = true;
+            this.chkShowLayerCursorTip.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkShowLayerCursorTip.Location = new System.Drawing.Point(12, 152);
+            this.chkShowLayerCursorTip.Name = "chkShowLayerCursorTip";
+            this.chkShowLayerCursorTip.Size = new System.Drawing.Size(178, 17);
+            this.chkShowLayerCursorTip.TabIndex = 7;
+            this.chkShowLayerCursorTip.Text = "Show Selected Layer Cursor Tip";
+            this.chkShowLayerCursorTip.ToolTipCaption = "";
+            this.chkShowLayerCursorTip.ToolTipText = "";
+            this.chkShowLayerCursorTip.UseVisualStyleBackColor = true;
             // 
             // chkShowTips
             // 
             this.chkShowTips.AutoSize = true;
             this.chkShowTips.Checked = true;
             this.chkShowTips.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShowTips.Location = new System.Drawing.Point(12, 88);
+            this.chkShowTips.Location = new System.Drawing.Point(12, 132);
             this.chkShowTips.Name = "chkShowTips";
             this.chkShowTips.Size = new System.Drawing.Size(111, 17);
             this.chkShowTips.TabIndex = 6;
@@ -185,7 +209,7 @@
             this.nudMaximumUndoRedo.Size = new System.Drawing.Size(40, 20);
             this.nudMaximumUndoRedo.TabIndex = 1;
             this.nudMaximumUndoRedo.ToolTipText = "The amount you can undo or redo room changes\r\nThe higher the number, the more mem" +
-    "ory it requires\r\nUse caution when adjusting this number";
+                "ory it requires\r\nUse caution when adjusting this number";
             this.nudMaximumUndoRedo.ToolTipTitle = "Maximum Undo/Redo Amount";
             this.nudMaximumUndoRedo.Value = new decimal(new int[] {
             10,
@@ -210,7 +234,7 @@
             this.butCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.butCancel.ImageXOffset = 0;
             this.butCancel.ImageYOffset = 0;
-            this.butCancel.Location = new System.Drawing.Point(160, 224);
+            this.butCancel.Location = new System.Drawing.Point(160, 272);
             this.butCancel.Name = "butCancel";
             this.butCancel.PushButtonImage = null;
             this.butCancel.Size = new System.Drawing.Size(76, 24);
@@ -232,7 +256,7 @@
             this.butOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.butOk.ImageXOffset = 0;
             this.butOk.ImageYOffset = 0;
-            this.butOk.Location = new System.Drawing.Point(80, 224);
+            this.butOk.Location = new System.Drawing.Point(80, 272);
             this.butOk.Name = "butOk";
             this.butOk.PushButtonImage = null;
             this.butOk.Size = new System.Drawing.Size(76, 24);
@@ -256,7 +280,7 @@
             this.grpAreaGrid.Controls.Add(this.nudGridWidth);
             this.grpAreaGrid.Controls.Add(this.nudGridHeight);
             this.grpAreaGrid.Controls.Add(this.lblGridWidth);
-            this.grpAreaGrid.Location = new System.Drawing.Point(4, 140);
+            this.grpAreaGrid.Location = new System.Drawing.Point(4, 188);
             this.grpAreaGrid.MinimumSize = new System.Drawing.Size(99, 0);
             this.grpAreaGrid.Name = "grpAreaGrid";
             this.grpAreaGrid.Padding = new System.Windows.Forms.Padding(10, 12, 10, 30);
@@ -347,25 +371,79 @@
             this.lblGridWidth.TabIndex = 0;
             this.lblGridWidth.Text = "Width:";
             // 
-            // chkShowLayerCursorTip
+            // nudHorizontalMagnificationMultiplier
             // 
-            this.chkShowLayerCursorTip.AutoSize = true;
-            this.chkShowLayerCursorTip.Checked = true;
-            this.chkShowLayerCursorTip.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShowLayerCursorTip.Location = new System.Drawing.Point(12, 108);
-            this.chkShowLayerCursorTip.Name = "chkShowLayerCursorTip";
-            this.chkShowLayerCursorTip.Size = new System.Drawing.Size(178, 17);
-            this.chkShowLayerCursorTip.TabIndex = 7;
-            this.chkShowLayerCursorTip.Text = "Show Selected Layer Cursor Tip";
-            this.chkShowLayerCursorTip.ToolTipCaption = "";
-            this.chkShowLayerCursorTip.ToolTipText = "";
-            this.chkShowLayerCursorTip.UseVisualStyleBackColor = true;
+            this.nudHorizontalMagnificationMultiplier.IgnoreHeight = true;
+            this.nudHorizontalMagnificationMultiplier.Location = new System.Drawing.Point(180, 84);
+            this.nudHorizontalMagnificationMultiplier.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.nudHorizontalMagnificationMultiplier.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nudHorizontalMagnificationMultiplier.Name = "nudHorizontalMagnificationMultiplier";
+            this.nudHorizontalMagnificationMultiplier.Size = new System.Drawing.Size(40, 20);
+            this.nudHorizontalMagnificationMultiplier.TabIndex = 9;
+            this.nudHorizontalMagnificationMultiplier.ToolTipText = "The multiplier applied to room magnification width";
+            this.nudHorizontalMagnificationMultiplier.ToolTipTitle = "Horizontal Magnification Multiplier:";
+            this.nudHorizontalMagnificationMultiplier.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // lblHorizontalMagnificationMultiplier
+            // 
+            this.lblHorizontalMagnificationMultiplier.AutoSize = true;
+            this.lblHorizontalMagnificationMultiplier.Location = new System.Drawing.Point(8, 88);
+            this.lblHorizontalMagnificationMultiplier.Name = "lblHorizontalMagnificationMultiplier";
+            this.lblHorizontalMagnificationMultiplier.Size = new System.Drawing.Size(167, 13);
+            this.lblHorizontalMagnificationMultiplier.TabIndex = 8;
+            this.lblHorizontalMagnificationMultiplier.Text = "Horizontal Magnification Multiplier:";
+            // 
+            // nudVerticalMagnificationMultiplier
+            // 
+            this.nudVerticalMagnificationMultiplier.IgnoreHeight = true;
+            this.nudVerticalMagnificationMultiplier.Location = new System.Drawing.Point(180, 108);
+            this.nudVerticalMagnificationMultiplier.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.nudVerticalMagnificationMultiplier.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nudVerticalMagnificationMultiplier.Name = "nudVerticalMagnificationMultiplier";
+            this.nudVerticalMagnificationMultiplier.Size = new System.Drawing.Size(40, 20);
+            this.nudVerticalMagnificationMultiplier.TabIndex = 11;
+            this.nudVerticalMagnificationMultiplier.ToolTipText = "The multiplier applied to room magnification height";
+            this.nudVerticalMagnificationMultiplier.ToolTipTitle = "Vertical Magnification Multiplier:";
+            this.nudVerticalMagnificationMultiplier.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // lblVerticalMagnificationMultiplier
+            // 
+            this.lblVerticalMagnificationMultiplier.AutoSize = true;
+            this.lblVerticalMagnificationMultiplier.Location = new System.Drawing.Point(8, 112);
+            this.lblVerticalMagnificationMultiplier.Name = "lblVerticalMagnificationMultiplier";
+            this.lblVerticalMagnificationMultiplier.Size = new System.Drawing.Size(155, 13);
+            this.lblVerticalMagnificationMultiplier.TabIndex = 10;
+            this.lblVerticalMagnificationMultiplier.Text = "Vertical Magnification Multiplier:";
             // 
             // PreferencesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(242, 255);
+            this.ClientSize = new System.Drawing.Size(242, 301);
             this.Controls.Add(this.grpAreaGrid);
             this.Controls.Add(this.butCancel);
             this.Controls.Add(this.butOk);
@@ -387,6 +465,8 @@
             this.grpAreaGrid.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudGridWidth)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGridHeight)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudHorizontalMagnificationMultiplier)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudVerticalMagnificationMultiplier)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -410,5 +490,9 @@
         private System.Windows.Forms.Label lblGridWidth;
         private System.Windows.Forms.Label lblGridSize;
         private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxCheckBox chkShowLayerCursorTip;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown nudVerticalMagnificationMultiplier;
+        private System.Windows.Forms.Label lblVerticalMagnificationMultiplier;
+        private Pyxosoft.Windows.Tools.PyxTools.Controls.PyxNumericUpDown nudHorizontalMagnificationMultiplier;
+        private System.Windows.Forms.Label lblHorizontalMagnificationMultiplier;
     }
 }

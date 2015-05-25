@@ -471,6 +471,9 @@ namespace GMare
                         pnlRoomEditor.Image = _background.GetCondensedTileset();
                     }
 
+                    // Trigger magnification update
+                    trkMagnify_ValueChanged(trkRoomMagnify, EventArgs.Empty);
+
                     // Set the status bar visibility
                     bool showTips = App.GetConfigBool(App.ShowTipsAppKey, true);
 
@@ -1738,17 +1741,21 @@ namespace GMare
             }
             else if (trkRoomMagnify.Name == name)
             {
+                // Get scale multipliers
+                float scaleX = App.GetConfigFloat(App.ScaleXAppKey, App.ScaleXAppDefault);
+                float scaleY = App.GetConfigFloat(App.ScaleYAppKey, App.ScaleYAppDefault);
+
                 // Offset values for scaling
                 switch (trkRoomMagnify.Value)
                 {
-                    case 1: pnlRoomEditor.Zoom(.12f); lblRoomMagnify.Text = "12%"; break;
-                    case 2: pnlRoomEditor.Zoom(.25f); lblRoomMagnify.Text = "25%"; break;
-                    case 3: pnlRoomEditor.Zoom(.50f); lblRoomMagnify.Text = "50%"; break;
-                    case 4: pnlRoomEditor.Zoom(1.0f); lblRoomMagnify.Text = "100%"; break;
-                    case 5: pnlRoomEditor.Zoom(2.0f); lblRoomMagnify.Text = "200%"; break;
-                    case 6: pnlRoomEditor.Zoom(3.0f); lblRoomMagnify.Text = "300%"; break;
-                    case 7: pnlRoomEditor.Zoom(4.0f); lblRoomMagnify.Text = "400%"; break;
-                    case 8: pnlRoomEditor.Zoom(5.0f); lblRoomMagnify.Text = "500%"; break;
+                    case 1: pnlRoomEditor.Zoom(.12f * scaleX, .12f * scaleY); lblRoomMagnify.Text = "12%"; break;
+                    case 2: pnlRoomEditor.Zoom(.25f * scaleX, .25f * scaleY); lblRoomMagnify.Text = "25%"; break;
+                    case 3: pnlRoomEditor.Zoom(.50f * scaleX, .50f * scaleY); lblRoomMagnify.Text = "50%"; break;
+                    case 4: pnlRoomEditor.Zoom(1.0f * scaleX, 1.0f * scaleY); lblRoomMagnify.Text = "100%"; break;
+                    case 5: pnlRoomEditor.Zoom(2.0f * scaleX, 2.0f * scaleY); lblRoomMagnify.Text = "200%"; break;
+                    case 6: pnlRoomEditor.Zoom(3.0f * scaleX, 3.0f * scaleY); lblRoomMagnify.Text = "300%"; break;
+                    case 7: pnlRoomEditor.Zoom(4.0f * scaleX, 4.0f * scaleY); lblRoomMagnify.Text = "400%"; break;
+                    case 8: pnlRoomEditor.Zoom(5.0f * scaleX, 5.0f * scaleY); lblRoomMagnify.Text = "500%"; break;
                 }
 
                 // Refresh mouse position after zoom
@@ -2155,6 +2162,9 @@ namespace GMare
             // SET UI
             SetUndoRedo();
             SetClipboard();
+
+            // Trigger magnification update
+            trkMagnify_ValueChanged(trkRoomMagnify, EventArgs.Empty);
         }
 
         /// <summary>
@@ -2450,6 +2460,9 @@ namespace GMare
 
             SetUndoRedo();
             SetClipboard();
+
+            // Trigger magnification update
+            trkMagnify_ValueChanged(trkRoomMagnify, EventArgs.Empty);
         }
 
         #endregion

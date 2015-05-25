@@ -56,6 +56,8 @@ namespace GMare.Objects
         public static string ShowBlendWarningAppKey = "ShowBlendWarning";              // Blend color warning app.config settings key
         public static string ShowTipsAppKey = "ShowTips";                              // If showing tips app.config settings key
         public static string ShowLayerCursorTipAppKey = "ShowLayerCursorTip";          // If showing the layer mouse tip app.config settings key
+        public static string ScaleXAppKey = "ScaleX";                                  // Horizontal scale multiplier app.config settings key
+        public static string ScaleYAppKey = "ScaleY";                                  // Vertical scale multiplier app.config settings key
         public static int UndoRedoMaximumAppDefault = 15;                              // Undo/Redo maximum default value
         public static float LowerLayerBrightnessAppDefault = -0.4f;                    // Lower layer brightness default value
         public static float UpperLayerTransparencyAppDefault = 0.4f;                   // Upper layer transparency default value
@@ -63,6 +65,8 @@ namespace GMare.Objects
         public static bool ShowBlendWarningAppDefault = false;                         // Blend color warning default value
         public static bool ShowTipsAppDefault = true;                                  // If showing tips default value
         public static bool ShowLayerCursorTipAppDefault = true;                        // If showing the layer mouse tip
+        public static float ScaleXAppDefault = 1f;                                     // Horizontal scale multiplier default value
+        public static float ScaleYAppDefault = 1f;                                     // Vertical scale multiplier default value
 
         #endregion
 

@@ -108,14 +108,14 @@ namespace GMare.Controls
 
                 // Get instance and viewport rectangles
                 Rectangle rect = new Rectangle(SelectedInstances[0].X, SelectedInstances[0].Y, obj.Image.Width, obj.Image.Height);
-                Rectangle view = new Rectangle(pnlRoom.Offset.X, pnlRoom.Offset.Y, (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom), (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom));
+                Rectangle view = new Rectangle(pnlRoom.Offset.X, pnlRoom.Offset.Y, (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom.X), (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom.Y));
 
                 // If the selected instance is not within the viewport
                 if (view.IntersectsWith(rect) == false)
                 {
                     // Calculate scroll position on selected instance so that it is centered on the control
-                    int x = rect.X - ((int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom) / 2) + (rect.Width / 2);
-                    int y = rect.Y - ((int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom) / 2) + (rect.Height / 2);
+                    int x = rect.X - ((int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom.X) / 2) + (rect.Width / 2);
+                    int y = rect.Y - ((int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom.Y) / 2) + (rect.Height / 2);
 
                     // Stay within minimum and maximum values
                     x = x < 0 ? 0 : x;
@@ -584,10 +584,10 @@ namespace GMare.Controls
             int y = sbVertical.Value - (e.Y - _previous.Y);
 
             // Check boundries
-            if (x >= sbHorizontal.Minimum && x <= App.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom) - 1)
+            if (x >= sbHorizontal.Minimum && x <= App.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom.X) - 1)
                 sbHorizontal.Value = x;
 
-            if (y >= sbVertical.Minimum && y <= App.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom) - 1)
+            if (y >= sbVertical.Minimum && y <= App.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom.Y) - 1)
                 sbVertical.Value = y;
 
             // Set new previous location
@@ -642,17 +642,17 @@ namespace GMare.Controls
             int thumb = 2;
 
             // If the room is wider than the room panel, show the horizontal scrollbar
-            if ((int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom) < App.Room.Width)
+            if ((int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom.X) < App.Room.Width)
                 pnlLayout.RowStyles[1].Height = 17;
 
             // If the room is taller than the room panel, show the vertical scrollbar
-            if ((int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom) < App.Room.Height)
+            if ((int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom.Y) < App.Room.Height)
                 pnlLayout.ColumnStyles[1].Width = 17;
 
             // If the offset does not make the maximum less than zero, set its value
-            if ((App.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom)) > 0)
+            if ((App.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom.X)) > 0)
             {
-                sbHorizontal.Maximum = App.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom);
+                sbHorizontal.Maximum = App.Room.Width - (int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom.X);
 
                 // If the horizontal maximum is a negative number
                 if (this.sbHorizontal.Maximum / thumb < 0)
@@ -676,9 +676,9 @@ namespace GMare.Controls
                 sbHorizontal.Value = 0;
 
             // If the offset does not make the maximum less than zero, set its value
-            if ((App.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom)) > 0)
+            if ((App.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom.Y)) > 0)
             {
-                sbVertical.Maximum = App.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom);
+                sbVertical.Maximum = App.Room.Height - (int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom.Y);
 
                 // If the vertical maximum is a negative number
                 if (sbVertical.Maximum / thumb < 0)
@@ -953,10 +953,10 @@ namespace GMare.Controls
         /// Magnifies the control and positions on mouse location
         /// </summary>
         /// <param name="amount">The amount to magnify</param>
-        public void Zoom(float amount)
+        public void Zoom(float scaleX, float scaleY)
         {
             // Set zoom
-            pnlRoom.Zoom = amount;
+            pnlRoom.Zoom = new PointF(scaleX, scaleY);
 
             // Set scrollbars
             SetScrollbars();
@@ -966,8 +966,8 @@ namespace GMare.Controls
                 return;
 
             // Calculate scroll position on mouse point, centered
-            int x = pnlRoom.MouseLocation.X - ((int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom) / 2);
-            int y = pnlRoom.MouseLocation.Y - ((int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom) / 2);
+            int x = pnlRoom.MouseLocation.X - ((int)(pnlRoom.ClientSize.Width / pnlRoom.Zoom.X) / 2);
+            int y = pnlRoom.MouseLocation.Y - ((int)(pnlRoom.ClientSize.Height / pnlRoom.Zoom.Y) / 2);
 
             // Stay within minimum and maximum values
             x = x < 0 ? 0 : x;

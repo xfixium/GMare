@@ -99,7 +99,7 @@
             this.pnlRoom.Snap = true;
             this.pnlRoom.TabIndex = 6;
             this.pnlRoom.ToolMode = GMare.Objects.ToolType.Brush;
-            this.pnlRoom.Zoom = 1F;
+            this.pnlRoom.Zoom = new System.Drawing.PointF(1F, 1F);
             this.pnlRoom.MousePositionChanged += new GMare.Controls.GMareRoomPanel.MousePositionHandler(this.pnlRoom_MousePositionChanged);
             this.pnlRoom.SelectedObjectChanged += new GMare.Controls.GMareRoomPanel.SelectedObjectChangedHandler(this.pnlRoom_SelectedObjectChanged);
             this.pnlRoom.SelectedInstancesPositionChanged += new GMare.Controls.GMareRoomPanel.InstancePositionHandler(this.pnlRoom_InstancesPositionChanged);
