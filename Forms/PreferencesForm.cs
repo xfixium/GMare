@@ -49,6 +49,8 @@ namespace GMare.Forms
         private bool _updateUndoRedo = false;     // If undo/redo maximum update is required
         private bool _showTips = true;            // If showing GMare tips
         private bool _showLayerCursorTip = true;  // If showing layer cursor tip
+        private float _scaleX = 1;                // The horizontal scale multiplier
+        private float _scaleY = 1;                // The vertical scale multiplier
 
         #endregion
 
@@ -103,6 +105,8 @@ namespace GMare.Forms
             _transparency = App.GetConfigFloat(App.UpperLayerTransparencyAppKey, App.UpperLayerTransparencyAppDefault);
             _showTips = App.GetConfigBool(App.ShowTipsAppKey, App.ShowTipsAppDefault);
             _showLayerCursorTip = App.GetConfigBool(App.ShowLayerCursorTipAppKey, App.ShowLayerCursorTipAppDefault);
+            _scaleX = App.GetConfigFloat(App.ScaleXAppKey, App.ScaleXAppDefault);
+            _scaleY = App.GetConfigFloat(App.ScaleYAppKey, App.ScaleYAppDefault);
 
             // Set UI
             nudMaximumUndoRedo.Value = _undoRedoMaximum;
@@ -113,6 +117,8 @@ namespace GMare.Forms
             grpAreaGrid.Checked = useAreaGrid;
             nudGridWidth.Value = areaWidth;
             nudGridHeight.Value = areaHeight;
+            nudHorizontalMagnificationMultiplier.Value = (decimal)_scaleX;
+            nudVerticalMagnificationMultiplier.Value = (decimal)_scaleY;
 
             // Trigger area grid change
             nudAreaGrid_ValueChanged(this, EventArgs.Empty);
@@ -181,7 +187,19 @@ namespace GMare.Forms
                     config.AppSettings.Settings[App.ShowLayerCursorTipAppKey].Value = chkShowLayerCursorTip.Checked.ToString();
                 else
                     config.AppSettings.Settings.Add(App.ShowLayerCursorTipAppKey, chkShowLayerCursorTip.Checked.ToString());
-                
+
+                // Horizontal scale multiplier
+                if (keys.Contains(App.ScaleXAppKey))
+                    config.AppSettings.Settings[App.ScaleXAppKey].Value = nudHorizontalMagnificationMultiplier.Value.ToString();
+                else
+                    config.AppSettings.Settings.Add(App.ScaleXAppKey, nudHorizontalMagnificationMultiplier.Value.ToString());
+
+                // Vertical scale multiplier
+                if (keys.Contains(App.ScaleYAppKey))
+                    config.AppSettings.Settings[App.ScaleYAppKey].Value = nudVerticalMagnificationMultiplier.Value.ToString();
+                else
+                    config.AppSettings.Settings.Add(App.ScaleYAppKey, nudVerticalMagnificationMultiplier.Value.ToString());
+
                 // Save the config
                 config.Save();
             }

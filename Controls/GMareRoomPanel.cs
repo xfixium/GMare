@@ -361,10 +361,10 @@ namespace GMare.Controls
         /// <summary>
         /// Gets or sets the scale factor of the room panel
         /// </summary>
-        public float Zoom
+        public PointF Zoom
         {
-            get { return GraphicsManager.ScreenScale; }
-            set { GraphicsManager.ScreenScale = value; Invalidate(); }
+            get { return new PointF(GraphicsManager.ScreenScaleX, GraphicsManager.ScreenScaleY); }
+            set { GraphicsManager.ScreenScaleX = value.X; GraphicsManager.ScreenScaleY = value.Y; Invalidate(); }
         }
 
         /// <summary>
@@ -1410,8 +1410,8 @@ namespace GMare.Controls
                                          (inst.Y > selection.Y ? inst.Y - selection.Y : selection.Y - inst.Y));
 
                 // Calculate instance position
-                int x = position.X + (int)(offset.X * Zoom);
-                int y = position.Y + (int)(offset.Y * Zoom);
+                int x = position.X + (int)(offset.X * Zoom.X);
+                int y = position.Y + (int)(offset.Y * Zoom.Y);
 
                 // Create pasting instance point
                 Point location = _snap ? GetTranslatedSnappedPoint(new Point(x, y), GridSize) : GetTranslatedPoint(new Point(x, y));
@@ -1960,8 +1960,8 @@ namespace GMare.Controls
             Rectangle viewport = GetViewport();
             PointF scale = PointF.Empty;
             int index = 0;
-            int cols = ((Offset.X + (int)(ClientSize.Width / Zoom)) / tileSize.Width) + 1;
-            int rows = ((Offset.Y + (int)(ClientSize.Height / Zoom)) / tileSize.Height) + 1;
+            int cols = ((Offset.X + (int)(ClientSize.Width / Zoom.X)) / tileSize.Width) + 1;
+            int rows = ((Offset.Y + (int)(ClientSize.Height / Zoom.Y)) / tileSize.Height) + 1;
             cols = cols > App.Room.Columns ? App.Room.Columns : cols;
             rows = rows > App.Room.Rows ? App.Room.Rows : rows;
 
@@ -2082,8 +2082,8 @@ namespace GMare.Controls
             Size canvas = GetSmallestCanvas();
 
             // Calculate line amounts
-            int cols = (int)((float)canvas.Width / (float)_gridX / Zoom) + 2;
-            int rows = (int)((float)canvas.Height / (float)_gridY / Zoom) + 2;
+            int cols = (int)((float)canvas.Width / (float)_gridX / Zoom.X) + 2;
+            int rows = (int)((float)canvas.Height / (float)_gridY / Zoom.Y) + 2;
 
             // Calculate offsets
             int offsetX = Offset.X % App.Room.Width;
@@ -2108,7 +2108,7 @@ namespace GMare.Controls
                         x1 = col * _gridX + snap.X;
                         y1 = snap.Y;
                         x2 = col * _gridX + snap.X;
-                        y2 = (int)(canvas.Height / Zoom) + snap.Y + _gridY;
+                        y2 = (int)(canvas.Height / Zoom.Y) + snap.Y + _gridY;
 
                         // Draw line
                         GraphicsManager.DrawLineCache(x1, y1, x2, y2, color);
@@ -2120,7 +2120,7 @@ namespace GMare.Controls
                         // Calculate coordinates
                         x1 = snap.X;
                         y1 = row * _gridY + snap.Y;
-                        x2 = (int)(canvas.Width / Zoom) + snap.X + _gridX;
+                        x2 = (int)(canvas.Width / Zoom.X) + snap.X + _gridX;
                         y2 = row * _gridY + snap.Y;
 
                         // Add line
@@ -2174,8 +2174,8 @@ namespace GMare.Controls
             Size canvas = GetSmallestCanvas();
 
             // Calculate line amounts
-            int cols = (int)((float)canvas.Width / (float)App.Room.AreaX / Zoom) + 2;
-            int rows = (int)((float)canvas.Height / (float)App.Room.AreaY / Zoom) + 2;
+            int cols = (int)((float)canvas.Width / (float)App.Room.AreaX / Zoom.X) + 2;
+            int rows = (int)((float)canvas.Height / (float)App.Room.AreaY / Zoom.Y) + 2;
 
             // Calculate offsets
             int offsetX = Offset.X % App.Room.Width;
@@ -2717,10 +2717,10 @@ namespace GMare.Controls
             Point point = new Point();
 
             // Calculate position with scroll offset
-            int offsetX = (int)(Offset.X * Zoom);
-            int offsetY = (int)(Offset.Y * Zoom);
-            point.X = (int)((x + offsetX) / Zoom);
-            point.Y = (int)((y + offsetY) / Zoom);
+            int offsetX = (int)(Offset.X * Zoom.X);
+            int offsetY = (int)(Offset.Y * Zoom.Y);
+            point.X = (int)((x + offsetX) / Zoom.X);
+            point.Y = (int)((y + offsetY) / Zoom.Y);
 
             // Return area corrected point
             return point;
@@ -2734,10 +2734,10 @@ namespace GMare.Controls
         public Point GetTranslatedPoint(Point point)
         {
             // Calculate snapped position
-            int offsetX = (int)(Offset.X * Zoom);
-            int offsetY = (int)(Offset.Y * Zoom);
-            int x = (int)((point.X + offsetX) / Zoom);
-            int y = (int)((point.Y + offsetY) / Zoom);
+            int offsetX = (int)(Offset.X * Zoom.X);
+            int offsetY = (int)(Offset.Y * Zoom.Y);
+            int x = (int)((point.X + offsetX) / Zoom.X);
+            int y = (int)((point.Y + offsetY) / Zoom.Y);
 
             return new Point(x, y);
         }
@@ -2751,12 +2751,12 @@ namespace GMare.Controls
         private Point GetTranslatedSnappedPoint(Point position, Size snap)
         {
             // Calculate snapped position
-            int width = (int)(snap.Width * Zoom);
-            int height = (int)(snap.Height * Zoom);
-            int offsetX = (int)(Offset.X * Zoom);
-            int offsetY = (int)(Offset.Y * Zoom);
-            int x = (int)((((position.X + offsetX) / width) * width) / Zoom);
-            int y = (int)((((position.Y + offsetY) / height) * height) / Zoom);
+            int width = (int)(snap.Width * Zoom.X);
+            int height = (int)(snap.Height * Zoom.Y);
+            int offsetX = (int)(Offset.X * Zoom.X);
+            int offsetY = (int)(Offset.Y * Zoom.Y);
+            int x = (int)((((position.X + offsetX) / width) * width) / Zoom.X);
+            int y = (int)((((position.Y + offsetY) / height) * height) / Zoom.Y);
 
             return new Point(x, y);
         }
@@ -2775,12 +2775,12 @@ namespace GMare.Controls
                 return size;
 
             // Check for the smallest width
-            if (ClientSize.Width > (int)(App.Room.Width * Zoom))
-                size.Width = (int)(App.Room.Width * Zoom);
+            if (ClientSize.Width > (int)(App.Room.Width * Zoom.X))
+                size.Width = (int)(App.Room.Width * Zoom.X);
 
             // Check for the smallest height
-            if (ClientSize.Height > (int)(App.Room.Height * Zoom))
-                size.Height = (int)(App.Room.Height * Zoom);
+            if (ClientSize.Height > (int)(App.Room.Height * Zoom.Y))
+                size.Height = (int)(App.Room.Height * Zoom.Y);
 
             // Return the smallest possible drawing area
             return size;
@@ -2856,7 +2856,7 @@ namespace GMare.Controls
         /// <returns>A scaled viewport</returns>
         private Rectangle GetViewport()
         {
-            return new Rectangle(Offset.X, Offset.Y, (int)(ClientSize.Width / Zoom), (int)(ClientSize.Height / Zoom));
+            return new Rectangle(Offset.X, Offset.Y, (int)(ClientSize.Width / Zoom.X), (int)(ClientSize.Height / Zoom.Y));
         }
 
         #endregion
@@ -2998,13 +2998,13 @@ namespace GMare.Controls
                 snap.Y += _background.TileHeight;
 
             // Move scrollbars
-            if (snap.X >= Offset.X + (ClientSize.Width / Zoom))
+            if (snap.X >= Offset.X + (ClientSize.Width / Zoom.X))
                 SetScrollBar(_background.TileWidth, 0);
 
             if (snap.X < Offset.X && snap.X >= 0)
                 SetScrollBar(-_background.TileWidth, 0);
 
-            if (snap.Y > Offset.Y + (ClientSize.Height / Zoom))
+            if (snap.Y > Offset.Y + (ClientSize.Height / Zoom.Y))
                 SetScrollBar(0, _background.TileHeight);
 
             if (snap.Y < Offset.Y && snap.Y >= 0)
@@ -3524,7 +3524,13 @@ namespace GMare.Controls
             // If no object was selected, or there are instances selected,  or painting instances, 
             // or not moving a new instance, return
             if (_selectedObject == null || _selectedInstances.Count > 0 || _altKey || !_moving)
+            {
+                // Update when instances are created by alt key
+                if (_altKey && SelectedInstanceChanged != null)
+                    SelectedInstanceChanged();
+
                 return;
+            }
 
             // Not moving a new instance anymore
             _moving = false;
@@ -3590,8 +3596,8 @@ namespace GMare.Controls
         private GMareInstance GetInstance(Point point)
         {
             // Offset scroll position
-            point.X += (int)(Offset.X * Zoom);
-            point.Y += (int)(Offset.Y * Zoom);
+            point.X += (int)(Offset.X * Zoom.X);
+            point.Y += (int)(Offset.Y * Zoom.Y);
 
             // Iterate through instances backwards (Top items have more priority)
             for (int i = App.Room.Instances.Count - 1; i > -1; i--)
@@ -3605,18 +3611,18 @@ namespace GMare.Controls
 
                 // Get the instance rectangle
                 Size size = GraphicsManager.Sprites[instance.ObjectId].Size;
-                Rectangle rect = new Rectangle((int)(instance.X * Zoom), (int)(instance.Y * Zoom),
-                    (int)(size.Width * Zoom), (int)(size.Height * Zoom));
+                Rectangle rect = new Rectangle((int)(instance.X * Zoom.X), (int)(instance.Y * Zoom.Y),
+                    (int)(size.Width * Zoom.X), (int)(size.Height * Zoom.Y));
 
                 // If the rectangle contains the point
                 if (rect.Contains(point))
                 {
                     // Get location on the sprite
-                    int x = point.X - (int)(instance.X * Zoom);
-                    int y = point.Y - (int)(instance.Y * Zoom);
+                    int x = point.X - (int)(instance.X * Zoom.X);
+                    int y = point.Y - (int)(instance.Y * Zoom.Y);
 
                     // Get the pixel from the sprite.
-                    Color color = Color.FromArgb(GraphicsManager.Sprites[instance.ObjectId].Pixels[(int)(x / Zoom), (int)(y / Zoom)]);
+                    Color color = Color.FromArgb(GraphicsManager.Sprites[instance.ObjectId].Pixels[(int)(x / Zoom.X), (int)(y / Zoom.Y)]);
 
                     // If not on a transparent pixel (Pixels arranged in GDI format) :P
                     if (color.B != 0)

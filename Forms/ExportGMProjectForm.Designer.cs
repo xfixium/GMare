@@ -238,7 +238,7 @@ namespace GMare. Forms
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.lstBackgrounds.CellSize = new System.Drawing.Size(64, 64);
             this.lstBackgrounds.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.lstBackgrounds.EmptyListText = "Background Selection Disabled";
+            this.lstBackgrounds.EmptyListText = "Backgrounds Empty";
             this.lstBackgrounds.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lstBackgrounds.FormattingEnabled = true;
             this.lstBackgrounds.Glyph = null;

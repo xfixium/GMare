@@ -346,9 +346,6 @@ namespace GMare.Forms
         /// </summary>
         private void Verify()
         {
-            // If both a room node and background have been selected, enable the ok button
-            butExport.Enabled = tvRooms.SelectedNode != null && lstBackgrounds.SelectedItem != null ? true : false;
-
             // If no background, disable tile export
             if (App.Room.Backgrounds[0].Image == null)
             {
@@ -359,6 +356,9 @@ namespace GMare.Forms
                 butViewOptimization.Checked = false;
                 butViewOptimization.Enabled = false;
             }
+
+            // If both a room node and background have been selected, enable the ok button
+            butExport.Enabled = tvRooms.SelectedNode != null && (chkWriteTiles.Checked && lstBackgrounds.SelectedItem == null) ? false : true;
         }
 
         /// <summary>
@@ -431,19 +431,6 @@ namespace GMare.Forms
         /// <returns>If the room property set was sucessful</returns>
         private bool SetRoomProperties(GMRoom room, int id)
         {
-            // Get the game maker background selected
-            GMBackground background = (GMBackground)lstBackgrounds.SelectedItem;
-
-            // If the selected background dimensions do not match the GMare project's background
-            if (chkWriteTiles.Checked && (App.Room.Backgrounds[0].Image.Width != background.Width || App.Room.Backgrounds[0].Image.Height != background.Height))
-            {
-                // Give warning, and cancel export
-                DialogResult result = MessageBox.Show("The selected background's size does not match the background used for this room. Please select a background that is the same size as the used background.", 
-                    "GMare", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
-
-                return false;
-            }
-
             // Set room properties
             room.Id = id == -1 ? room.Id : id;
             room.Name = txtName.Text;
@@ -460,6 +447,19 @@ namespace GMare.Forms
             // If exporting tiles, set tiles
             if (chkWriteTiles.Checked)
             {
+                // Get the game maker background selected
+                GMBackground background = (GMBackground)lstBackgrounds.SelectedItem;
+
+                // If the selected background dimensions do not match the GMare project's background
+                if (chkWriteTiles.Checked && (App.Room.Backgrounds[0].Image.Width != background.Width || App.Room.Backgrounds[0].Image.Height != background.Height))
+                {
+                    // Give warning, and cancel export
+                    DialogResult result = MessageBox.Show("The selected background's size does not match the background used for this room. Please select a background that is the same size as the used background.",
+                        "GMare", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+
+                    return false;
+                }
+
                 // Copy the room's background, set the game maker background id
                 GMareBackground gmareBackground = App.Room.Backgrounds[0].Clone();
                 gmareBackground.GameMakerId = background.Id;
